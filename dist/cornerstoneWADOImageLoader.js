@@ -1,4 +1,4 @@
-/*! cornerstoneWADOImageLoader - v0.4.5 - 2014-09-21 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstoneWADOImageLoader - v0.4.5 - 2014-10-17 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO requests.  It currently does not support compressed
 // transfer syntaxes or big endian transfer syntaxes.  It will support implicit little endian transfer
@@ -129,6 +129,29 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
                 }
             }
         };
+        oReq.onprogress = function(oProgress) {
+            // console.log('progress:',oProgress)
+            
+            if (oProgress.lengthComputable) {  //evt.loaded the bytes browser receive
+                //evt.total the total bytes seted by the header
+                //
+                var loaded = oProgress.loaded;
+                var total = oProgress.total;
+                var percentComplete = Math.round((loaded / total)*100);
+                
+                $(document).trigger('CornerstoneImageLoadProgress', {
+                    fileURL: oProgress.target.responseURL,
+                    loaded: loaded,
+                    total: total,
+                    percentComplete: percentComplete
+                });
+            } else {
+                $(document).trigger('CornerstoneImageLoadProgress', {
+                    fileURL: oProgress.target.responseURL,
+                    loaded: oProgress.loaded
+                });
+            }
+        };
         oReq.send();
 
         return deferred;
@@ -136,6 +159,7 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
 
     // steam the http and https prefixes so we can use wado URL's directly
     cornerstone.registerImageLoader('dicomweb', loadImage);
+    cornerstone.registerImageLoader('dicomwebs', loadImage);
 
     return cornerstoneWADOImageLoader;
 }($, cornerstone, cornerstoneWADOImageLoader));
