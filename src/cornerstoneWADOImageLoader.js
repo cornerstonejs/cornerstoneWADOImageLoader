@@ -158,7 +158,6 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
 
     // steam the http and https prefixes so we can use wado URL's directly
     cornerstone.registerImageLoader('dicomweb', loadImage);
-    cornerstone.registerImageLoader('dicomwebs', loadImage);
 
     return cornerstoneWADOImageLoader;
 }($, cornerstone, cornerstoneWADOImageLoader));
