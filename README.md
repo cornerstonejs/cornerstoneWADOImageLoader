@@ -12,7 +12,7 @@ Alpha but usable, see key features and backlog below.
 Live Examples
 ---------------
 
-[Click here for a live example of this library in use!](https://rawgithub.com/chafey/cornerstoneWADOImageLoader/master/examples/index.html)
+[Click here for a live example of this library in use!](http://rawgithub.com/chafey/cornerstoneWADOImageLoader/master/examples/index.html)
 
 You can also see it in action with the
 [cornerstoneDemo application](https://github.com/chafey/cornerstoneDemo).
@@ -25,6 +25,10 @@ Get a packaged source file:
 * [cornerstoneWADOImageLoader.js](https://raw.githubusercontent.com/chafey/cornerstoneWADOImageLoader/master/dist/cornerstoneWADOImageLoader.js)
 * [cornerstoneWADOImageLoader.min.js](https://raw.githubusercontent.com/chafey/cornerstoneWADOImageLoader/master/dist/cornerstoneWADOImageLoader.min.js)
 
+or form bower:
+
+> bower install cornerstoneWADOImageLoader
+
 Usage
 -------
 
@@ -32,9 +36,10 @@ The cornerstoneWADOImageLoader depends on the following libraries:
 
 1. [jQuery](https://github.com/jquery/jquery)
 2. [dicomParser](https://github.com/chafey/dicomParser) 
-3. [cornerestone](https://github.com/chafey/cornerStone)
+3. [cornerstone](https://github.com/chafey/cornerStone)
+4. [JPEG2000 Codec](https://github.com/OHIF/image-JPEG2000)
 
-All three of these libraries should be loaded before the cornerstoneWADOImageLoader.js.  See the source code 
+All of these libraries should be loaded before the cornerstoneWADOImageLoader.js.  See the source code
 for the [example](https://rawgithub.com/chafey/cornerstoneWADOImageLoader/master/examples/index.html).
 
 The image loader prefix is 'dicomweb'.  Here are some example imageId's:
@@ -82,11 +87,7 @@ Key Features
     * RGB Color
     * YBRFull Color
     * YBRFull422 Color (including encapsulated)
-* Supported transfer syntaxes
-    * Implicit Little Endian
-    * Explicit Little Endian
-
-NOTE: JPEG2000 is not supported!
+* Supports most popular transfer syntaxes [see full list](https://github.com/chafey/cornerstoneWADOImageLoader/blob/master/docs/TransferSyntaxes.md)
 
 Build System
 ============
@@ -123,15 +124,15 @@ Automatically running the build and unit tests after each source change:
 Backlog
 ------------
 
+* Refactor out code not specific to XMLHttpRequest into a separate library so it can be more easily re-used (e.g. by the cornerstoneFileImageLoader)
 * Support images with Pixel Padding
 * Mask out burned in overlays?
-* Consider alternatives to jQuery for deferred (when.js?)
 * Add error handling
-* Add support for compressed transfer syntaxes
-  * JPEG 2000
-  * JPEG
+* Add support for less commonly used transfer syntaxes
+  * JPEG-LS
   * RLE
-* Add support for less common pixel formats
+* Add support for less commonlu used pixel formats
+  * Pallete color
 
 
 FAQ

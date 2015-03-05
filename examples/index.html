@@ -17,9 +17,12 @@
         </p>
         <p>
             This example illustrates how to use the cornerstoneWADOImageLoader to get a DICOM P10
-            SOP instance using HTTP and display it in your web browser using cornerstone.  Only
-            uncompressed little endian transfer syntaxes are currently supported and use of an
-            explicit little endian transfer syntax is recommended.  For WADO requests,
+            SOP instance using HTTP and display it in your web browser using cornerstone.
+            Not all transfer syntaxes are currently supported,
+            <a href="https://github.com/chafey/cornerstoneWADOImageLoader/blob/master/docs/TransferSyntaxes.md">
+                click here for the full list.
+            </a>
+            For WADO requests,
             you can request that the server return the SOP Instance in explicit little endian by
             appending the following query string to your URL:
             <code>&transferSyntax=1.2.840.10008.1.2.1</code>
@@ -39,6 +42,8 @@
         <strong>Use of this example require IE10+ or any other modern browser.</strong>
 
     </div>
+
+    <div id="loadProgress">Image Load Progress:</div>
 
     <div class="row">
         <form class="form-horizontal">
@@ -77,6 +82,9 @@
 <!-- include the dicomParser library as the WADO image loader depends on it -->
 <script src="dicomParser.min.js"></script>
 
+<!-- jpeg 2000 codec -->
+<script src="jpx.min.js"></script>
+
 <!-- include the cornerstoneWADOImageLoader library -->
 <script src="../dist/cornerstoneWADOImageLoader.js"></script>
 
@@ -96,6 +104,10 @@
             cornerstone.displayImage(element, image);
         });
     }
+
+    $(cornerstone).bind('CornerstoneImageLoadProgress', function(eventData) {
+        $('#loadProgress').text('Image Load Progress: ' + eventData.percentComplete + "%");
+    });
 
     $(document).ready(function() {
 
