@@ -156,7 +156,8 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
             rowPixelSpacing: pixelSpacing.row,
             data: dataSet,
             invert: invert,
-            sizeInBytes: sizeInBytes
+            sizeInBytes: sizeInBytes,
+            metaData: cornerstoneWADOImageLoader.getImageMetadata(dataSet)
         };
 
         // TODO: deal with pixel padding and all of the various issues by setting it to min pixel value (or lower)

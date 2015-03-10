@@ -153,7 +153,8 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
                 rowPixelSpacing: pixelSpacing.row,
                 data: dataSet,
                 invert: false,
-                sizeInBytes: sizeInBytes
+                sizeInBytes: sizeInBytes,
+                metaData: cornerstoneWADOImageLoader.getImageMetadata(dataSet)
             };
 
             if(image.windowCenter === undefined) {

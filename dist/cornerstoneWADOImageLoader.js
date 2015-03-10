@@ -1,4 +1,4 @@
-/*! cornerstoneWADOImageLoader - v0.5.0 - 2015-02-26 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.5.0 - 2015-03-05 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO requests.  It currently does not support compressed
 // transfer syntaxes or big endian transfer syntaxes.  It will support implicit little endian transfer
@@ -100,7 +100,8 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
             // TODO: consider sending out progress messages here as we receive the pixel data
             if (oReq.readyState === 4)
             {
-                if (oReq.status === 200) {
+                // status code of zero when loading local (offline) files, at least on chrome
+                if (oReq.status === 200 || oReq.status === 0) {
                     // request succeeded, create an image object and resolve the deferred
 
                     // Parse the DICOM File
@@ -140,10 +141,17 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
                 var percentComplete = Math.round((loaded / total)*100);
 
                 $(cornerstone).trigger('CornerstoneImageLoadProgress', {
+                    fileURL: oProgress.target.responseURL,
                     imageId: imageId,
                     loaded: loaded,
                     total: total,
                     percentComplete: percentComplete
+                });
+            } else {
+                $(document).trigger('CornerstoneImageLoadProgress', {
+                    fileURL: oProgress.target.responseURL,
+                    imageId: imageId,
+                    loaded: oProgress.loaded
                 });
             }
         };

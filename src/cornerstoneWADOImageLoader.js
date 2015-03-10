@@ -99,7 +99,8 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
             // TODO: consider sending out progress messages here as we receive the pixel data
             if (oReq.readyState === 4)
             {
-                if (oReq.status === 200) {
+                // status code of zero when loading local (offline) files, at least on chrome
+                if (oReq.status === 200 || oReq.status === 0) {
                     // request succeeded, create an image object and resolve the deferred
 
                     // Parse the DICOM File
@@ -139,10 +140,17 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
                 var percentComplete = Math.round((loaded / total)*100);
 
                 $(cornerstone).trigger('CornerstoneImageLoadProgress', {
+                    fileURL: oProgress.target.responseURL,
                     imageId: imageId,
                     loaded: loaded,
                     total: total,
                     percentComplete: percentComplete
+                });
+            } else {
+                $(document).trigger('CornerstoneImageLoadProgress', {
+                    fileURL: oProgress.target.responseURL,
+                    imageId: imageId,
+                    loaded: oProgress.loaded
                 });
             }
         };
