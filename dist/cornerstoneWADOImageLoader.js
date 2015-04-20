@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.5.0 - 2015-03-05 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.5.0 - 2015-04-20 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO requests.  It currently does not support compressed
 // transfer syntaxes or big endian transfer syntaxes.  It will support implicit little endian transfer
@@ -107,7 +107,13 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
                     // Parse the DICOM File
                     var dicomPart10AsArrayBuffer = oReq.response;
                     var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
-                    var dataSet = dicomParser.parseDicom(byteArray);
+                    var dataSet;
+                    try {
+                        dataSet = dicomParser.parseDicom(byteArray);
+                    } catch (err) {
+                        console.error(err);
+                        dataSet = err.dataSet;
+                    }
 
                     // if multiframe, cache the parsed data set to speed up subsequent
                     // requests for the other frames
@@ -238,6 +244,28 @@ var cornerstoneWADOImageLoader = (function (cornerstoneWADOImageLoader) {
     cornerstoneWADOImageLoader.decodeYBRFull = decodeYBRFull;
 
     return cornerstoneWADOImageLoader;
+}(cornerstoneWADOImageLoader));
+var cornerstoneWADOImageLoader = (function (cornerstoneWADOImageLoader) {
+
+	"use strict";
+
+	if (cornerstoneWADOImageLoader === undefined) {
+		cornerstoneWADOImageLoader = {};
+	}
+
+	function getImageMetadata(dataSet) {
+		return {
+			frameOfReferenceUID: dataSet.string('x00200052'),
+			imageOrientationPatient: dataSet.string('x00200037'),
+			imagePositionPatient: dataSet.string('x00200032'),
+			pixelSpacing: dataSet.string('x00280030')
+		};
+	}
+
+	// module exports
+	cornerstoneWADOImageLoader.getImageMetadata = getImageMetadata;
+
+	return cornerstoneWADOImageLoader;
 }(cornerstoneWADOImageLoader));
 var cornerstoneWADOImageLoader = (function (cornerstoneWADOImageLoader) {
 
@@ -503,7 +531,8 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
                 rowPixelSpacing: pixelSpacing.row,
                 data: dataSet,
                 invert: false,
-                sizeInBytes: sizeInBytes
+                sizeInBytes: sizeInBytes,
+                metaData: cornerstoneWADOImageLoader.getImageMetadata(dataSet)
             };
 
             if(image.windowCenter === undefined) {
@@ -681,7 +710,8 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
             rowPixelSpacing: pixelSpacing.row,
             data: dataSet,
             invert: invert,
-            sizeInBytes: sizeInBytes
+            sizeInBytes: sizeInBytes,
+            metaData: cornerstoneWADOImageLoader.getImageMetadata(dataSet)
         };
 
         // TODO: deal with pixel padding and all of the various issues by setting it to min pixel value (or lower)

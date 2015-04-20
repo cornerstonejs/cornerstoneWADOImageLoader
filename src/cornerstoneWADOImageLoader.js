@@ -106,7 +106,13 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
                     // Parse the DICOM File
                     var dicomPart10AsArrayBuffer = oReq.response;
                     var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
-                    var dataSet = dicomParser.parseDicom(byteArray);
+                    var dataSet;
+                    try {
+                        dataSet = dicomParser.parseDicom(byteArray);
+                    } catch (err) {
+                        console.error(err);
+                        dataSet = err.dataSet;
+                    }
 
                     // if multiframe, cache the parsed data set to speed up subsequent
                     // requests for the other frames
