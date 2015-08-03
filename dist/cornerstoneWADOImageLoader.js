@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.5.2 - 2015-04-04 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.5.2 - 2015-08-03 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO requests.  It currently does not support compressed
 // transfer syntaxes or big endian transfer syntaxes.  It will support implicit little endian transfer
@@ -649,6 +649,16 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
         var storedPixelData = extractStoredPixels(dataSet, columns, rows, frame);
         var minMax = getMinMax(storedPixelData);
 
+        // Get the pixel format in a string to save as image.datatype
+        // This is useful for determining which texture-packing method to use
+        // in the WebGL renderer
+        var pixelFormat = getPixelFormat(dataSet);
+        var pixelFormats = {
+            1: 'uint8',
+            2: 'uint16',
+            3: 'int16'
+        };
+
         function getPixelData() {
             return storedPixelData;
         }
@@ -656,6 +666,7 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
         // Extract the various attributes we need
         var image = {
             imageId : imageId,
+            datatype: pixelFormats[pixelFormat],
             minPixelValue : minMax.min,
             maxPixelValue : minMax.max,
             slope: rescaleSlopeAndIntercept.slope,
