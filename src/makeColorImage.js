@@ -8,8 +8,7 @@
     function extractStoredPixels(dataSet, frame) {
 
         // special case for JPEG Baseline 8 bit
-        if(cornerstoneWADOImageLoader.isJPEGBaseline8Bit(dataSet) === true)
-        {
+        if(cornerstoneWADOImageLoader.isJPEGBaseline8Bit(dataSet) === true) {
           return cornerstoneWADOImageLoader.decodeJPEGBaseline8Bit(canvas, dataSet, frame);
         }
 
@@ -40,10 +39,9 @@
         var imageDataPromise;
         try {
           imageDataPromise = extractStoredPixels(dataSet, frame);
-        }
-        catch(err) {
+        } catch(err) {
           deferred.reject(err);
-          return deferred;
+          return deferred.promise();
         }
 
         imageDataPromise.then(function(imageData) {
@@ -103,7 +101,7 @@
             deferred.reject(error);
         });
 
-        return deferred;
+        return deferred.promise();
     }
 
     // module exports
