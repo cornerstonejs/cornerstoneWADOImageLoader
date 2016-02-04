@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.8.1 - 2016-02-03 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.8.1 - 2016-02-04 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -4241,7 +4241,8 @@ var JpegImage = (function jpegImage() {
         // TODO: deal with pixel padding and all of the various issues by setting it to min pixel value (or lower)
         // TODO: Mask out overlays embedded in pixel data above high bit
 
-        if(image.windowCenter === undefined) {
+        if(image.windowCenter === undefined || isNaN(image.windowCenter) ||
+           image.windowWidth === undefined || isNaN(image.windowWidth)) {
             var maxVoi = image.maxPixelValue * image.slope + image.intercept;
             var minVoi = image.minPixelValue * image.slope + image.intercept;
             image.windowWidth = maxVoi - minVoi;
