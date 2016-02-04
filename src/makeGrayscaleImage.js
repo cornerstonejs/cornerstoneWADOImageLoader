@@ -59,7 +59,7 @@
             bytesPerPixel = getBytesPerPixel(dataSet);
         } catch(error) {
             deferred.reject(error);
-            return deferred;
+            return deferred.promise();
         }
 
         var numPixels = rows * columns;
@@ -73,10 +73,9 @@
         var storedPixelData;
         try {
           storedPixelData = cornerstoneWADOImageLoader.decodeTransferSyntax(dataSet, frame);
-        }
-        catch(err) {
+        } catch(err) {
           deferred.reject(err);
-          return deferred;
+          return deferred.promise();
         }
 
         var minMax = cornerstoneWADOImageLoader.getMinMax(storedPixelData);
@@ -137,7 +136,7 @@
         }
 
         deferred.resolve(image);
-        return deferred;
+        return deferred.promise();
     }
 
     // module exports

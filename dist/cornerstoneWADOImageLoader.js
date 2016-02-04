@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.8.1 - 2016-02-03 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.8.1 - 2016-02-04 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -84,12 +84,12 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       {
         throw "no color space conversion for photometric interpretation " + photometricInterpretation;
       }
-      deferred.resolve(imageData);
-      return deferred;
     } catch (error) {
       deferred.reject(error);
-      return deferred;
+      return deferred.promise();
     }
+    deferred.resolve(imageData);
+    return deferred.promise();
   }
 
   // module exports
@@ -380,7 +380,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       }
 
     };
-    return deferred;
+    return deferred.promise();
   }
 
   function isJPEGBaseline8Bit(dataSet) {
@@ -3480,14 +3480,14 @@ var JpegImage = (function jpegImage() {
       }, function(error) {
         deferred.reject(error);
       });
-      return deferred;
+      return deferred.promise();
     }
 
     var fileIndex = parseInt(url);
     var file = cornerstoneWADOImageLoader.fileManager.get(fileIndex);
     if(file === undefined) {
       deferred.reject('unknown file index ' + url);
-      return deferred;
+      return deferred.promise();
     }
 
 
@@ -3508,7 +3508,7 @@ var JpegImage = (function jpegImage() {
         }, function(error) {
           deferred.reject(error);
         });
-        return deferred;
+        return deferred.promise();
       }
 
       var imagePromise = cornerstoneWADOImageLoader.createImageObject(dataSet, imageId, frame);
@@ -3520,7 +3520,7 @@ var JpegImage = (function jpegImage() {
     };
     fileReader.readAsArrayBuffer(file);
 
-    return deferred;
+    return deferred.promise();
   }
 
   // registery dicomweb and wadouri image loader prefixes
@@ -3697,7 +3697,7 @@ var JpegImage = (function jpegImage() {
     };
     xhr.send();
 
-    return deferred;
+    return deferred.promise();
   };
 }(cornerstoneWADOImageLoader));
 /**
@@ -3746,7 +3746,7 @@ var JpegImage = (function jpegImage() {
     var image = cornerstoneWADOImageLoader.imageManager.get(index);
     if(image === undefined) {
       deferred.reject('unknown imageId');
-      return deferred;
+      return deferred.promise();
     }
 
     var mediaType;// = 'image/dicom+jp2';
@@ -3781,7 +3781,7 @@ var JpegImage = (function jpegImage() {
       deferred.reject(reason);
     });
 
-    return deferred;
+    return deferred.promise();
   }
 
   // registery dicomweb and wadouri image loader prefixes
@@ -4009,8 +4009,7 @@ var JpegImage = (function jpegImage() {
     function extractStoredPixels(dataSet, frame) {
 
         // special case for JPEG Baseline 8 bit
-        if(cornerstoneWADOImageLoader.isJPEGBaseline8Bit(dataSet) === true)
-        {
+        if(cornerstoneWADOImageLoader.isJPEGBaseline8Bit(dataSet) === true) {
           return cornerstoneWADOImageLoader.decodeJPEGBaseline8Bit(canvas, dataSet, frame);
         }
 
@@ -4041,10 +4040,9 @@ var JpegImage = (function jpegImage() {
         var imageDataPromise;
         try {
           imageDataPromise = extractStoredPixels(dataSet, frame);
-        }
-        catch(err) {
+        } catch(err) {
           deferred.reject(err);
-          return deferred;
+          return deferred.promise();
         }
 
         imageDataPromise.then(function(imageData) {
@@ -4104,7 +4102,7 @@ var JpegImage = (function jpegImage() {
             deferred.reject(error);
         });
 
-        return deferred;
+        return deferred.promise();
     }
 
     // module exports
@@ -4171,7 +4169,7 @@ var JpegImage = (function jpegImage() {
             bytesPerPixel = getBytesPerPixel(dataSet);
         } catch(error) {
             deferred.reject(error);
-            return deferred;
+            return deferred.promise();
         }
 
         var numPixels = rows * columns;
@@ -4185,10 +4183,9 @@ var JpegImage = (function jpegImage() {
         var storedPixelData;
         try {
           storedPixelData = cornerstoneWADOImageLoader.decodeTransferSyntax(dataSet, frame);
-        }
-        catch(err) {
+        } catch(err) {
           deferred.reject(err);
-          return deferred;
+          return deferred.promise();
         }
 
         var minMax = cornerstoneWADOImageLoader.getMinMax(storedPixelData);
@@ -4249,7 +4246,7 @@ var JpegImage = (function jpegImage() {
         }
 
         deferred.resolve(image);
-        return deferred;
+        return deferred.promise();
     }
 
     // module exports
@@ -4316,7 +4313,7 @@ var JpegImage = (function jpegImage() {
 
     xhr.send();
 
-    return deferred;
+    return deferred.promise();
   }
 
   cornerstoneWADOImageLoader.internal.xhrRequest = xhrRequest;

@@ -55,12 +55,12 @@
       {
         throw "no color space conversion for photometric interpretation " + photometricInterpretation;
       }
-      deferred.resolve(imageData);
-      return deferred;
     } catch (error) {
       deferred.reject(error);
-      return deferred;
+      return deferred.promise();
     }
+    deferred.resolve(imageData);
+    return deferred.promise();
   }
 
   // module exports
