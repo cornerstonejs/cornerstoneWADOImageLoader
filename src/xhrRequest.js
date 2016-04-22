@@ -23,10 +23,9 @@
           var dataSet = dicomParser.parseDicom(byteArray);
 
           deferred.resolve(dataSet);
-        }
-        else {
+        } else {
           // request failed, reject the deferred
-          deferred.reject(xhr.response);
+          deferred.reject(xhr);
         }
       }
     };

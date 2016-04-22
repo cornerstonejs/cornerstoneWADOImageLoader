@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.9.2 - 2016-02-17 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.9.2 - 2016-04-22 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -4371,10 +4371,9 @@ var JpegImage = (function jpegImage() {
           var dataSet = dicomParser.parseDicom(byteArray);
 
           deferred.resolve(dataSet);
-        }
-        else {
+        } else {
           // request failed, reject the deferred
-          deferred.reject(xhr.response);
+          deferred.reject(xhr);
         }
       }
     };
