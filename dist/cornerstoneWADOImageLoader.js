@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.10.1 - 2016-05-04 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.10.2 - 2016-05-23 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -3635,7 +3635,7 @@ var JpegImage = (function jpegImage() {
       // if multiframe, cache the parsed data set to speed up subsequent
       // requests for the other frames
       if(frame !== undefined) {
-        var dataSet = cornerstoneWADOImageLoader.internal.multiFrameCacheHack[url];
+        cornerstoneWADOImageLoader.internal.multiFrameCacheHack[url] = dataSet;
         var imagePromise = cornerstoneWADOImageLoader.createImageObject(dataSet, imageId, frame);
         imagePromise.then(function(image) {
           deferred.resolve(image);
@@ -3661,6 +3661,7 @@ var JpegImage = (function jpegImage() {
   cornerstone.registerImageLoader('dicomfile', loadImage);
 
 }($, cornerstone, cornerstoneWADOImageLoader));
+
 /**
  */
 (function (cornerstoneWADOImageLoader) {
@@ -4409,7 +4410,7 @@ var JpegImage = (function jpegImage() {
   "use strict";
 
   // module exports
-  cornerstoneWADOImageLoader.version = '0.10.1';
+  cornerstoneWADOImageLoader.version = '0.10.2';
 
 }(cornerstoneWADOImageLoader));
 (function ($, cornerstone, cornerstoneWADOImageLoader) {
