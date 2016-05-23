@@ -50,7 +50,7 @@
       // if multiframe, cache the parsed data set to speed up subsequent
       // requests for the other frames
       if(frame !== undefined) {
-        var dataSet = cornerstoneWADOImageLoader.internal.multiFrameCacheHack[url];
+        cornerstoneWADOImageLoader.internal.multiFrameCacheHack[url] = dataSet;
         var imagePromise = cornerstoneWADOImageLoader.createImageObject(dataSet, imageId, frame);
         imagePromise.then(function(image) {
           deferred.resolve(image);
