@@ -99,6 +99,13 @@
                 image.windowWidth = 255;
                 image.windowCenter = 128;
             }
+
+            // invoke the callback to allow external code to modify the newly created image object if needed - e.g.
+            // apply vendor specific workarounds and such
+            if(cornerstoneWADOImageLoader.internal.options.imageCreated) {
+                cornerstoneWADOImageLoader.internal.options.imageCreated(image);
+            }
+
             deferred.resolve(image);
         }, function(error) {
             deferred.reject(error);
