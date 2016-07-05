@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.13.3 - 2016-06-02 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.13.4 - 2016-07-05 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -75,12 +75,12 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
     // if the dataset for this url is already loaded, use it
     if(cornerstoneWADOImageLoader.dataSetCacheManager.isLoaded(parsedImageId.url)) {
-      return loadDataSetFromPromise(cornerstoneWADOImageLoader.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url);
+      return loadDataSetFromPromise(cornerstoneWADOImageLoader.dataSetCacheManager.load(parsedImageId.url, loader, imageId), imageId, parsedImageId.frame, parsedImageId.url);
     }
 
     // if multiframe, load the dataSet via the dataSetCacheManager to keep it in memory
     if(parsedImageId.frame !== undefined) {
-      return loadDataSetFromPromise(cornerstoneWADOImageLoader.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url);
+      return loadDataSetFromPromise(cornerstoneWADOImageLoader.dataSetCacheManager.load(parsedImageId.url, loader, imageId), imageId, parsedImageId.frame, parsedImageId.url);
     }
 
     // not multiframe, load it directly and let cornerstone cache manager its lifetime
@@ -408,7 +408,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
   }
 
   // loads the dicom dataset from the wadouri sp
-  function load(uri, loadRequest) {
+  function load(uri, loadRequest, imageId) {
 
     // if already loaded return it right away
     if(loadedDataSets[uri]) {
@@ -428,7 +428,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     //console.log('loading ' + uri);
 
     // This uri is not loaded or being loaded, load it via an xhrRequest
-    var promise = loadRequest(uri);
+    var promise = loadRequest(uri, imageId);
     promises[uri] = promise;
 
     // handle success and failure of the XHR request load
