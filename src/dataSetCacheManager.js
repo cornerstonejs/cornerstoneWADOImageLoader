@@ -17,7 +17,7 @@
   }
 
   // loads the dicom dataset from the wadouri sp
-  function load(uri, loadRequest) {
+  function load(uri, loadRequest, imageId) {
 
     // if already loaded return it right away
     if(loadedDataSets[uri]) {
@@ -37,7 +37,7 @@
     //console.log('loading ' + uri);
 
     // This uri is not loaded or being loaded, load it via an xhrRequest
-    var promise = loadRequest(uri);
+    var promise = loadRequest(uri, imageId);
     promises[uri] = promise;
 
     // handle success and failure of the XHR request load
