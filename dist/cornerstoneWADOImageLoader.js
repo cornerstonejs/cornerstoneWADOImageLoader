@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-10 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-19 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -63,9 +63,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     var start = new Date().getTime();
     frame = frame || 0;
     var deferred = $.Deferred();
-    xhrRequestPromise.then(function(dicomPart10AsArrayBuffer, xhr) {
-      var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
-      var dataSet = dicomParser.parseDicom(byteArray);
+    xhrRequestPromise.then(function(dataSet, xhr) {
       var pixelData = getPixelData(dataSet, frame);
       var metaDataProvider = cornerstoneWADOImageLoader.wadouri.metaDataProvider;
       var transferSyntax =  dataSet.string('x00020010');
@@ -1079,7 +1077,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
  * image loader mechanism.  One reason a caller may need to do this is to determine the number of frames
  * in a multiframe sop instance so it can create the imageId's correctly.
  */
-(function (cornerstoneWADOImageLoader) {
+(function ($, cornerstoneWADOImageLoader) {
 
   "use strict";
 
@@ -1105,6 +1103,8 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     // loads the dicom dataset from the wadouri sp
   function load(uri, loadRequest) {
 
+    loadRequest = loadRequest ||  cornerstoneWADOImageLoader.internal.xhrRequest;
+
     // if already loaded return it right away
     if(loadedDataSets[uri]) {
       //console.log('using loaded dataset ' + uri);
@@ -1127,6 +1127,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     promises[uri] = promise;
 
     // handle success and failure of the XHR request load
+    var loadDeferred = $.Deferred();
     promise.then(function(dicomPart10AsArrayBuffer, xhr) {
       var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
       var dataSet = dicomParser.parseDicom(byteArray);
@@ -1135,6 +1136,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
         dataSet: dataSet,
         cacheCount: 1
       };
+      loadDeferred.resolve(dataSet);
       // done loading, remove the promise
       delete promises[uri];
     }, function () {
@@ -1142,7 +1144,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
         // error thrown, remove the promise
         delete promises[uri];
       });
-    return promise;
+    return loadDeferred;
   }
 
   // remove the cached/loaded dicom dataset for the specified wadouri to free up memory
@@ -1172,7 +1174,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     get: get
   };
 
-}(cornerstoneWADOImageLoader));
+}($, cornerstoneWADOImageLoader));
 /**
  */
 (function (cornerstoneWADOImageLoader) {
