@@ -483,27 +483,37 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   "use strict";
 
+  function addDecodeTask(imageFrame, transferSyntax, pixelData) {
+    return cornerstoneWADOImageLoader.webWorkerManager.addTask(
+      'decodeTask',
+      {
+        imageFrame : imageFrame,
+        transferSyntax : transferSyntax,
+        pixelData : pixelData
+      });
+  }
+
   function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas) {
     // Implicit VR Little Endian
     if(transferSyntax === "1.2.840.10008.1.2") {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // Explicit VR Little Endian
     else if(transferSyntax === "1.2.840.10008.1.2.1") {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // Explicit VR Big Endian (retired)
     else if (transferSyntax === "1.2.840.10008.1.2.2" ) {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // Deflate transfer syntax (deflated by dicomParser)
     else if(transferSyntax === '1.2.840.10008.1.2.1.99') {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // RLE Lossless
     else if (transferSyntax === "1.2.840.10008.1.2.5" )
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG Baseline lossy process 1 (8 bit)
     else if (transferSyntax === "1.2.840.10008.1.2.4.50")
@@ -512,43 +522,43 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       {
         return cornerstoneWADOImageLoader.decodeJPEGBaseline8Bit(imageFrame, canvas);
       } else {
-        return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+        return addDecodeTask(imageFrame, transferSyntax, pixelData);
       }
     }
     // JPEG Baseline lossy process 2 & 4 (12 bit)
     else if (transferSyntax === "1.2.840.10008.1.2.4.51")
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG Lossless, Nonhierarchical (Processes 14)
     else if (transferSyntax === "1.2.840.10008.1.2.4.57")
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG Lossless, Nonhierarchical (Processes 14 [Selection 1])
     else if (transferSyntax === "1.2.840.10008.1.2.4.70" )
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG-LS Lossless Image Compression
     else if (transferSyntax === "1.2.840.10008.1.2.4.80" )
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG-LS Lossy (Near-Lossless) Image Compression
     else if (transferSyntax === "1.2.840.10008.1.2.4.81" )
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
      // JPEG 2000 Lossless
     else if (transferSyntax === "1.2.840.10008.1.2.4.90")
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG 2000 Lossy
     else if (transferSyntax === "1.2.840.10008.1.2.4.91")
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     /* Don't know if these work...
      // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
@@ -1620,7 +1630,13 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
   var config = {
     maxWebWorkers: navigator.hardwareConcurrency || 1,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
-    codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js'
+    codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
+    otherWebWorkers: [{
+      path: 'foo.js',
+      config : {
+        someOption: 42
+      }
+    }]
   };
 
   var statistics = {
@@ -1658,13 +1674,9 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
           // a message to decode it
           webWorkers[i].decodeTask = decodeTask;
           webWorkers[i].worker.postMessage({
-            message: 'decodeTask',
+            message: decodeTask.message,
             workerIndex: i,
-            decodeTask: {
-              imageFrame : decodeTask.imageFrame,
-              transferSyntax : decodeTask.transferSyntax,
-              pixelData: decodeTask.pixelData,
-            }
+            data: decodeTask.data
           });
           return;
         }
@@ -1694,7 +1706,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
    * @param msg
    */
   function handleMessageFromWorker(msg) {
-    //console.log('handleMessageFromWorker', msg.data);
+    console.log('handleMessageFromWorker', msg.data);
     if(msg.data.message === 'initializeTaskCompleted') {
       webWorkers[msg.data.workerIndex].status = 'ready';
       startTaskOnWebWorker();
@@ -1709,6 +1721,15 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       msg.data.imageFrame.webWorkerTimeInMS = end - webWorkers[msg.data.workerIndex].decodeTask.start;
 
       webWorkers[msg.data.workerIndex].decodeTask.deferred.resolve(msg.data.imageFrame);
+      webWorkers[msg.data.workerIndex].decodeTask = undefined;
+      startTaskOnWebWorker();
+    } else {
+      webWorkers[msg.data.workerIndex].status = 'ready';
+      statistics.numDecodeTasksCompleted++;
+      //statistics.totalDecodeTimeInMS += msg.data.imageFrame.decodeTimeInMS;
+      //var end = new Date().getTime();
+      //msg.data.imageFrame.webWorkerTimeInMS = end - webWorkers[msg.data.workerIndex].decodeTask.start;
+      webWorkers[msg.data.workerIndex].decodeTask.deferred.resolve(msg.data);
       webWorkers[msg.data.workerIndex].decodeTask = undefined;
       startTaskOnWebWorker();
     }
@@ -1747,7 +1768,11 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
    * @param priority
    * @returns {*}
    */
-  function addTask(imageFrame, transferSyntax, pixelData, priority) {
+  function addTask(message, data, priority) {
+    if(!webWorkers.length) {
+      initialize();
+    }
+
     priority = priority || 0;
     var deferred = $.Deferred();
 
@@ -1760,11 +1785,10 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
     // insert the decode task in the sorted position
     decodeTasks.splice(i, 0, {
+      message: message,
       status: 'ready',
       added : new Date().getTime(),
-      imageFrame : imageFrame,
-      transferSyntax : transferSyntax,
-      pixelData: pixelData,
+      data: data,
       deferred: deferred,
       priority: priority
     });
@@ -1783,8 +1807,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     return statistics;
   }
 
-  initialize();
-  
+
   // module exports
   cornerstoneWADOImageLoader.webWorkerManager = {
     initialize : initialize,

@@ -4,27 +4,37 @@
 
   "use strict";
 
+  function addDecodeTask(imageFrame, transferSyntax, pixelData) {
+    return cornerstoneWADOImageLoader.webWorkerManager.addTask(
+      'decodeTask',
+      {
+        imageFrame : imageFrame,
+        transferSyntax : transferSyntax,
+        pixelData : pixelData
+      });
+  }
+
   function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas) {
     // Implicit VR Little Endian
     if(transferSyntax === "1.2.840.10008.1.2") {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // Explicit VR Little Endian
     else if(transferSyntax === "1.2.840.10008.1.2.1") {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // Explicit VR Big Endian (retired)
     else if (transferSyntax === "1.2.840.10008.1.2.2" ) {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // Deflate transfer syntax (deflated by dicomParser)
     else if(transferSyntax === '1.2.840.10008.1.2.1.99') {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // RLE Lossless
     else if (transferSyntax === "1.2.840.10008.1.2.5" )
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG Baseline lossy process 1 (8 bit)
     else if (transferSyntax === "1.2.840.10008.1.2.4.50")
@@ -33,43 +43,43 @@
       {
         return cornerstoneWADOImageLoader.decodeJPEGBaseline8Bit(imageFrame, canvas);
       } else {
-        return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+        return addDecodeTask(imageFrame, transferSyntax, pixelData);
       }
     }
     // JPEG Baseline lossy process 2 & 4 (12 bit)
     else if (transferSyntax === "1.2.840.10008.1.2.4.51")
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG Lossless, Nonhierarchical (Processes 14)
     else if (transferSyntax === "1.2.840.10008.1.2.4.57")
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG Lossless, Nonhierarchical (Processes 14 [Selection 1])
     else if (transferSyntax === "1.2.840.10008.1.2.4.70" )
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG-LS Lossless Image Compression
     else if (transferSyntax === "1.2.840.10008.1.2.4.80" )
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG-LS Lossy (Near-Lossless) Image Compression
     else if (transferSyntax === "1.2.840.10008.1.2.4.81" )
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
      // JPEG 2000 Lossless
     else if (transferSyntax === "1.2.840.10008.1.2.4.90")
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     // JPEG 2000 Lossy
     else if (transferSyntax === "1.2.840.10008.1.2.4.91")
     {
-      return cornerstoneWADOImageLoader.webWorkerManager.addTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData);
     }
     /* Don't know if these work...
      // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)

@@ -11,7 +11,13 @@
   var config = {
     maxWebWorkers: navigator.hardwareConcurrency || 1,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
-    codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js'
+    codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
+    otherWebWorkers: [{
+      path: 'foo.js',
+      config : {
+        someOption: 42
+      }
+    }]
   };
 
   var statistics = {
@@ -49,13 +55,9 @@
           // a message to decode it
           webWorkers[i].decodeTask = decodeTask;
           webWorkers[i].worker.postMessage({
-            message: 'decodeTask',
+            message: decodeTask.message,
             workerIndex: i,
-            decodeTask: {
-              imageFrame : decodeTask.imageFrame,
-              transferSyntax : decodeTask.transferSyntax,
-              pixelData: decodeTask.pixelData,
-            }
+            data: decodeTask.data
           });
           return;
         }
@@ -85,7 +87,7 @@
    * @param msg
    */
   function handleMessageFromWorker(msg) {
-    //console.log('handleMessageFromWorker', msg.data);
+    console.log('handleMessageFromWorker', msg.data);
     if(msg.data.message === 'initializeTaskCompleted') {
       webWorkers[msg.data.workerIndex].status = 'ready';
       startTaskOnWebWorker();
@@ -100,6 +102,15 @@
       msg.data.imageFrame.webWorkerTimeInMS = end - webWorkers[msg.data.workerIndex].decodeTask.start;
 
       webWorkers[msg.data.workerIndex].decodeTask.deferred.resolve(msg.data.imageFrame);
+      webWorkers[msg.data.workerIndex].decodeTask = undefined;
+      startTaskOnWebWorker();
+    } else {
+      webWorkers[msg.data.workerIndex].status = 'ready';
+      statistics.numDecodeTasksCompleted++;
+      //statistics.totalDecodeTimeInMS += msg.data.imageFrame.decodeTimeInMS;
+      //var end = new Date().getTime();
+      //msg.data.imageFrame.webWorkerTimeInMS = end - webWorkers[msg.data.workerIndex].decodeTask.start;
+      webWorkers[msg.data.workerIndex].decodeTask.deferred.resolve(msg.data);
       webWorkers[msg.data.workerIndex].decodeTask = undefined;
       startTaskOnWebWorker();
     }
@@ -138,7 +149,11 @@
    * @param priority
    * @returns {*}
    */
-  function addTask(imageFrame, transferSyntax, pixelData, priority) {
+  function addTask(message, data, priority) {
+    if(!webWorkers.length) {
+      initialize();
+    }
+
     priority = priority || 0;
     var deferred = $.Deferred();
 
@@ -151,11 +166,10 @@
 
     // insert the decode task in the sorted position
     decodeTasks.splice(i, 0, {
+      message: message,
       status: 'ready',
       added : new Date().getTime(),
-      imageFrame : imageFrame,
-      transferSyntax : transferSyntax,
-      pixelData: pixelData,
+      data: data,
       deferred: deferred,
       priority: priority
     });
@@ -174,8 +188,7 @@
     return statistics;
   }
 
-  initialize();
-  
+
   // module exports
   cornerstoneWADOImageLoader.webWorkerManager = {
     initialize : initialize,

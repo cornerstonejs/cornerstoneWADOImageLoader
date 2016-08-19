@@ -10,6 +10,13 @@ function initializeTask(data) {
   self.importScripts(config.codecsPath );
   //console.timeEnd('loadingCodecs');
 
+  // load any additional web workers
+  if(data.config.otherWebWorkers) {
+    for(var i=0; i < data.config.otherWebWorkers.length; i++) {
+      self.importScripts(data.config.otherWebWorkers[i].path);
+    }
+  }
+
   self.postMessage({
     message: 'initializeTaskCompleted',
     workerIndex: data.workerIndex
@@ -18,9 +25,10 @@ function initializeTask(data) {
 
 
 function decodeTask(data) {
-  var imageFrame = data.decodeTask.imageFrame;
-  var pixelData = new Uint8Array(data.decodeTask.pixelData);
-  var transferSyntax = data.decodeTask.transferSyntax;
+  console.log(data);
+  var imageFrame = data.data.imageFrame;
+  var pixelData = new Uint8Array(data.data.pixelData);
+  var transferSyntax = data.data.transferSyntax;
   
   cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData);
   cornerstoneWADOImageLoader.calculateMinMax(imageFrame);
@@ -34,12 +42,25 @@ function decodeTask(data) {
   }, [imageFrame.pixelData]);
 }
 
+messageMap = {
+  'initializeTask' : initializeTask,
+  'decodeTask' : decodeTask
+};
+
+
+function registerMessageHandler(message, handler) {
+  messageMap[message] = handler;
+}
+
+
 
 self.onmessage = function(msg) {
-  //console.log('web worker onmessage', msg.data);
-  if(msg.data.message === 'initializeTask') {
+  console.log('web worker onmessage', msg.data);
+  messageMap[msg.data.message](msg.data);
+  /*if(msg.data.message === 'initializeTask') {
     initializeTask(msg.data);
   } else if(msg.data.message === 'decodeTask') {
     decodeTask(msg.data);
   }
+  */
 };
