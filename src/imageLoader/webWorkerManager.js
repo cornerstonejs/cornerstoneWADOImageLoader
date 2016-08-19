@@ -2,12 +2,14 @@
 
   "use strict";
 
+  // array of waiting decode tasks sorted with highest priority task first
   var decodeTasks = [];
 
+  // array of web workers to dispatch decode tasks to
   var webWorkers = [];
 
   var config = {
-    maxWebWorkers: 1,
+    maxWebWorkers: navigator.hardwareConcurrency || 1,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
     codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js'
   };
@@ -18,24 +20,33 @@
     totalTimeDelayedInMS: 0,
   };
 
+  /**
+   * Function to start a task on a web worker
+   */
   function startTaskOnWebWorker() {
+    // return immediately if no decode tasks to do
     if(!decodeTasks.length) {
       return;
     }
-    
+
+    // look for a web worker that is ready
     for(var i=0; i < webWorkers.length; i++) {
        {
         if(webWorkers[i].status === 'ready') {
+          // mark it as busy so tasks are not assigned to it
           webWorkers[i].status = 'busy';
 
+          // get the highest priority decode task
           var decodeTask = decodeTasks.shift();
-
           decodeTask.start = new Date().getTime();
 
+          // update stats with how long this task was delayed (waiting in queue)
           var end = new Date().getTime();
           var delayed = end - decodeTask.added;
           statistics.totalTimeDelayedInMS += delayed;
 
+          // assign this decode task to this web worker and send the web worker
+          // a message to decode it
           webWorkers[i].decodeTask = decodeTask;
           webWorkers[i].worker.postMessage({
             message: 'decodeTask',
@@ -52,6 +63,11 @@
     }
   }
 
+  /**
+   * Helper function to set pixel data to the right typed array.  This is needed because web workers
+   * can transfer array buffers but not typed arrays
+   * @param imageFrame
+   */
   function setPixelDataType(imageFrame) {
     if(imageFrame.bitsAllocated === 16) {
       if(imageFrame.pixelRepresentation === 0) {
@@ -64,6 +80,10 @@
     }
   }
 
+  /**
+   * Function to handle a message from a web worker
+   * @param msg
+   */
   function handleMessageFromWorker(msg) {
     //console.log('handleMessageFromWorker', msg.data);
     if(msg.data.message === 'initializeTaskCompleted') {
@@ -85,6 +105,10 @@
     }
   }
 
+  /**
+   * Initialization function for the web worker manager - spawns web workers
+   * @param configObject
+   */
   function initialize(configObject) {
     if(configObject) {
       config = configObject;
@@ -105,22 +129,47 @@
     }
   }
 
-  function addTask(imageFrame, transferSyntax, pixelData) {
+  /**
+   * Function to add a decode task to be performed
+   *
+   * @param imageFrame
+   * @param transferSyntax
+   * @param pixelData
+   * @param priority
+   * @returns {*}
+   */
+  function addTask(imageFrame, transferSyntax, pixelData, priority) {
+    priority = priority || 0;
     var deferred = $.Deferred();
-    decodeTasks.push({
+
+    // find the right spot to insert this decode task (based on priority)
+    for(var i=0; i < decodeTasks.length; i++) {
+      if(decodeTasks[i].priority >= priority) {
+        break;
+      }
+    }
+
+    // insert the decode task in the sorted position
+    decodeTasks.splice(i, 0, {
       status: 'ready',
       added : new Date().getTime(),
       imageFrame : imageFrame,
       transferSyntax : transferSyntax,
       pixelData: pixelData,
-      deferred: deferred
+      deferred: deferred,
+      priority: priority
     });
 
+    // try to start a task on the web worker since we just added a new task and a web worker may be available
     startTaskOnWebWorker();
 
     return deferred.promise();
   }
 
+  /**
+   * Function to return the statistics on running web workers
+   * @returns {{numDecodeTasksCompleted: number, totalDecodeTimeInMS: number, totalTimeDelayedInMS: number}}
+   */
   function getStatistics() {
     return statistics;
   }

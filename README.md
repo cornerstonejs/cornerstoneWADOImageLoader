@@ -2,8 +2,9 @@ cornerstone WADO Image Loader
 =============================
 
 A [cornerstone](https://github.com/chafey/cornerstone) Image Loader for DICOM P10 instances over
-HTTP.  This can be used to integrate cornerstone with WADO-URI servers or any other HTTP based server
-that returns DICOM P10 instances (e.g. [Orthanc](http://www.orthanc-server.com/) or custom servers)
+HTTP (WADO-URI) or DICOMWeb (WADO-RS).  This can be used to integrate cornerstone with WADO-URI
+servers, DICOMWeb servers or any other HTTP based server that returns DICOM P10 instances
+ (e.g. [Orthanc](http://www.orthanc-server.com/) or custom servers)
 
 Troubleshooting
 ---------------

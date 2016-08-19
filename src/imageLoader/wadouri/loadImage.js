@@ -22,7 +22,7 @@
     }
   }
 
-  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame, sharedCacheKey) {
+  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame, sharedCacheKey, priority) {
     var start = new Date().getTime();
     frame = frame || 0;
     var deferred = $.Deferred();
@@ -32,11 +32,13 @@
       var pixelData = getPixelData(dataSet, frame);
       var metaDataProvider = cornerstoneWADOImageLoader.wadouri.metaDataProvider;
       var transferSyntax =  dataSet.string('x00020010');
+      var loadEnd = new Date().getTime();
       var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, metaDataProvider);
       imagePromise.then(function(image) {
         image.data = dataSet;
         var end = new Date().getTime();
-        image.loadTimeInMS = end - start;
+        image.loadTimeInMS = loadEnd - start;
+        image.totalTimeInMS = end - start;
         addDecache(image);
         deferred.resolve(image);
       });
@@ -55,7 +57,7 @@
     }
   }
 
-  function loadImage(imageId) {
+  function loadImage(imageId, priority) {
 
     var parsedImageId = cornerstoneWADOImageLoader.wadouri.parseImageId(imageId);
 
@@ -63,11 +65,11 @@
 
     // if the dataset for this url is already loaded, use it
     if(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.isLoaded(parsedImageId.url)) {
-      return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url);
+      return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url, priority);
     }
 
     // load the dataSet via the dataSetCacheManager
-    return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url);
+    return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url, priority);
   }
 
   // register dicomweb and wadouri image loader prefixes

@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-07-18 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-10 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -59,7 +59,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
-  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame, sharedCacheKey) {
+  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame, sharedCacheKey, priority) {
     var start = new Date().getTime();
     frame = frame || 0;
     var deferred = $.Deferred();
@@ -69,11 +69,13 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       var pixelData = getPixelData(dataSet, frame);
       var metaDataProvider = cornerstoneWADOImageLoader.wadouri.metaDataProvider;
       var transferSyntax =  dataSet.string('x00020010');
+      var loadEnd = new Date().getTime();
       var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, metaDataProvider);
       imagePromise.then(function(image) {
         image.data = dataSet;
         var end = new Date().getTime();
-        image.loadTimeInMS = end - start;
+        image.loadTimeInMS = loadEnd - start;
+        image.totalTimeInMS = end - start;
         addDecache(image);
         deferred.resolve(image);
       });
@@ -92,7 +94,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
-  function loadImage(imageId) {
+  function loadImage(imageId, priority) {
 
     var parsedImageId = cornerstoneWADOImageLoader.wadouri.parseImageId(imageId);
 
@@ -100,11 +102,11 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
     // if the dataset for this url is already loaded, use it
     if(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.isLoaded(parsedImageId.url)) {
-      return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url);
+      return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url, priority);
     }
 
     // load the dataSet via the dataSetCacheManager
-    return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url);
+    return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url, priority);
   }
 
   // register dicomweb and wadouri image loader prefixes
@@ -1607,12 +1609,14 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   "use strict";
 
+  // array of waiting decode tasks sorted with highest priority task first
   var decodeTasks = [];
 
+  // array of web workers to dispatch decode tasks to
   var webWorkers = [];
 
   var config = {
-    maxWebWorkers: 1,
+    maxWebWorkers: navigator.hardwareConcurrency || 1,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
     codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js'
   };
@@ -1623,24 +1627,33 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     totalTimeDelayedInMS: 0,
   };
 
+  /**
+   * Function to start a task on a web worker
+   */
   function startTaskOnWebWorker() {
+    // return immediately if no decode tasks to do
     if(!decodeTasks.length) {
       return;
     }
-    
+
+    // look for a web worker that is ready
     for(var i=0; i < webWorkers.length; i++) {
        {
         if(webWorkers[i].status === 'ready') {
+          // mark it as busy so tasks are not assigned to it
           webWorkers[i].status = 'busy';
 
+          // get the highest priority decode task
           var decodeTask = decodeTasks.shift();
-
           decodeTask.start = new Date().getTime();
 
+          // update stats with how long this task was delayed (waiting in queue)
           var end = new Date().getTime();
           var delayed = end - decodeTask.added;
           statistics.totalTimeDelayedInMS += delayed;
 
+          // assign this decode task to this web worker and send the web worker
+          // a message to decode it
           webWorkers[i].decodeTask = decodeTask;
           webWorkers[i].worker.postMessage({
             message: 'decodeTask',
@@ -1657,6 +1670,11 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
+  /**
+   * Helper function to set pixel data to the right typed array.  This is needed because web workers
+   * can transfer array buffers but not typed arrays
+   * @param imageFrame
+   */
   function setPixelDataType(imageFrame) {
     if(imageFrame.bitsAllocated === 16) {
       if(imageFrame.pixelRepresentation === 0) {
@@ -1669,6 +1687,10 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
+  /**
+   * Function to handle a message from a web worker
+   * @param msg
+   */
   function handleMessageFromWorker(msg) {
     //console.log('handleMessageFromWorker', msg.data);
     if(msg.data.message === 'initializeTaskCompleted') {
@@ -1690,6 +1712,10 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
+  /**
+   * Initialization function for the web worker manager - spawns web workers
+   * @param configObject
+   */
   function initialize(configObject) {
     if(configObject) {
       config = configObject;
@@ -1710,22 +1736,47 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
-  function addTask(imageFrame, transferSyntax, pixelData) {
+  /**
+   * Function to add a decode task to be performed
+   *
+   * @param imageFrame
+   * @param transferSyntax
+   * @param pixelData
+   * @param priority
+   * @returns {*}
+   */
+  function addTask(imageFrame, transferSyntax, pixelData, priority) {
+    priority = priority || 0;
     var deferred = $.Deferred();
-    decodeTasks.push({
+
+    // find the right spot to insert this decode task (based on priority)
+    for(var i=0; i < decodeTasks.length; i++) {
+      if(decodeTasks[i].priority >= priority) {
+        break;
+      }
+    }
+
+    // insert the decode task in the sorted position
+    decodeTasks.splice(i, 0, {
       status: 'ready',
       added : new Date().getTime(),
       imageFrame : imageFrame,
       transferSyntax : transferSyntax,
       pixelData: pixelData,
-      deferred: deferred
+      deferred: deferred,
+      priority: priority
     });
 
+    // try to start a task on the web worker since we just added a new task and a web worker may be available
     startTaskOnWebWorker();
 
     return deferred.promise();
   }
 
+  /**
+   * Function to return the statistics on running web workers
+   * @returns {{numDecodeTasksCompleted: number, totalDecodeTimeInMS: number, totalTimeDelayedInMS: number}}
+   */
   function getStatistics() {
     return statistics;
   }
