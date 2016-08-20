@@ -42,6 +42,17 @@ function decodeTaskInitialize(config) {
   }
 }
 
+function calculateMinMax(imageFrame)
+{
+  if(imageFrame.smallestPixelValue !== undefined && imageFrame.largestPixelValue !== undefined) {
+    return;
+  }
+
+  var minMax = cornerstoneWADOImageLoader.getMinMax(imageFrame.pixelData);
+  imageFrame.smallestPixelValue = minMax.min;
+  imageFrame.largestPixelValue = minMax.max;
+}
+
 /**
  * Task handler function
  * @param data
@@ -58,7 +69,7 @@ function decodeTaskHandler(data) {
 
   cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData);
 
-  cornerstoneWADOImageLoader.calculateMinMax(imageFrame);
+  calculateMinMax(imageFrame);
 
   // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
   // typed arrays

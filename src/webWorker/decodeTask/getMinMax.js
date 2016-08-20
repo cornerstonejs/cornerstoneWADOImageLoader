@@ -2,13 +2,8 @@
 
   "use strict";
 
-  function calculateMinMax(imageFrame)
+  function getMinMax(storedPixelData)
   {
-    if(imageFrame.smallestPixelValue !== undefined && imageFrame.largestPixelValue !== undefined) {
-      return;
-    }
-    var storedPixelData = imageFrame.pixelData;
-
     // we always calculate the min max values since they are not always
     // present in DICOM and we don't want to trust them anyway as cornerstone
     // depends on us providing reliable values for these
@@ -23,12 +18,15 @@
       max = Math.max(max, spv);
     }
 
-    imageFrame.smallestPixelValue = min;
-    imageFrame.largestPixelValue = max;
+    return {
+      min: min,
+      max: max
+    };
   }
 
+
   // module exports
-  cornerstoneWADOImageLoader.calculateMinMax = calculateMinMax;
+  cornerstoneWADOImageLoader.getMinMax = getMinMax;
 
 }(cornerstoneWADOImageLoader));
 

@@ -124,6 +124,31 @@ If you want to create your own custom web worker tasks, follow the following ste
    * workerIndex - the index of the web worker that the handler is being invoked on
    * data - the data passed by the UI thread code for your custom web worker task
 
+5) Post a message back to the ui thread when your handler is done.  It should generally look like this:
 
+```
+  self.postMessage({
+    taskId: 'decodeTask',
+    status: 'success',
+    result: {
+      imageFrame: imageFrame,
+    },
+    workerIndex: data.workerIndex
+  }, [imageFrame.pixelData]);
+```
 
+status can be "success" or "fail".  result is whatever you want to return to the ui thread.  Note that you
+should use the transferList argument to transfer big data you don't need to keep in the web worker to
+keep memory usage down.
+
+6) Queue a task for your custom web worker from the UI Thread using cornerstoneWADOImageLoader.webWorkerManager.addTask.
+  This function takes three parameters:
+  * taskId - This should match the taskId registered by your custom web worker task in step 6 above
+  * data - This is an object you want passed to your web worker task.  This can include pixel data or
+           whatever else you want
+  * priority - integer with lower numbers being higher priority.  if not specified a priority of 0 is used.
+           Note that decode tasks currently use a priority of 5
+
+7) Have the UI thread set a then handler on the returned promise to get the result the custom web worker returned
+   in step 5 above.
 

@@ -64,15 +64,30 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-3">
-                    <button class="form-control" type="button" id="startWebWorker" class="btn btn-primary">Start 1 Web Worker</button>
+                    <button class="form-control" type="button" id="startWebWorker" class="btn btn-primary">Start 1 Sleep Tasks</button>
                 </div>
                 <div class="col-sm-3">
-                    <button class="form-control" type="button" id="start10WebWorkers" class="btn btn-primary">Start 10 Web Workers</button>
+                    <button class="form-control" type="button" id="start10WebWorkers" class="btn btn-primary">Start 10 Sleep Tasks</button>
                 </div>
                 <div class="col-sm-3">
                     <button class="form-control" type="button" id="sharpen" class="btn btn-primary">Sharpen Image</button>
                 </div>
+                <div class="col-sm-3">
+                    <button class="form-control" type="button" id="edgeDetect" class="btn btn-primary">Edge Enhance</button>
+                </div>
+                <div class="col-sm-3">
+                    <button class="form-control" type="button" id="boxBlur" class="btn btn-primary">Box Blur</button>
+                </div>
+                <div class="col-sm-3">
+                    <button class="form-control" type="button" id="gaussianBlur" class="btn btn-primary">Gaussian Blur</button>
+                </div>
+                <div class="col-sm-3">
+                    <button class="form-control" type="button" id="emboss" class="btn btn-primary">Emboss</button>
+                </div>
 
+                <div class="col-sm-3">
+                    <button class="form-control" type="button" id="unsharp" class="btn btn-primary">Unsharp</button>
+                </div>
             </div>
         </form>
     </div>
@@ -127,7 +142,7 @@
         webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
         webWorkerTaskPaths: [
             '../examples/customWebWorkerTask/sleepTask.js',
-            '../examples/customWebWorkerTask/sharpenTask.js'
+            '../examples/customWebWorkerTask/convolveTask.js'
 
         ],
         taskConfiguration: {
@@ -152,6 +167,7 @@
         try {
             var start = new Date().getTime();
             cornerstone.loadAndCacheImage(imageId).then(function(image) {
+                console.log(typeof image.getPixelData());
                 console.log(image);
                 loadedImage = image;
                 updateStatistics();
@@ -233,47 +249,96 @@
                 startWebWorker();
             }
         });
-        $('#sharpen').click(function(e) {
-            var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('sharpenTask', {
+
+
+
+        function convolute(kernel, multiplier, calculateWWWC) {
+            var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('convolveTask', {
                 pixelData :loadedImage.getPixelData(),
+                kernel : kernel,
+                multiplier: multiplier,
                 imageFrame: {
+                    typedArrayName: loadedImage.getPixelData().constructor.name,
                     width : loadedImage.width,
-                    height : loadedImage.height,
+                    height : loadedImage.height
                 }
             }, 1);
             promise.then(function(result) {
-                console.log('sharpen task completed');
+                console.log('convolveTask task completed');
                 result.pixelData = new Int16Array(result.pixelData);
 
-                var minMax = cornerstoneWADOImageLoader.getMinMax(result.pixelData);
-                console.log(minMax);
                 var sharpenedImage = {
-                    color : false,
+                    color: false,
                     columns: loadedImage.columns,
-                    rows : loadedImage.rows,
-                    width : loadedImage.width,
-                    height : loadedImage.height,
-                    imageId : new Date().toISOString(),
-                    maxPixelValue: minMax.max,
-                    minPixelValue: minMax.min,
-                    windowWidth : loadedImage.windowWidth,
-                    windowLevel : loadedImage.windowLevel,
-                    sizeInBytes : loadedImage.sizeInBytes,
-                    render : loadedImage.render,
+                    rows: loadedImage.rows,
+                    width: loadedImage.width,
+                    height: loadedImage.height,
+                    imageId: new Date().toISOString(),
+                    maxPixelValue: result.minMax.max,
+                    minPixelValue: result.minMax.min,
+                    windowWidth: calculateWWWC ? (result.minMax.max - result.minMax.max) : loadedImage.windowWidth,
+                    windowLevel: calculateWWWC ? ((result.minMax.max + result.minMax.max) / 2) : loadedImage.windowLevel,
+                    sizeInBytes: loadedImage.sizeInBytes,
+                    render: loadedImage.render,
                     slope: loadedImage.slope,
                     intercept: loadedImage.intercept,
                     invert: loadedImage.invert,
-                    getPixelData : function() {return result.pixelData;}
+                    getPixelData: function () {
+                        return result.pixelData;
+                    }
                 };
-
-                console.log(sharpenedImage);
 
                 cornerstone.displayImage(element, sharpenedImage);
                 loadedImage = sharpenedImage;
                 updateStatistics();
             });
+        }
+
+        $('#sharpen').click(function(e) {
+            convolute([
+                [ 0,-1, 0],
+                [-1, 5,-1],
+                [ 0,-1, 0]
+            ], 1);
+        });
+        $('#edgeDetect').click(function(e) {
+            convolute([
+                [-1,-1,-1],
+                [-1, 9,-1],
+                [-1,-1,-1]
+            ], 1);
+        });
+        $('#boxBlur').click(function(e) {
+            convolute([
+                [1,1,1],
+                [1,1,1],
+                [1,1,1]
+            ], 1/9);
+        });
+        $('#gaussianBlur').click(function(e) {
+            convolute([
+                [1,2,1],
+                [2,4,2],
+                [1,2,1]
+            ], 1/16);
+        });
+        $('#emboss').click(function(e) {
+            convolute([
+                [-2,1,0],
+                [-1,1,1],
+                [ 0,1,2]
+            ], 1/3);
         });
 
+        $('#unsharp').click(function(e) {
+            convolute([
+                [ 1, 4,   6, 4, 1],
+                [ 4,16,  24,16, 4],
+                [ 6,24,-476,24, 6],
+                [ 4,16,  24,16, 4],
+                [ 1, 4,   6, 4, 1],
+            ], -1/256);
+        });
 
         $('form').submit(function() {
             downloadAndView();
