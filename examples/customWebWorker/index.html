@@ -18,9 +18,6 @@
                 Click for more info
             </button>
         </p>
-
-
-
     </div>
     <div class="collapse" id="collapseInfo">
         <p>
@@ -67,8 +64,11 @@
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-2">
-                    <button class="form-control" type="button" id="startWebWorker" class="btn btn-primary">Start Custom Web Worker</button>
+                <div class="col-sm-3">
+                    <button class="form-control" type="button" id="startWebWorker" class="btn btn-primary">Start 1 Web Worker</button>
+                </div>
+                <div class="col-sm-3">
+                    <button class="form-control" type="button" id="start10WebWorkers" class="btn btn-primary">Start 10 Web Workers</button>
                 </div>
             </div>
         </form>
@@ -88,31 +88,11 @@
             </div>
         </div>
         <div class="col-md-6">
-            <span>Transfer Syntax: </span><span id="transferSyntax"></span><br>
-            <span>SOP Class: </span><span id="sopClass"></span><br>
-            <span>Samples Per Pixel: </span><span id="samplesPerPixel"></span><br>
-            <span>Photometric Interpretation: </span><span id="photometricInterpretation"></span><br>
-            <span>Number Of Frames: </span><span id="numberOfFrames"></span><br>
-            <span>Planar Configuration: </span><span id="planarConfiguration"></span><br>
-            <span>Rows: </span><span id="rows"></span><br>
-            <span>Columns: </span><span id="columns"></span><br>
-            <span>Pixel Spacing: </span><span id="pixelSpacing"></span><br>
-            <span>Bits Allocated: </span><span id="bitsAllocated"></span><br>
-            <span>Bits Stored: </span><span id="bitsStored"></span><br>
-            <span>High Bit: </span><span id="highBit"></span><br>
-            <span>Pixel Representation: </span><span id="pixelRepresentation"></span><br>
-            <span>WindowCenter: </span><span id="windowCenter"></span><br>
-            <span>WindowWidth: </span><span id="windowWidth"></span><br>
-            <span>RescaleIntercept: </span><span id="rescaleIntercept"></span><br>
-            <span>RescaleSlope: </span><span id="rescaleSlope"></span><br>
-            <span>Basic Offset Table Entries: </span><span id="basicOffsetTable"></span><br>
-            <span>Fragments: </span><span id="fragments"></span><br>
-            <span>Max Stored Pixel Value: </span><span id="minStoredPixelValue"></span><br>
-            <span>Min Stored Pixel Value: </span><span id="maxStoredPixelValue"></span><br>
-            <span>Total Time: </span><span id="totalTime"></span><br>
-            <span>Load Time: </span><span id="loadTime"></span><br>
-            <span>Decode Time: </span><span id="decodeTime"></span><br>
-            <span>WebWorker Time: </span><span id="webWorkerTime"></span><br>
+            <span>Num Queued Tasks: </span><span id="numQueuedTasks"></span><br>
+            <span>Num Tasks Executing: </span><span id="numTasksExecuting"></span><br>
+            <span>Total Tasks Executed: </span><span id="totalTasksExecuted"></span><br>
+            <span>Total Task Execution Time: </span><span id="totalTaskExecutionTime"></span><br>
+            <span>Total Task Delay Time: </span><span id="totalTaskDelayTime"></span><br>
         </div>
     </div>
 </div>
@@ -192,6 +172,7 @@
             var start = new Date().getTime();
             cornerstone.loadAndCacheImage(imageId).then(function(image) {
                 console.log(image);
+                updateStatistics();
                 var viewport = cornerstone.getDefaultViewportForImage(element, image);
                 $('#toggleModalityLUT').attr("checked",viewport.modalityLUT !== undefined);
                 $('#toggleVOILUT').attr("checked",viewport.voiLUT !== undefined);
@@ -205,61 +186,6 @@
                     cornerstoneTools.zoomWheel.activate(element); // zoom is the default tool for middle mouse wheel
                     loaded = true;
                 }
-
-                function getTransferSyntax() {
-                    var value = image.data.string('x00020010');
-                    return value + ' [' + uids[value] + ']';
-                }
-
-                function getSopClass() {
-                    var value = image.data.string('x00080016');
-                    return value + ' [' + uids[value] + ']';
-                }
-
-                function getPixelRepresentation() {
-                    var value = image.data.uint16('x00280103');
-                    if(value === undefined) {
-                        return;
-                    }
-                    return value + (value === 0 ? ' (unsigned)' : ' (signed)');
-                }
-
-                function getPlanarConfiguration() {
-                    var value = image.data.uint16('x00280006');
-                    if(value === undefined) {
-                        return;
-                    }
-                    return value + (value === 0 ? ' (pixel)' : ' (plane)');
-                }
-
-
-                $('#transferSyntax').text(getTransferSyntax());
-                $('#sopClass').text(getSopClass());
-                $('#samplesPerPixel').text(image.data.uint16('x00280002'));
-                $('#photometricInterpretation').text(image.data.string('x00280004'));
-                $('#numberOfFrames').text(image.data.string('x00280008'));
-                $('#planarConfiguration').text(getPlanarConfiguration());
-                $('#rows').text(image.data.uint16('x00280010'));
-                $('#columns').text(image.data.uint16('x00280011'));
-                $('#pixelSpacing').text(image.data.string('x00280030'));
-                $('#bitsAllocated').text(image.data.uint16('x00280100'));
-                $('#bitsStored').text(image.data.uint16('x00280101'));
-                $('#highBit').text(image.data.uint16('x00280102'));
-                $('#pixelRepresentation').text(getPixelRepresentation());
-                $('#windowCenter').text(image.data.string('x00281050'));
-                $('#windowWidth').text(image.data.string('x00281051'));
-                $('#rescaleIntercept').text(image.data.string('x00281052'));
-                $('#rescaleSlope').text(image.data.string('x00281053'));
-                $('#basicOffsetTable').text(image.data.elements.x7fe00010.basicOffsetTable ? image.data.elements.x7fe00010.basicOffsetTable.length : '');
-                $('#fragments').text(image.data.elements.x7fe00010.fragments ? image.data.elements.x7fe00010.fragments.length : '');
-                $('#minStoredPixelValue').text(image.minPixelValue);
-                $('#maxStoredPixelValue').text(image.maxPixelValue);
-                var end = new Date().getTime();
-                var time = end - start;
-                $('#totalTime').text(time + "ms");
-                $('#loadTime').text(image.loadTimeInMS + "ms");
-                $('#decodeTime').text(image.decodeTimeInMS + "ms");
-                $('#webWorkerTime').text(image.webWorkerTimeInMS + "ms");
 
             }, function(err) {
                 alert(err);
@@ -295,6 +221,23 @@
         return url;
     }
 
+    function updateStatistics() {
+        var stats = cornerstoneWADOImageLoader.webWorkerManager.getStatistics();
+        $('#numQueuedTasks').text(stats.numQueuedTasks);
+        $('#numTasksExecuting').text(stats.numTasksExecuting);
+        $('#totalTasksExecuted').text(stats.numTasksCompleted);
+        $('#totalTaskExecutionTime').text(stats.totalTaskTimeInMS);
+        $('#totalTaskDelayTime').text(stats.totalTimeDelayedInMS);
+    }
+
+    function startWebWorker() {
+        var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('myCustomMessage', {}, 1);
+        promise.then(function(result) {
+            updateStatistics();
+        });
+        updateStatistics();
+    }
+
     $(document).ready(function() {
 
         var element = $('#dicomImage').get(0);
@@ -304,10 +247,12 @@
             downloadAndView();
         });
         $('#startWebWorker').click(function(e) {
-            var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('myCustomMessage', {}, 1);
-            promise.then(function(result) {
-               console.log('result', result);
-            });
+            startWebWorker();
+        });
+        $('#start10WebWorkers').click(function(e) {
+            for(var i=0; i < 10; i++) {
+                startWebWorker();
+            }
         });
 
         $('form').submit(function() {
@@ -315,9 +260,12 @@
             return false;
         });
 
-
-
     });
+
+    setInterval(function() {
+        updateStatistics();
+    },100);
+
 
     //var worker = new Worker('../webWorker.js');
     //var pixelData = new Uint8Array(512000);

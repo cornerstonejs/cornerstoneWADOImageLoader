@@ -18,14 +18,17 @@ function initializeTask(data) {
   }
 
   self.postMessage({
-    message: 'initializeTaskCompleted',
+    message: 'initializeTask',
+    status: 'success',
+    result: {
+    },
     workerIndex: data.workerIndex
   });
 }
 
 
 function decodeTask(data) {
-  console.log(data);
+  //console.log(data);
   var imageFrame = data.data.imageFrame;
   var pixelData = new Uint8Array(data.data.pixelData);
   var transferSyntax = data.data.transferSyntax;
@@ -36,8 +39,11 @@ function decodeTask(data) {
   imageFrame.pixelData = imageFrame.pixelData.buffer;
 
   self.postMessage({
-    message: 'decodeTaskCompleted',
-    imageFrame: imageFrame,
+    message: 'decodeTask',
+    status: 'success',
+    result: {
+      imageFrame: imageFrame,
+    },
     workerIndex: data.workerIndex
   }, [imageFrame.pixelData]);
 }
@@ -52,15 +58,7 @@ function registerMessageHandler(message, handler) {
   messageMap[message] = handler;
 }
 
-
-
 self.onmessage = function(msg) {
-  console.log('web worker onmessage', msg.data);
+  //console.log('web worker onmessage', msg.data);
   messageMap[msg.data.message](msg.data);
-  /*if(msg.data.message === 'initializeTask') {
-    initializeTask(msg.data);
-  } else if(msg.data.message === 'decodeTask') {
-    decodeTask(msg.data);
-  }
-  */
 };

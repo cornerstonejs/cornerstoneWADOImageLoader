@@ -1,5 +1,4 @@
-console.log('custom web worker loaded');
-console.log('messageMap', messageMap);
+//console.log('custom web worker loaded');
 
 function myCustomMessageHandler(data) {
 
@@ -9,7 +8,7 @@ function myCustomMessageHandler(data) {
       result: 'success',
       workerIndex: data.workerIndex
     });
-  }, 30);
+  }, 3000);
 }
 
 registerMessageHandler('myCustomMessage', myCustomMessageHandler);
