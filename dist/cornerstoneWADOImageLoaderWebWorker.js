@@ -37,7 +37,7 @@ function initialize(data) {
 
   // tell main ui thread that we have completed initialization
   self.postMessage({
-    message: 'initialize',
+    taskId: 'initialize',
     status: 'success',
     result: {
     },
@@ -64,22 +64,22 @@ function registerTaskHandler(taskHandler) {
  */
 self.onmessage = function(msg) {
   //console.log('web worker onmessage', msg.data);
-  if(msg.data.message === 'initialize') {
+  if(msg.data.taskId === 'initialize') {
     initialize(msg.data);
     return;
   }
 
   // dispatch the message if there is a handler registered for it
-  if(taskHandlers[msg.data.message]) {
-    taskHandlers[msg.data.message].handler(msg.data);
+  if(taskHandlers[msg.data.taskId]) {
+    taskHandlers[msg.data.taskId].handler(msg.data);
     return;
   }
 
   // not task handler registered - send a failure message back to ui thread
-  console.log('no task handler for ', msg.data.message);
+  console.log('no task handler for ', msg.data.taskId);
   console.log(taskHandlers);
   self.postMessage({
-    message: msg.data.message,
+    taskId: msg.data.taskId,
     status: 'fail',
     result: {
       reason: 'no task handler registered'
@@ -155,7 +155,7 @@ function decodeTaskHandler(data) {
 
   // Post the result message back to the UI thread and transfer the pixelData to avoid a gc operation on it
   self.postMessage({
-    message: 'decodeTask',
+    taskId: 'decodeTask',
     status: 'success',
     result: {
       imageFrame: imageFrame,

@@ -1677,7 +1677,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
           // a message to decode it
           webWorkers[i].task = task;
           webWorkers[i].worker.postMessage({
-            message: task.message,
+            taskId: task.taskId,
             workerIndex: i,
             data: task.data
           });
@@ -1711,10 +1711,10 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
    */
   function handleMessageFromWorker(msg) {
     //console.log('handleMessageFromWorker', msg.data);
-    if(msg.data.message === 'initialize') {
+    if(msg.data.taskId === 'initialize') {
       webWorkers[msg.data.workerIndex].status = 'ready';
       startTaskOnWebWorker();
-    } else if(msg.data.message === 'decodeTask') {
+    } else if(msg.data.taskId === 'decodeTask') {
       statistics.numTasksExecuting--;
       webWorkers[msg.data.workerIndex].status = 'ready';
       setPixelDataType(msg.data.result.imageFrame);
@@ -1749,6 +1749,8 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       config = configObject;
     }
 
+    config.maxWebWorkers = config.maxWebWorkers || (navigator.hardwareConcurrency || 1);
+
     for(var i=0; i < config.maxWebWorkers; i++) {
       var worker = new Worker(config.webWorkerPath);
       webWorkers.push({
@@ -1757,7 +1759,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       });
       worker.addEventListener('message', handleMessageFromWorker);
       worker.postMessage({
-        message: 'initialize',
+        taskId: 'initialize',
         workerIndex: webWorkers.length - 1,
         config: config
       });
@@ -1790,7 +1792,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
     // insert the decode task in the sorted position
     tasks.splice(i, 0, {
-      message: message,
+      taskId: message,
       status: 'ready',
       added : new Date().getTime(),
       data: data,

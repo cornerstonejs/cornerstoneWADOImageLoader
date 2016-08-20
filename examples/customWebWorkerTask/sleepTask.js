@@ -13,7 +13,7 @@ function sleepTaskHandler(data) {
 
     // once the task is done, we send a message back with our result
     self.postMessage({
-      message: 'sleepTask',
+      taskId: 'sleepTask',
       result: 'success',
       workerIndex: data.workerIndex
     });

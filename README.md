@@ -41,9 +41,6 @@ The cornerstoneWADOImageLoader depends on the following external libraries:
 2. [dicomParser](https://github.com/chafey/dicomParser) 
 3. [cornerstone](https://github.com/chafey/cornerStone)
 
-
-
-
 ##### Optional Codecs
 
 cornerstoneWADOImageLoader supports all non retired transfer syntaxes except for JPIP
@@ -170,10 +167,14 @@ Key Features
 ------------
 
 * Implements a [cornerstone ImageLoader](https://github.com/chafey/cornerstone/wiki/ImageLoader) for DICOM P10 Instances via a HTTP get request. 
-  * Can be used with a WADO server
+  * Can be used with a WADO-URI server
   * Can be used with Orthanc's file endpoint
   * Can be used with any server that returns DICOM P10 instances via HTTP GET
+* Implements a [cornerstone ImageLoader](https://github.com/chafey/cornerstone/wiki/ImageLoader) for WADO-RS (DICOMWeb)
 * Supports many popular transfer syntaxes and photometric interpretations [see full list](https://github.com/chafey/cornerstoneWADOImageLoader/blob/master/docs/TransferSyntaxes.md)
+* Framework to execute CPU intensive tasks in web workers
+  * Used for image decoding
+  * Can be used for your own CPU intensive tasks (e.g. image processing)
 
 Build System
 ============

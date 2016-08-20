@@ -52,7 +52,7 @@
 
     // once the task is done, we send a message back with our result
     self.postMessage({
-      message: 'sharpenTask',
+      taskId: 'sharpenTask',
       result: 'success',
       pixelData: shapenedPixelData.buffer,
       workerIndex: data.workerIndex

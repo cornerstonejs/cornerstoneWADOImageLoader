@@ -66,7 +66,7 @@ function decodeTaskHandler(data) {
 
   // Post the result message back to the UI thread and transfer the pixelData to avoid a gc operation on it
   self.postMessage({
-    message: 'decodeTask',
+    taskId: 'decodeTask',
     status: 'success',
     result: {
       imageFrame: imageFrame,
