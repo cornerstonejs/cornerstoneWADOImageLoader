@@ -78,8 +78,7 @@
     return image;
   }
 
-  function decodeJPEGLS(imageFrame, pixelData)
-  {
+  function initializeJPEGLS() {
     // check to make sure codec is loaded
     if(typeof CharLS === 'undefined') {
       throw 'No JPEG-LS decoder loaded';
@@ -93,6 +92,12 @@
         throw 'JPEG-LS failed to initialize';
       }
     }
+
+  }
+
+  function decodeJPEGLS(imageFrame, pixelData)
+  {
+    initializeJPEGLS();
 
     var image = jpegLSDecode(pixelData, imageFrame.pixelRepresentation === 1);
     //console.log(image);
@@ -110,5 +115,6 @@
 
   // module exports
   cornerstoneWADOImageLoader.decodeJPEGLS = decodeJPEGLS;
+  cornerstoneWADOImageLoader.initializeJPEGLS = initializeJPEGLS;
 
 }(cornerstoneWADOImageLoader));

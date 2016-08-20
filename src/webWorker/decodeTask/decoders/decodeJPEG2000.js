@@ -121,8 +121,7 @@
     return imageFrame;
   }
 
-  function decodeJPEG2000(imageFrame, pixelData)
-  {
+  function initializeJPEG2000() {
     // check to make sure codec is loaded
     if(typeof OpenJPEG === 'undefined' &&
       typeof JpxImage === 'undefined') {
@@ -138,6 +137,15 @@
           throw 'OpenJPEG failed to initialize';
         }
       }
+    }
+  }
+
+  function decodeJPEG2000(imageFrame, pixelData)
+  {
+    initializeJPEG2000();
+
+    // OpenJPEG2000 https://github.com/jpambrun/openjpeg
+    if(typeof OpenJPEG !== 'undefined') {
       return decodeOpenJpeg2000(imageFrame, pixelData);
     }
 
@@ -148,4 +156,6 @@
   }
 
   cornerstoneWADOImageLoader.decodeJPEG2000 = decodeJPEG2000;
+  cornerstoneWADOImageLoader.initializeJPEG2000 = initializeJPEG2000;
+
 }(cornerstoneWADOImageLoader));

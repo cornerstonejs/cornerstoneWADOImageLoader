@@ -1,39 +1,131 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-19 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-20 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 
-cornerstoneWADOImageLoader = {};
+// an object of task handlers
+var taskHandlers = {};
 
-function initializeTask(data) {
+// Flag to ensure web worker is only initialized once
+var initialized = false;
+
+// the configuration object passed in when the web worker manager is initialized
+var config;
+
+/**
+ * Initialization function that loads additional web workers and initializes them
+ * @param data
+ */
+function initialize(data) {
   //console.log('web worker initialize ', data.workerIndex);
+  // prevent initialization from happening more than once
+  if(initialized) {
+    return;
+  }
 
-  var config = data.config;
+  // save the config data
+  config = data.config;
 
-  //console.time('loadingCodecs');
-  self.importScripts(config.codecsPath );
-  //console.timeEnd('loadingCodecs');
-
-  // load any additional web workers
+  // load any additional web worker tasks
   if(data.config.otherWebWorkers) {
     for(var i=0; i < data.config.otherWebWorkers.length; i++) {
       self.importScripts(data.config.otherWebWorkers[i].path);
     }
   }
 
+  // initialize each task handler
+  Object.keys(taskHandlers).forEach(function(key) {
+    taskHandlers[key].initialize(config);
+  });
+
+  // tell main ui thread that we have completed initialization
   self.postMessage({
-    message: 'initializeTask',
+    message: 'initialize',
     status: 'success',
     result: {
     },
     workerIndex: data.workerIndex
   });
+
+  initialized = true;
 }
 
+/**
+ * Function exposed to web worker tasks to register themselves
+ * @param taskHandler
+ */
+function registerTaskHandler(taskHandler) {
+  taskHandlers[taskHandler.taskId] = taskHandler;
+  if(initialized) {
+    taskHandlers[key].initialize(config);
+  }
+}
 
-function decodeTask(data) {
+/**
+ * Web worker message handler - dispatches messages to the registered task handlers
+ * @param msg
+ */
+self.onmessage = function(msg) {
+  //console.log('web worker onmessage', msg.data);
+  if(msg.data.message === 'initialize') {
+    initialize(msg.data);
+    return;
+  }
+
+  // dispatch the message if there is a handler registered for it
+  if(taskHandlers[msg.data.message]) {
+    taskHandlers[msg.data.message].handler(msg.data);
+    return;
+  }
+
+  // not task handler registered - send a failure message back to ui thread
+  self.postMessage({
+    message: msg.data.message,
+    status: 'fail',
+    result: {
+      reason: 'no task handler registered'
+    },
+    workerIndex: data.workerIndex
+  });
+};
+
+cornerstoneWADOImageLoader = {};
+
+var codecsLoaded = false;
+
+var decodeConfig;
+
+function loadCodecs(config) {
+  // prevent loading codecs more than once
+  if(codecsLoaded) {
+    return;
+  }
+
+  //console.time('loadCodecs');
+  self.importScripts(config.codecsPath);
+  codecsLoaded = true;
+  //console.timeEnd('loadCodecs');
+
+  if(config.initializeCodecsOnStartup) {
+    //console.time('initializeCodecs');
+    cornerstoneWADOImageLoader.initializeJPEG2000();
+    cornerstoneWADOImageLoader.initializeJPEGLS();
+    //console.timeEnd('initializeCodecs');
+  }
+}
+
+function decodeTaskInitialize(config) {
+  decodeConfig = config;
+  if(config.loadCodecsOnStartup) {
+    loadCodecs(config);
+  }
+}
+
+function decodeTaskHandler(data) {
+  loadCodecs(decodeConfig);
+
   //console.log(data);
   var imageFrame = data.data.imageFrame;
   var pixelData = new Uint8Array(data.data.pixelData);
   var transferSyntax = data.data.transferSyntax;
-  
+
   cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData);
   cornerstoneWADOImageLoader.calculateMinMax(imageFrame);
 
@@ -49,20 +141,12 @@ function decodeTask(data) {
   }, [imageFrame.pixelData]);
 }
 
-messageMap = {
-  'initializeTask' : initializeTask,
-  'decodeTask' : decodeTask
-};
+registerTaskHandler({
+  taskId :'decodeTask',
+  handler: decodeTaskHandler,
+  initialize: decodeTaskInitialize
+});
 
-
-function registerMessageHandler(message, handler) {
-  messageMap[message] = handler;
-}
-
-self.onmessage = function(msg) {
-  //console.log('web worker onmessage', msg.data);
-  messageMap[msg.data.message](msg.data);
-};
 (function (cornerstoneWADOImageLoader) {
 
   "use strict";
@@ -361,8 +445,7 @@ self.onmessage = function(msg) {
     return imageFrame;
   }
 
-  function decodeJPEG2000(imageFrame, pixelData)
-  {
+  function initializeJPEG2000() {
     // check to make sure codec is loaded
     if(typeof OpenJPEG === 'undefined' &&
       typeof JpxImage === 'undefined') {
@@ -378,6 +461,15 @@ self.onmessage = function(msg) {
           throw 'OpenJPEG failed to initialize';
         }
       }
+    }
+  }
+
+  function decodeJPEG2000(imageFrame, pixelData)
+  {
+    initializeJPEG2000();
+
+    // OpenJPEG2000 https://github.com/jpambrun/openjpeg
+    if(typeof OpenJPEG !== 'undefined') {
       return decodeOpenJpeg2000(imageFrame, pixelData);
     }
 
@@ -388,6 +480,8 @@ self.onmessage = function(msg) {
   }
 
   cornerstoneWADOImageLoader.decodeJPEG2000 = decodeJPEG2000;
+  cornerstoneWADOImageLoader.initializeJPEG2000 = initializeJPEG2000;
+
 }(cornerstoneWADOImageLoader));
 (function (cornerstoneWADOImageLoader) {
 
@@ -612,8 +706,7 @@ self.onmessage = function(msg) {
     return image;
   }
 
-  function decodeJPEGLS(imageFrame, pixelData)
-  {
+  function initializeJPEGLS() {
     // check to make sure codec is loaded
     if(typeof CharLS === 'undefined') {
       throw 'No JPEG-LS decoder loaded';
@@ -627,6 +720,12 @@ self.onmessage = function(msg) {
         throw 'JPEG-LS failed to initialize';
       }
     }
+
+  }
+
+  function decodeJPEGLS(imageFrame, pixelData)
+  {
+    initializeJPEGLS();
 
     var image = jpegLSDecode(pixelData, imageFrame.pixelRepresentation === 1);
     //console.log(image);
@@ -644,6 +743,7 @@ self.onmessage = function(msg) {
 
   // module exports
   cornerstoneWADOImageLoader.decodeJPEGLS = decodeJPEGLS;
+  cornerstoneWADOImageLoader.initializeJPEGLS = initializeJPEGLS;
 
 }(cornerstoneWADOImageLoader));
 /**

@@ -11,7 +11,7 @@
 <div class="container">
 
     <div class="page-header">
-        <h1>Example of displaying a DICOM P10 image using Cornerstone</h1>
+        <h1>Example of using a custom web worker</h1>
         <p class="lead">
             Enter a URL for a DICOM P10 object below to view it using cornerstone.
             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseInfo" aria-expanded="false" aria-controls="collapseInfo">
@@ -50,7 +50,6 @@
         <strong>Use of this example require IE10+ or any other modern browser.</strong>
         <hr>
     </div>
-    <div id="loadProgress">Image Load Progress:</div>
 
     <div class="row">
         <form class="form-horizontal">
@@ -113,56 +112,26 @@
 <!-- include the dicomParser library as the WADO image loader depends on it -->
 <script src="../dicomParser.min.js"></script>
 
-<!-- BEGIN Optional Codecs -->
-
-<!-- OpenJPEG based jpeg 2000 codec -->
-<script src="../../codecs/openJPEG-FixedMemory.js"></script>
-
-<!-- PDF.js based jpeg 2000 codec -->
-<!-- NOTE: do not load the OpenJPEG codec if you use this one -->
-<!-- <script src="../../codecs/jpx.min.js"></script> -->
-
-<!-- JPEG-LS codec -->
-<script src="../../codecs/charLS-FixedMemory-browser.js"></script>
-
-<!-- JPEG Lossless codec -->
-<script src="../../codecs/jpegLossless.js"></script>
-
-<!-- JPEG Baseline codec -->
-<script src="../../codecs/jpeg.js"></script>
-
-<!-- Deflate transfer syntax codec -->
-<script src="../../codecs/pako.min.js"></script>
-
-<!-- END Optional Codecs -->
-
 <!-- include the cornerstoneWADOImageLoader library -->
 <script src="../../dist/cornerstoneWADOImageLoader.js"></script>
 
-<script src="../dicomfile/uids.js"></script>
-
 
 <script>
+    // Initialize the web worker manager with our custom web worker task
     var config = {
-        maxWebWorkers: navigator.hardwareConcurrency || 1,
+        maxWebWorkers:  4,
         webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
+        loadCodecsOnStartup : true,
+        initializeCodecsOnStartup: false,
         codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
         otherWebWorkers: [{
-            path: '../examples/customWebWorker/customWebWorker.js',
+            path: '../examples/customWebWorkerTask/customWebWorkerTask.js',
             config : {
                 someOption: 42
             }
         }]
     };
-
     cornerstoneWADOImageLoader.webWorkerManager.initialize(config);
-
-    cornerstoneWADOImageLoader.configure({
-        beforeSend: function(xhr) {
-            // Add custom headers here (e.g. auth tokens)
-            //xhr.setRequestHeader('APIKEY', 'my auth token');
-        }
-    });
 
     var loaded = false;
 
@@ -207,10 +176,6 @@
         // image enable the dicomImage element and activate a few tools
         loadAndViewImage(url);
     }
-
-    $(cornerstone).bind('CornerstoneImageLoadProgress', function(eventData) {
-        $('#loadProgress').text('Image Load Progress: ' + eventData.percentComplete + "%");
-    });
 
     function getUrlWithoutFrame() {
         var url = $('#wadoURL').val();
@@ -262,14 +227,11 @@
 
     });
 
+    // set an interval timer to periodically update the statistics for a real time view of
+    // what the web workers are doing
     setInterval(function() {
         updateStatistics();
     },100);
-
-
-    //var worker = new Worker('../webWorker.js');
-    //var pixelData = new Uint8Array(512000);
-    //worker.postMessage({hello: 'world', pixelData: pixelData.buffer}, [pixelData.buffer]);
 
 </script>
 </html>

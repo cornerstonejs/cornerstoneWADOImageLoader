@@ -1,64 +1,86 @@
 
-cornerstoneWADOImageLoader = {};
+// an object of task handlers
+var taskHandlers = {};
 
-function initializeTask(data) {
+// Flag to ensure web worker is only initialized once
+var initialized = false;
+
+// the configuration object passed in when the web worker manager is initialized
+var config;
+
+/**
+ * Initialization function that loads additional web workers and initializes them
+ * @param data
+ */
+function initialize(data) {
   //console.log('web worker initialize ', data.workerIndex);
+  // prevent initialization from happening more than once
+  if(initialized) {
+    return;
+  }
 
-  var config = data.config;
+  // save the config data
+  config = data.config;
 
-  //console.time('loadingCodecs');
-  self.importScripts(config.codecsPath );
-  //console.timeEnd('loadingCodecs');
-
-  // load any additional web workers
+  // load any additional web worker tasks
   if(data.config.otherWebWorkers) {
     for(var i=0; i < data.config.otherWebWorkers.length; i++) {
       self.importScripts(data.config.otherWebWorkers[i].path);
     }
   }
 
+  // initialize each task handler
+  Object.keys(taskHandlers).forEach(function(key) {
+    taskHandlers[key].initialize(config);
+  });
+
+  // tell main ui thread that we have completed initialization
   self.postMessage({
-    message: 'initializeTask',
+    message: 'initialize',
     status: 'success',
     result: {
     },
     workerIndex: data.workerIndex
   });
+
+  initialized = true;
 }
 
-
-function decodeTask(data) {
-  //console.log(data);
-  var imageFrame = data.data.imageFrame;
-  var pixelData = new Uint8Array(data.data.pixelData);
-  var transferSyntax = data.data.transferSyntax;
-  
-  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData);
-  cornerstoneWADOImageLoader.calculateMinMax(imageFrame);
-
-  imageFrame.pixelData = imageFrame.pixelData.buffer;
-
-  self.postMessage({
-    message: 'decodeTask',
-    status: 'success',
-    result: {
-      imageFrame: imageFrame,
-    },
-    workerIndex: data.workerIndex
-  }, [imageFrame.pixelData]);
+/**
+ * Function exposed to web worker tasks to register themselves
+ * @param taskHandler
+ */
+function registerTaskHandler(taskHandler) {
+  taskHandlers[taskHandler.taskId] = taskHandler;
+  if(initialized) {
+    taskHandlers[key].initialize(config);
+  }
 }
 
-messageMap = {
-  'initializeTask' : initializeTask,
-  'decodeTask' : decodeTask
-};
-
-
-function registerMessageHandler(message, handler) {
-  messageMap[message] = handler;
-}
-
+/**
+ * Web worker message handler - dispatches messages to the registered task handlers
+ * @param msg
+ */
 self.onmessage = function(msg) {
   //console.log('web worker onmessage', msg.data);
-  messageMap[msg.data.message](msg.data);
+  if(msg.data.message === 'initialize') {
+    initialize(msg.data);
+    return;
+  }
+
+  // dispatch the message if there is a handler registered for it
+  if(taskHandlers[msg.data.message]) {
+    taskHandlers[msg.data.message].handler(msg.data);
+    return;
+  }
+
+  // not task handler registered - send a failure message back to ui thread
+  self.postMessage({
+    message: msg.data.message,
+    status: 'fail',
+    result: {
+      reason: 'no task handler registered'
+    },
+    workerIndex: data.workerIndex
+  });
 };

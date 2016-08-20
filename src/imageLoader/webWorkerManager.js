@@ -11,6 +11,8 @@
   var config = {
     maxWebWorkers: navigator.hardwareConcurrency || 1,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
+    loadCodecsOnStartup : true,
+    initializeCodecsOnStartup: true,
     codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
     otherWebWorkers: [{
       path: 'foo.js',
@@ -91,7 +93,7 @@
    */
   function handleMessageFromWorker(msg) {
     //console.log('handleMessageFromWorker', msg.data);
-    if(msg.data.message === 'initializeTask') {
+    if(msg.data.message === 'initialize') {
       webWorkers[msg.data.workerIndex].status = 'ready';
       startTaskOnWebWorker();
     } else if(msg.data.message === 'decodeTask') {
@@ -137,7 +139,7 @@
       });
       worker.addEventListener('message', handleMessageFromWorker);
       worker.postMessage({
-        message: 'initializeTask',
+        message: 'initialize',
         workerIndex: webWorkers.length - 1,
         config: config
       });

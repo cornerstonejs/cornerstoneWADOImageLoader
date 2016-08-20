@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-19 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-20 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -1630,6 +1630,8 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
   var config = {
     maxWebWorkers: navigator.hardwareConcurrency || 1,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
+    loadCodecsOnStartup : true,
+    initializeCodecsOnStartup: true,
     codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
     otherWebWorkers: [{
       path: 'foo.js',
@@ -1710,7 +1712,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
    */
   function handleMessageFromWorker(msg) {
     //console.log('handleMessageFromWorker', msg.data);
-    if(msg.data.message === 'initializeTask') {
+    if(msg.data.message === 'initialize') {
       webWorkers[msg.data.workerIndex].status = 'ready';
       startTaskOnWebWorker();
     } else if(msg.data.message === 'decodeTask') {
@@ -1756,7 +1758,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       });
       worker.addEventListener('message', handleMessageFromWorker);
       worker.postMessage({
-        message: 'initializeTask',
+        message: 'initialize',
         workerIndex: webWorkers.length - 1,
         config: config
       });

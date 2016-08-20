@@ -67,7 +67,7 @@ module.exports = function(grunt) {
                 dest: 'dist/cornerstoneWADOImageLoaderCodecs.js'
             },
             buildWebWorker: {
-                src : ['src/webWorker/main.js', 'src/webWorker/**/*.js'],
+                src : ['src/webWorker/main.js', 'src/webWorker/decodeTask/decodeTask.js', 'src/webWorker/**/*.js'],
                 dest: 'build/cornerstoneWADOImageLoaderWebWorker.js'
             },
             distWebWorker: {
