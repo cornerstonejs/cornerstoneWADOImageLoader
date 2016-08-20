@@ -56,7 +56,7 @@
             <div class="form-group">
                 <label class="control-label col-sm-1" for="wadoURL">URL</label>
                 <div class="col-sm-8">
-                    <input class="form-control" type="text" id="wadoURL" placeholder="Enter WADO URL" value="../../testImages/CT1_J2KR">
+                    <input class="form-control" type="text" id="wadoURL" placeholder="Enter WADO URL" value="../../testImages/CTImage.dcm">
                 </div>
                 <div class="col-sm-3">
                     <button class="form-control" type="button" id="downloadAndView" class="btn btn-primary">Download and View</button>
@@ -69,6 +69,10 @@
                 <div class="col-sm-3">
                     <button class="form-control" type="button" id="start10WebWorkers" class="btn btn-primary">Start 10 Web Workers</button>
                 </div>
+                <div class="col-sm-3">
+                    <button class="form-control" type="button" id="sharpen" class="btn btn-primary">Sharpen Image</button>
+                </div>
+
             </div>
         </form>
     </div>
@@ -122,7 +126,9 @@
         maxWebWorkers: navigator.hardwareConcurrency || 1,
         webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
         webWorkerTaskPaths: [
-            '../examples/customWebWorkerTask/sleepTask.js'
+            '../examples/customWebWorkerTask/sleepTask.js',
+            '../examples/customWebWorkerTask/sharpenTask.js'
+
         ],
         taskConfiguration: {
             'decodeTask' : {
@@ -139,12 +145,15 @@
 
     var loaded = false;
 
+    var loadedImage;
+
     function loadAndViewImage(imageId) {
         var element = $('#dicomImage').get(0);
         try {
             var start = new Date().getTime();
             cornerstone.loadAndCacheImage(imageId).then(function(image) {
                 console.log(image);
+                loadedImage = image;
                 updateStatistics();
                 var viewport = cornerstone.getDefaultViewportForImage(element, image);
                 $('#toggleModalityLUT').attr("checked",viewport.modalityLUT !== undefined);
@@ -223,6 +232,46 @@
                 startWebWorker();
             }
         });
+        $('#sharpen').click(function(e) {
+            var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('sharpenTask', {
+                pixelData :loadedImage.getPixelData(),
+                imageFrame: {
+                    width : loadedImage.width,
+                    height : loadedImage.height,
+                }
+            }, 1);
+            promise.then(function(result) {
+                result.pixelData = new Int16Array(result.pixelData);
+
+                var minMax = cornerstoneWADOImageLoader.getMinMax(result.pixelData);
+                console.log(minMax);
+                var sharpenedImage = {
+                    color : false,
+                    columns: loadedImage.columns,
+                    rows : loadedImage.rows,
+                    width : loadedImage.width,
+                    height : loadedImage.height,
+                    imageId : new Date().toISOString(),
+                    maxPixelValue: minMax.max,
+                    minPixelValue: minMax.min,
+                    windowWidth : loadedImage.windowWidth,
+                    windowLevel : loadedImage.windowLevel,
+                    sizeInBytes : loadedImage.sizeInBytes,
+                    render : loadedImage.render,
+                    slope: loadedImage.slope,
+                    intercept: loadedImage.intercept,
+                    invert: loadedImage.invert,
+                    getPixelData : function() {return result.pixelData;}
+                };
+
+                console.log(sharpenedImage);
+
+                cornerstone.displayImage(element, sharpenedImage);
+                loadedImage = sharpenedImage;
+                updateStatistics();
+            });
+        });
+
 
         $('form').submit(function() {
             downloadAndView();
