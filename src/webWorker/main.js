@@ -23,15 +23,15 @@ function initialize(data) {
   config = data.config;
 
   // load any additional web worker tasks
-  if(data.config.otherWebWorkers) {
-    for(var i=0; i < data.config.otherWebWorkers.length; i++) {
-      self.importScripts(data.config.otherWebWorkers[i].path);
+  if(data.config.webWorkerTaskPaths) {
+    for(var i=0; i < data.config.webWorkerTaskPaths.length; i++) {
+      self.importScripts(data.config.webWorkerTaskPaths[i]);
     }
   }
 
   // initialize each task handler
   Object.keys(taskHandlers).forEach(function(key) {
-    taskHandlers[key].initialize(config);
+    taskHandlers[key].initialize(config.taskConfiguration);
   });
 
   // tell main ui thread that we have completed initialization
@@ -75,12 +75,14 @@ self.onmessage = function(msg) {
   }
 
   // not task handler registered - send a failure message back to ui thread
+  console.log('no task handler for ', msg.data.message);
+  console.log(taskHandlers);
   self.postMessage({
     message: msg.data.message,
     status: 'fail',
     result: {
       reason: 'no task handler registered'
     },
-    workerIndex: data.workerIndex
+    workerIndex: msg.data.workerIndex
   });
 };

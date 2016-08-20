@@ -11,15 +11,14 @@
   var config = {
     maxWebWorkers: navigator.hardwareConcurrency || 1,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
-    loadCodecsOnStartup : true,
-    initializeCodecsOnStartup: true,
-    codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
-    otherWebWorkers: [{
-      path: 'foo.js',
-      config : {
-        someOption: 42
+    webWorkerTaskPaths: [],
+    taskConfiguration: {
+      'decodeTask' : {
+        loadCodecsOnStartup : true,
+        initializeCodecsOnStartup: false,
+        codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js'
       }
-    }]
+    }
   };
 
   var statistics = {

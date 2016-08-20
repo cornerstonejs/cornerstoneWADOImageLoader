@@ -119,17 +119,21 @@
 <script>
     // Initialize the web worker manager with our custom web worker task
     var config = {
-        maxWebWorkers:  4,
+        maxWebWorkers: navigator.hardwareConcurrency || 1,
         webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
-        loadCodecsOnStartup : true,
-        initializeCodecsOnStartup: false,
-        codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
-        otherWebWorkers: [{
-            path: '../examples/customWebWorkerTask/customWebWorkerTask.js',
-            config : {
-                someOption: 42
+        webWorkerTaskPaths: [
+            '../examples/customWebWorkerTask/sleepTask.js'
+        ],
+        taskConfiguration: {
+            'decodeTask' : {
+                loadCodecsOnStartup : true,
+                initializeCodecsOnStartup: false,
+                codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js'
+            },
+            'sleepTask' : {
+                sleepTime: 3000
             }
-        }]
+        }
     };
     cornerstoneWADOImageLoader.webWorkerManager.initialize(config);
 
@@ -196,7 +200,7 @@
     }
 
     function startWebWorker() {
-        var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('myCustomMessage', {}, 1);
+        var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('sleepTask', {}, 1);
         promise.then(function(result) {
             updateStatistics();
         });

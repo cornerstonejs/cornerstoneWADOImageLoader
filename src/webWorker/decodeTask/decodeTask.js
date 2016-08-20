@@ -1,22 +1,29 @@
-
 cornerstoneWADOImageLoader = {};
 
+// flag to ensure codecs are loaded only once
 var codecsLoaded = false;
 
+// the configuration object for the decodeTask
 var decodeConfig;
 
+/**
+ * Function to control loading and initializing the codecs
+ * @param config
+ */
 function loadCodecs(config) {
   // prevent loading codecs more than once
   if(codecsLoaded) {
     return;
   }
 
+  // Load the codecs
   //console.time('loadCodecs');
-  self.importScripts(config.codecsPath);
+  self.importScripts(config.decodeTask.codecsPath);
   codecsLoaded = true;
   //console.timeEnd('loadCodecs');
 
-  if(config.initializeCodecsOnStartup) {
+  // Initialize the codecs
+  if(config.decodeTask.initializeCodecsOnStartup) {
     //console.time('initializeCodecs');
     cornerstoneWADOImageLoader.initializeJPEG2000();
     cornerstoneWADOImageLoader.initializeJPEGLS();
@@ -24,26 +31,40 @@ function loadCodecs(config) {
   }
 }
 
+/**
+ * Task initialization function
+ * @param config
+ */
 function decodeTaskInitialize(config) {
   decodeConfig = config;
-  if(config.loadCodecsOnStartup) {
+  if(config.decodeTask.loadCodecsOnStartup) {
     loadCodecs(config);
   }
 }
 
+/**
+ * Task handler function
+ * @param data
+ */
 function decodeTaskHandler(data) {
+  // Load the codecs if they aren't already loaded
   loadCodecs(decodeConfig);
 
-  //console.log(data);
   var imageFrame = data.data.imageFrame;
-  var pixelData = new Uint8Array(data.data.pixelData);
-  var transferSyntax = data.data.transferSyntax;
 
-  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData);
+  // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
+  // not typed arrays
+  var pixelData = new Uint8Array(data.data.pixelData);
+
+  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData);
+
   cornerstoneWADOImageLoader.calculateMinMax(imageFrame);
 
+  // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
+  // typed arrays
   imageFrame.pixelData = imageFrame.pixelData.buffer;
 
+  // Post the result message back to the UI thread and transfer the pixelData to avoid a gc operation on it
   self.postMessage({
     message: 'decodeTask',
     status: 'success',
@@ -54,6 +75,7 @@ function decodeTaskHandler(data) {
   }, [imageFrame.pixelData]);
 }
 
+// register our task
 registerTaskHandler({
   taskId :'decodeTask',
   handler: decodeTaskHandler,

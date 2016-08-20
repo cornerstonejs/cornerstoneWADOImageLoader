@@ -24,15 +24,15 @@ function initialize(data) {
   config = data.config;
 
   // load any additional web worker tasks
-  if(data.config.otherWebWorkers) {
-    for(var i=0; i < data.config.otherWebWorkers.length; i++) {
-      self.importScripts(data.config.otherWebWorkers[i].path);
+  if(data.config.webWorkerTaskPaths) {
+    for(var i=0; i < data.config.webWorkerTaskPaths.length; i++) {
+      self.importScripts(data.config.webWorkerTaskPaths[i]);
     }
   }
 
   // initialize each task handler
   Object.keys(taskHandlers).forEach(function(key) {
-    taskHandlers[key].initialize(config);
+    taskHandlers[key].initialize(config.taskConfiguration);
   });
 
   // tell main ui thread that we have completed initialization
@@ -76,34 +76,43 @@ self.onmessage = function(msg) {
   }
 
   // not task handler registered - send a failure message back to ui thread
+  console.log('no task handler for ', msg.data.message);
+  console.log(taskHandlers);
   self.postMessage({
     message: msg.data.message,
     status: 'fail',
     result: {
       reason: 'no task handler registered'
     },
-    workerIndex: data.workerIndex
+    workerIndex: msg.data.workerIndex
   });
 };
-
 cornerstoneWADOImageLoader = {};
 
+// flag to ensure codecs are loaded only once
 var codecsLoaded = false;
 
+// the configuration object for the decodeTask
 var decodeConfig;
 
+/**
+ * Function to control loading and initializing the codecs
+ * @param config
+ */
 function loadCodecs(config) {
   // prevent loading codecs more than once
   if(codecsLoaded) {
     return;
   }
 
+  // Load the codecs
   //console.time('loadCodecs');
-  self.importScripts(config.codecsPath);
+  self.importScripts(config.decodeTask.codecsPath);
   codecsLoaded = true;
   //console.timeEnd('loadCodecs');
 
-  if(config.initializeCodecsOnStartup) {
+  // Initialize the codecs
+  if(config.decodeTask.initializeCodecsOnStartup) {
     //console.time('initializeCodecs');
     cornerstoneWADOImageLoader.initializeJPEG2000();
     cornerstoneWADOImageLoader.initializeJPEGLS();
@@ -111,26 +120,40 @@ function loadCodecs(config) {
   }
 }
 
+/**
+ * Task initialization function
+ * @param config
+ */
 function decodeTaskInitialize(config) {
   decodeConfig = config;
-  if(config.loadCodecsOnStartup) {
+  if(config.decodeTask.loadCodecsOnStartup) {
     loadCodecs(config);
   }
 }
 
+/**
+ * Task handler function
+ * @param data
+ */
 function decodeTaskHandler(data) {
+  // Load the codecs if they aren't already loaded
   loadCodecs(decodeConfig);
 
-  //console.log(data);
   var imageFrame = data.data.imageFrame;
-  var pixelData = new Uint8Array(data.data.pixelData);
-  var transferSyntax = data.data.transferSyntax;
 
-  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData);
+  // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
+  // not typed arrays
+  var pixelData = new Uint8Array(data.data.pixelData);
+
+  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData);
+
   cornerstoneWADOImageLoader.calculateMinMax(imageFrame);
 
+  // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
+  // typed arrays
   imageFrame.pixelData = imageFrame.pixelData.buffer;
 
+  // Post the result message back to the UI thread and transfer the pixelData to avoid a gc operation on it
   self.postMessage({
     message: 'decodeTask',
     status: 'success',
@@ -141,6 +164,7 @@ function decodeTaskHandler(data) {
   }, [imageFrame.pixelData]);
 }
 
+// register our task
 registerTaskHandler({
   taskId :'decodeTask',
   handler: decodeTaskHandler,

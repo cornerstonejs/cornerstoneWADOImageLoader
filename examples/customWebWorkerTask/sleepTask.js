@@ -1,26 +1,28 @@
 //console.log('custom web worker loaded');
 
-function myCustomTaskInitialize(config) {
+var sleepConfig;
 
+function sleepTaskInitialize(config) {
+  sleepConfig = config;
 }
 
-function myCustomTaskHandler(data) {
+function sleepTaskHandler(data) {
 
   // we fake real processing by setting a timeout
   setTimeout(function() {
 
     // once the task is done, we send a message back with our result
     self.postMessage({
-      message: 'myCustomMessage',
+      message: 'sleepTask',
       result: 'success',
       workerIndex: data.workerIndex
     });
-  }, 3000);
+  }, sleepConfig.sleepTask.sleepTime);
 }
 
 // register ourselves to receive messages
 registerTaskHandler({
-  taskId :'myCustomMessage',
-  handler: myCustomTaskHandler,
-  initialize: myCustomTaskInitialize
+  taskId :'sleepTask',
+  handler: sleepTaskHandler  ,
+  initialize: sleepTaskInitialize
 });
