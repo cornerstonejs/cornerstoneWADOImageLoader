@@ -209,8 +209,9 @@
     }
 
     function startWebWorker() {
-        var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('sleepTask', {}, 1);
+        var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('sleepTask', {}, 10);
         promise.then(function(result) {
+            console.log('sleep task completed');
             updateStatistics();
         });
         updateStatistics();
@@ -241,6 +242,7 @@
                 }
             }, 1);
             promise.then(function(result) {
+                console.log('sharpen task completed');
                 result.pixelData = new Int16Array(result.pixelData);
 
                 var minMax = cornerstoneWADOImageLoader.getMinMax(result.pixelData);

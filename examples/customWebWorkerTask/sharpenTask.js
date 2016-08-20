@@ -6,7 +6,6 @@
     sharpenConfig = config;
   }
 
-
   function handler(data) {
 
     // convert pixel data from ArrayBuffer to Int16Array since web workers support passing ArrayBuffers but
@@ -57,7 +56,7 @@
       result: 'success',
       pixelData: shapenedPixelData.buffer,
       workerIndex: data.workerIndex
-    });
+    }, [shapenedPixelData.buffer]);
   }
 
 // register ourselves to receive messages

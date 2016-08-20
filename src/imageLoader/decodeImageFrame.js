@@ -11,7 +11,7 @@
         imageFrame : imageFrame,
         transferSyntax : transferSyntax,
         pixelData : pixelData
-      });
+      }, 5);
   }
 
   function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas) {
