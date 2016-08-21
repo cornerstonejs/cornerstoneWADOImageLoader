@@ -68,7 +68,8 @@ Building on the prior minimal example, you can configure the web worker framewor
             'decodeTask' : {
                 loadCodecsOnStartup : true,
                 initializeCodecsOnStartup: false,
-                codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js'
+                codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
+                usePDFJS: false
             },
             'sleepTask' : {
                 sleepTime: 3000
@@ -98,6 +99,10 @@ don't want to pay the CPU cost up front.  If disabled, the codecs will be loaded
 the JPEG2000 or JPEG-LS decoders on startup.  Initialization takes even more CPU (and time) than loading so it is
 disabled by default.  If you expect to display JPEG-LS or JPEG2000 images frequently, you might want to enable
 this flag.
+
+* taskConfiguration.decodeTask.usePDFJS - By default, the decode task uses the OpenJPEG based codec for
+  decoding JPEG2000 images.  Set this to true to use the PDF.JS codec.  The PDF.js codec is faster than the
+  OpenJPEG based codec but does not properly decode all images and is therefore not recommended.
 
 * taskConfiguration.sleepTask.sleepTime - This is a configuratio option for a custom web worker task,
 See "Custom Web Worker Tasks" section below.

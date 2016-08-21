@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-20 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-21 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 
 // an object of task handlers
 var taskHandlers = {};
@@ -136,7 +136,6 @@ function calculateMinMax(imageFrame)
   if(imageFrame.smallestPixelValue !== undefined && imageFrame.largestPixelValue !== undefined) {
     return;
   }
-  
 
   var minMax = cornerstoneWADOImageLoader.getMinMax(imageFrame.pixelData);
   imageFrame.smallestPixelValue = minMax.min;
@@ -157,7 +156,7 @@ function decodeTaskHandler(data) {
   // not typed arrays
   var pixelData = new Uint8Array(data.data.pixelData);
 
-  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData);
+  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData, decodeConfig.decodeTask);
 
   calculateMinMax(imageFrame);
 
@@ -189,7 +188,7 @@ registerTaskHandler({
 
   "use strict";
 
-  function decodeImageFrame(imageFrame, transferSyntax, pixelData) {
+  function decodeImageFrame(imageFrame, transferSyntax, pixelData, decodeConfig) {
     var start = new Date().getTime();
 
     // Implicit VR Little Endian
@@ -246,12 +245,12 @@ registerTaskHandler({
     // JPEG 2000 Lossless
     else if (transferSyntax === "1.2.840.10008.1.2.4.90")
     {
-      imageFrame = cornerstoneWADOImageLoader.decodeJPEG2000(imageFrame, pixelData);
+      imageFrame = cornerstoneWADOImageLoader.decodeJPEG2000(imageFrame, pixelData, decodeConfig);
     }
     // JPEG 2000 Lossy
     else if (transferSyntax === "1.2.840.10008.1.2.4.91")
     {
-      imageFrame = cornerstoneWADOImageLoader.decodeJPEG2000(imageFrame, pixelData);
+      imageFrame = cornerstoneWADOImageLoader.decodeJPEG2000(imageFrame, pixelData, decodeConfig);
     }
     /* Don't know if these work...
      // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
@@ -446,36 +445,33 @@ registerTaskHandler({
     return imageFrame;
   }
 
-  function initializeJPEG2000() {
+  function initializeJPEG2000(decodeConfig) {
     // check to make sure codec is loaded
-    if(typeof OpenJPEG === 'undefined' &&
-      typeof JpxImage === 'undefined') {
-      throw 'No JPEG2000 decoder loaded';
+    if(!decodeConfig.usePDFJS) {
+      if(typeof OpenJPEG === 'undefined') {
+        throw 'OpenJPEG decoder not loaded';
+      }
     }
 
-    // OpenJPEG2000 https://github.com/jpambrun/openjpeg
-    if(typeof OpenJPEG !== 'undefined') {
-      // Initialize if it isn't already initialized
-      if (!openJPEG) {
-        openJPEG = OpenJPEG();
-        if (!openJPEG || !openJPEG._jp2_decode) {
-          throw 'OpenJPEG failed to initialize';
-        }
+    if (!openJPEG) {
+      openJPEG = OpenJPEG();
+      if (!openJPEG || !openJPEG._jp2_decode) {
+        throw 'OpenJPEG failed to initialize';
       }
     }
   }
 
-  function decodeJPEG2000(imageFrame, pixelData)
+  function decodeJPEG2000(imageFrame, pixelData, decodeConfig)
   {
-    initializeJPEG2000();
+    initializeJPEG2000(decodeConfig);
 
-    // OpenJPEG2000 https://github.com/jpambrun/openjpeg
-    if(typeof OpenJPEG !== 'undefined') {
+    if(!decodeConfig.usePDFJS) {
+      // OpenJPEG2000 https://github.com/jpambrun/openjpeg
+      console.log('OpenJPEG')
       return decodeOpenJpeg2000(imageFrame, pixelData);
-    }
-
-    // OHIF image-JPEG2000 https://github.com/OHIF/image-JPEG2000
-    if(typeof JpxImage !== 'undefined') {
+    } else {
+      // OHIF image-JPEG2000 https://github.com/OHIF/image-JPEG2000
+      console.log('PDFJS')
       return decodeJpx(imageFrame, pixelData);
     }
   }

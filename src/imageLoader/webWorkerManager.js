@@ -16,7 +16,8 @@
       'decodeTask' : {
         loadCodecsOnStartup : true,
         initializeCodecsOnStartup: false,
-        codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js'
+        codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
+        usePDFJS: false
       }
     }
   };

@@ -67,7 +67,7 @@ function decodeTaskHandler(data) {
   // not typed arrays
   var pixelData = new Uint8Array(data.data.pixelData);
 
-  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData);
+  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData, decodeConfig.decodeTask);
 
   calculateMinMax(imageFrame);
 
