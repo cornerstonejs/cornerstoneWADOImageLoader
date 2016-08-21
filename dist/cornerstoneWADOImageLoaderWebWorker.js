@@ -1,186 +1,193 @@
 /*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-21 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+var registerTaskHandler;
 
-// an object of task handlers
-var taskHandlers = {};
+(function () {
 
-// Flag to ensure web worker is only initialized once
-var initialized = false;
 
-// the configuration object passed in when the web worker manager is initialized
-var config;
+  // an object of task handlers
+  var taskHandlers = {};
 
-/**
- * Initialization function that loads additional web workers and initializes them
- * @param data
- */
-function initialize(data) {
-  //console.log('web worker initialize ', data.workerIndex);
-  // prevent initialization from happening more than once
-  if(initialized) {
-    return;
+  // Flag to ensure web worker is only initialized once
+  var initialized = false;
+
+  // the configuration object passed in when the web worker manager is initialized
+  var config;
+
+  /**
+   * Initialization function that loads additional web workers and initializes them
+   * @param data
+   */
+  function initialize(data) {
+    //console.log('web worker initialize ', data.workerIndex);
+    // prevent initialization from happening more than once
+    if(initialized) {
+      return;
+    }
+
+    // save the config data
+    config = data.config;
+
+    // load any additional web worker tasks
+    if(data.config.webWorkerTaskPaths) {
+      for(var i=0; i < data.config.webWorkerTaskPaths.length; i++) {
+        self.importScripts(data.config.webWorkerTaskPaths[i]);
+      }
+    }
+
+    // initialize each task handler
+    Object.keys(taskHandlers).forEach(function(key) {
+      taskHandlers[key].initialize(config.taskConfiguration);
+    });
+
+    // tell main ui thread that we have completed initialization
+    self.postMessage({
+      taskId: 'initialize',
+      status: 'success',
+      result: {
+      },
+      workerIndex: data.workerIndex
+    });
+
+    initialized = true;
   }
 
-  // save the config data
-  config = data.config;
-
-  // load any additional web worker tasks
-  if(data.config.webWorkerTaskPaths) {
-    for(var i=0; i < data.config.webWorkerTaskPaths.length; i++) {
-      self.importScripts(data.config.webWorkerTaskPaths[i]);
+  /**
+   * Function exposed to web worker tasks to register themselves
+   * @param taskHandler
+   */
+  registerTaskHandler = function(taskHandler) {
+    taskHandlers[taskHandler.taskId] = taskHandler;
+    if(initialized) {
+      taskHandlers[key].initialize(config);
     }
   }
 
-  // initialize each task handler
-  Object.keys(taskHandlers).forEach(function(key) {
-    taskHandlers[key].initialize(config.taskConfiguration);
-  });
+  /**
+   * Web worker message handler - dispatches messages to the registered task handlers
+   * @param msg
+   */
+  self.onmessage = function(msg) {
+    //console.log('web worker onmessage', msg.data);
+    if(msg.data.taskId === 'initialize') {
+      initialize(msg.data);
+      return;
+    }
 
-  // tell main ui thread that we have completed initialization
-  self.postMessage({
-    taskId: 'initialize',
-    status: 'success',
-    result: {
-    },
-    workerIndex: data.workerIndex
-  });
+    // dispatch the message if there is a handler registered for it
+    if(taskHandlers[msg.data.taskId]) {
+      taskHandlers[msg.data.taskId].handler(msg.data, function(result, transferList) {
+        self.postMessage({
+          taskId: msg.data.taskId,
+          status: 'success',
+          result: result,
+          workerIndex: msg.data.workerIndex
+        }, transferList);
+      });
+      return;
+    }
 
-  initialized = true;
-}
+    // not task handler registered - send a failure message back to ui thread
+    console.log('no task handler for ', msg.data.taskId);
+    console.log(taskHandlers);
+    self.postMessage({
+      taskId: msg.data.taskId,
+      status: 'failed - no task handler registered',
+      workerIndex: msg.data.workerIndex
+    });
+  };
 
-/**
- * Function exposed to web worker tasks to register themselves
- * @param taskHandler
- */
-function registerTaskHandler(taskHandler) {
-  taskHandlers[taskHandler.taskId] = taskHandler;
-  if(initialized) {
-    taskHandlers[key].initialize(config);
-  }
-}
+}());
 
-/**
- * Web worker message handler - dispatches messages to the registered task handlers
- * @param msg
- */
-self.onmessage = function(msg) {
-  //console.log('web worker onmessage', msg.data);
-  if(msg.data.taskId === 'initialize') {
-    initialize(msg.data);
-    return;
-  }
-
-  // dispatch the message if there is a handler registered for it
-  if(taskHandlers[msg.data.taskId]) {
-    taskHandlers[msg.data.taskId].handler(msg.data);
-    return;
-  }
-
-  // not task handler registered - send a failure message back to ui thread
-  console.log('no task handler for ', msg.data.taskId);
-  console.log(taskHandlers);
-  self.postMessage({
-    taskId: msg.data.taskId,
-    status: 'fail',
-    result: {
-      reason: 'no task handler registered'
-    },
-    workerIndex: msg.data.workerIndex
-  });
-};
 cornerstoneWADOImageLoader = {};
 
-// flag to ensure codecs are loaded only once
-var codecsLoaded = false;
+(function () {
 
-// the configuration object for the decodeTask
-var decodeConfig;
+  // flag to ensure codecs are loaded only once
+  var codecsLoaded = false;
 
-/**
- * Function to control loading and initializing the codecs
- * @param config
- */
-function loadCodecs(config) {
-  // prevent loading codecs more than once
-  if(codecsLoaded) {
-    return;
+  // the configuration object for the decodeTask
+  var decodeConfig;
+
+  /**
+   * Function to control loading and initializing the codecs
+   * @param config
+   */
+  function loadCodecs(config) {
+    // prevent loading codecs more than once
+    if (codecsLoaded) {
+      return;
+    }
+
+    // Load the codecs
+    //console.time('loadCodecs');
+    self.importScripts(config.decodeTask.codecsPath);
+    codecsLoaded = true;
+    //console.timeEnd('loadCodecs');
+
+    // Initialize the codecs
+    if (config.decodeTask.initializeCodecsOnStartup) {
+      //console.time('initializeCodecs');
+      cornerstoneWADOImageLoader.initializeJPEG2000();
+      cornerstoneWADOImageLoader.initializeJPEGLS();
+      //console.timeEnd('initializeCodecs');
+    }
   }
 
-  // Load the codecs
-  //console.time('loadCodecs');
-  self.importScripts(config.decodeTask.codecsPath);
-  codecsLoaded = true;
-  //console.timeEnd('loadCodecs');
-
-  // Initialize the codecs
-  if(config.decodeTask.initializeCodecsOnStartup) {
-    //console.time('initializeCodecs');
-    cornerstoneWADOImageLoader.initializeJPEG2000();
-    cornerstoneWADOImageLoader.initializeJPEGLS();
-    //console.timeEnd('initializeCodecs');
-  }
-}
-
-/**
- * Task initialization function
- * @param config
- */
-function decodeTaskInitialize(config) {
-  decodeConfig = config;
-  if(config.decodeTask.loadCodecsOnStartup) {
-    loadCodecs(config);
-  }
-}
-
-function calculateMinMax(imageFrame)
-{
-  if(imageFrame.smallestPixelValue !== undefined && imageFrame.largestPixelValue !== undefined) {
-    return;
+  /**
+   * Task initialization function
+   * @param config
+   */
+  function decodeTaskInitialize(config) {
+    decodeConfig = config;
+    if (config.decodeTask.loadCodecsOnStartup) {
+      loadCodecs(config);
+    }
   }
 
-  var minMax = cornerstoneWADOImageLoader.getMinMax(imageFrame.pixelData);
-  imageFrame.smallestPixelValue = minMax.min;
-  imageFrame.largestPixelValue = minMax.max;
-}
+  function calculateMinMax(imageFrame) {
+    if (imageFrame.smallestPixelValue !== undefined && imageFrame.largestPixelValue !== undefined) {
+      return;
+    }
 
-/**
- * Task handler function
- * @param data
- */
-function decodeTaskHandler(data) {
-  // Load the codecs if they aren't already loaded
-  loadCodecs(decodeConfig);
+    var minMax = cornerstoneWADOImageLoader.getMinMax(imageFrame.pixelData);
+    imageFrame.smallestPixelValue = minMax.min;
+    imageFrame.largestPixelValue = minMax.max;
+  }
 
-  var imageFrame = data.data.imageFrame;
+  /**
+   * Task handler function
+   * @param data
+   */
+  function decodeTaskHandler(data, doneCallback) {
+    // Load the codecs if they aren't already loaded
+    loadCodecs(decodeConfig);
 
-  // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
-  // not typed arrays
-  var pixelData = new Uint8Array(data.data.pixelData);
+    var imageFrame = data.data.imageFrame;
 
-  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData, decodeConfig.decodeTask);
+    // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
+    // not typed arrays
+    var pixelData = new Uint8Array(data.data.pixelData);
 
-  calculateMinMax(imageFrame);
+    cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData, decodeConfig.decodeTask);
 
-  // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
-  // typed arrays
-  imageFrame.pixelData = imageFrame.pixelData.buffer;
+    calculateMinMax(imageFrame);
 
-  // Post the result message back to the UI thread and transfer the pixelData to avoid a gc operation on it
-  self.postMessage({
+    // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
+    // typed arrays
+    imageFrame.pixelData = imageFrame.pixelData.buffer;
+
+    // invoke the callback with our result and pass the pixelData in the transferlist to move it to
+    // UI thread context and avoid a copy
+    doneCallback({imageFrame: imageFrame}, [imageFrame.pixelData]);
+  }
+
+  // register our task
+  registerTaskHandler({
     taskId: 'decodeTask',
-    status: 'success',
-    result: {
-      imageFrame: imageFrame,
-    },
-    workerIndex: data.workerIndex
-  }, [imageFrame.pixelData]);
-}
-
-// register our task
-registerTaskHandler({
-  taskId :'decodeTask',
-  handler: decodeTaskHandler,
-  initialize: decodeTaskInitialize
-});
+    handler: decodeTaskHandler,
+    initialize: decodeTaskInitialize
+  });
+}());
 
 /**
  */

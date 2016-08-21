@@ -1,94 +1,90 @@
 cornerstoneWADOImageLoader = {};
 
-// flag to ensure codecs are loaded only once
-var codecsLoaded = false;
+(function () {
 
-// the configuration object for the decodeTask
-var decodeConfig;
+  // flag to ensure codecs are loaded only once
+  var codecsLoaded = false;
 
-/**
- * Function to control loading and initializing the codecs
- * @param config
- */
-function loadCodecs(config) {
-  // prevent loading codecs more than once
-  if(codecsLoaded) {
-    return;
+  // the configuration object for the decodeTask
+  var decodeConfig;
+
+  /**
+   * Function to control loading and initializing the codecs
+   * @param config
+   */
+  function loadCodecs(config) {
+    // prevent loading codecs more than once
+    if (codecsLoaded) {
+      return;
+    }
+
+    // Load the codecs
+    //console.time('loadCodecs');
+    self.importScripts(config.decodeTask.codecsPath);
+    codecsLoaded = true;
+    //console.timeEnd('loadCodecs');
+
+    // Initialize the codecs
+    if (config.decodeTask.initializeCodecsOnStartup) {
+      //console.time('initializeCodecs');
+      cornerstoneWADOImageLoader.initializeJPEG2000();
+      cornerstoneWADOImageLoader.initializeJPEGLS();
+      //console.timeEnd('initializeCodecs');
+    }
   }
 
-  // Load the codecs
-  //console.time('loadCodecs');
-  self.importScripts(config.decodeTask.codecsPath);
-  codecsLoaded = true;
-  //console.timeEnd('loadCodecs');
-
-  // Initialize the codecs
-  if(config.decodeTask.initializeCodecsOnStartup) {
-    //console.time('initializeCodecs');
-    cornerstoneWADOImageLoader.initializeJPEG2000();
-    cornerstoneWADOImageLoader.initializeJPEGLS();
-    //console.timeEnd('initializeCodecs');
-  }
-}
-
-/**
- * Task initialization function
- * @param config
- */
-function decodeTaskInitialize(config) {
-  decodeConfig = config;
-  if(config.decodeTask.loadCodecsOnStartup) {
-    loadCodecs(config);
-  }
-}
-
-function calculateMinMax(imageFrame)
-{
-  if(imageFrame.smallestPixelValue !== undefined && imageFrame.largestPixelValue !== undefined) {
-    return;
+  /**
+   * Task initialization function
+   * @param config
+   */
+  function decodeTaskInitialize(config) {
+    decodeConfig = config;
+    if (config.decodeTask.loadCodecsOnStartup) {
+      loadCodecs(config);
+    }
   }
 
-  var minMax = cornerstoneWADOImageLoader.getMinMax(imageFrame.pixelData);
-  imageFrame.smallestPixelValue = minMax.min;
-  imageFrame.largestPixelValue = minMax.max;
-}
+  function calculateMinMax(imageFrame) {
+    if (imageFrame.smallestPixelValue !== undefined && imageFrame.largestPixelValue !== undefined) {
+      return;
+    }
 
-/**
- * Task handler function
- * @param data
- */
-function decodeTaskHandler(data) {
-  // Load the codecs if they aren't already loaded
-  loadCodecs(decodeConfig);
+    var minMax = cornerstoneWADOImageLoader.getMinMax(imageFrame.pixelData);
+    imageFrame.smallestPixelValue = minMax.min;
+    imageFrame.largestPixelValue = minMax.max;
+  }
 
-  var imageFrame = data.data.imageFrame;
+  /**
+   * Task handler function
+   * @param data
+   */
+  function decodeTaskHandler(data, doneCallback) {
+    // Load the codecs if they aren't already loaded
+    loadCodecs(decodeConfig);
 
-  // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
-  // not typed arrays
-  var pixelData = new Uint8Array(data.data.pixelData);
+    var imageFrame = data.data.imageFrame;
 
-  cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData, decodeConfig.decodeTask);
+    // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
+    // not typed arrays
+    var pixelData = new Uint8Array(data.data.pixelData);
 
-  calculateMinMax(imageFrame);
+    cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData, decodeConfig.decodeTask);
 
-  // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
-  // typed arrays
-  imageFrame.pixelData = imageFrame.pixelData.buffer;
+    calculateMinMax(imageFrame);
 
-  // Post the result message back to the UI thread and transfer the pixelData to avoid a gc operation on it
-  self.postMessage({
+    // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
+    // typed arrays
+    imageFrame.pixelData = imageFrame.pixelData.buffer;
+
+    // invoke the callback with our result and pass the pixelData in the transferlist to move it to
+    // UI thread context and avoid a copy
+    doneCallback({imageFrame: imageFrame}, [imageFrame.pixelData]);
+  }
+
+  // register our task
+  registerTaskHandler({
     taskId: 'decodeTask',
-    status: 'success',
-    result: {
-      imageFrame: imageFrame,
-    },
-    workerIndex: data.workerIndex
-  }, [imageFrame.pixelData]);
-}
-
-// register our task
-registerTaskHandler({
-  taskId :'decodeTask',
-  handler: decodeTaskHandler,
-  initialize: decodeTaskInitialize
-});
+    handler: decodeTaskHandler,
+    initialize: decodeTaskInitialize
+  });
+}());

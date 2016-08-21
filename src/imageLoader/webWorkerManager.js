@@ -92,7 +92,7 @@
    * @param msg
    */
   function handleMessageFromWorker(msg) {
-    //console.log('handleMessageFromWorker', msg.data);
+    console.log('handleMessageFromWorker', msg.data);
     if(msg.data.taskId === 'initialize') {
       webWorkers[msg.data.workerIndex].status = 'ready';
       startTaskOnWebWorker();
@@ -116,7 +116,7 @@
       statistics.numTasksCompleted++;
       var end = new Date().getTime();
       statistics.totalTaskTimeInMS += end - webWorkers[msg.data.workerIndex].task.start;
-      webWorkers[msg.data.workerIndex].task.deferred.resolve(msg.data);
+      webWorkers[msg.data.workerIndex].task.deferred.resolve(msg.data.result);
       webWorkers[msg.data.workerIndex].task = undefined;
       startTaskOnWebWorker();
     }

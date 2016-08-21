@@ -6,7 +6,7 @@
     convolveConfig = config;
   }
 
-  function handler(data) {
+  function handler(data, doneCallback) {
 
     // convert pixel data from ArrayBuffer to Int16Array since web workers support passing ArrayBuffers but
     // not typed arrays
@@ -62,13 +62,11 @@
       }
     }
 
-    // once the task is done, we send a message back with our result
-    self.postMessage({
-      taskId: 'convolveTask',
-      result: 'success',
+    // once the task is done, we send a message back with our result and pass the pixeldata
+    // via the transferList to avoid a copy
+    doneCallback({
       pixelData: convolvedPixelData.buffer,
-      minMax: cornerstoneWADOImageLoader.getMinMax(convolvedPixelData),
-      workerIndex: data.workerIndex
+      minMax: cornerstoneWADOImageLoader.getMinMax(convolvedPixelData)
     }, [convolvedPixelData.buffer]);
   }
 

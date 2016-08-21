@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-20 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-21 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -1711,7 +1711,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
    * @param msg
    */
   function handleMessageFromWorker(msg) {
-    //console.log('handleMessageFromWorker', msg.data);
+    console.log('handleMessageFromWorker', msg.data);
     if(msg.data.taskId === 'initialize') {
       webWorkers[msg.data.workerIndex].status = 'ready';
       startTaskOnWebWorker();
@@ -1735,7 +1735,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       statistics.numTasksCompleted++;
       var end = new Date().getTime();
       statistics.totalTaskTimeInMS += end - webWorkers[msg.data.workerIndex].task.start;
-      webWorkers[msg.data.workerIndex].task.deferred.resolve(msg.data);
+      webWorkers[msg.data.workerIndex].task.deferred.resolve(msg.data.result);
       webWorkers[msg.data.workerIndex].task = undefined;
       startTaskOnWebWorker();
     }
