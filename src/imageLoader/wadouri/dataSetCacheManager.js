@@ -55,7 +55,7 @@
 
     // handle success and failure of the XHR request load
     var loadDeferred = $.Deferred();
-    promise.then(function(dicomPart10AsArrayBuffer, xhr) {
+    promise.then(function(dicomPart10AsArrayBuffer/*, xhr*/) {
       var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
       var dataSet = dicomParser.parseDicom(byteArray);
 

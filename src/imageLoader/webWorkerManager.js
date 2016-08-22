@@ -30,7 +30,7 @@
     numTasksExecuting : 0,
     numTasksCompleted: 0,
     totalTaskTimeInMS: 0,
-    totalTimeDelayedInMS: 0,
+    totalTimeDelayedInMS: 0
   };
 
   /**
@@ -55,8 +55,7 @@
 
           // update stats with how long this task was delayed (waiting in queue)
           var end = new Date().getTime();
-          var delayed = end - task.added;
-          statistics.totalTimeDelayedInMS += delayed;
+          statistics.totalTimeDelayedInMS += end - task.added;
 
           // assign this task to this web worker and send the web worker
           // a message to execute it

@@ -59,11 +59,11 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
-  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame, sharedCacheKey, priority) {
+  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame/*, sharedCacheKey, priority*/) {
     var start = new Date().getTime();
     frame = frame || 0;
     var deferred = $.Deferred();
-    xhrRequestPromise.then(function(dataSet, xhr) {
+    xhrRequestPromise.then(function(dataSet/*, xhr*/) {
       var pixelData = getPixelData(dataSet, frame);
       var metaDataProvider = cornerstoneWADOImageLoader.wadouri.metaDataProvider;
       var transferSyntax =  dataSet.string('x00020010');
@@ -362,8 +362,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   function getSizeInBytes(imageFrame) {
     var bytesPerPixel = Math.round(imageFrame.bitsAllocated / 8);
-    var sizeInBytes = imageFrame.rows * imageFrame.columns * bytesPerPixel * imageFrame.samplesPerPixel;
-    return sizeInBytes;
+    return imageFrame.rows * imageFrame.columns * bytesPerPixel * imageFrame.samplesPerPixel;
   }
 
   /**
@@ -598,10 +597,6 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       }
       throw "no decoder for transfer syntax " + transferSyntax;
     }
-
-    var deferred = $.Deferred();
-    deferred.resolve(imageFrame);
-    return deferred.promise();
   }
 
   cornerstoneWADOImageLoader.decodeImageFrame = decodeImageFrame;
@@ -615,7 +610,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
   function getImageFrame(imageId, metaDataProvider) {
     var imagePixelModule = metaDataProvider('imagePixelModule', imageId);
 
-    var imageFrame = {
+    return {
       samplesPerPixel : imagePixelModule.samplesPerPixel,
       photometricInterpretation : imagePixelModule.photometricInterpretation,
       planarConfiguration : imagePixelModule.planarConfiguration,
@@ -633,8 +628,6 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       bluePaletteColorLookupTableData : imagePixelModule.bluePaletteColorLookupTableData,
       pixelData: undefined // populated later after decoding
     };
-
-    return imageFrame;
   }
 
   cornerstoneWADOImageLoader.getImageFrame = getImageFrame;
@@ -648,15 +641,14 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     // we always calculate the min max values since they are not always
     // present in DICOM and we don't want to trust them anyway as cornerstone
     // depends on us providing reliable values for these
-    var min = 65535;
-    var max = -32768;
+    var min = storedPixelData[0];
+    var max = storedPixelData[0];
+    var storedPixel;
     var numPixels = storedPixelData.length;
-    var pixelData = storedPixelData;
     for(var index = 0; index < numPixels; index++) {
-      var spv = pixelData[index];
-      // TODO: test to see if it is faster to use conditional here rather than calling min/max functions
-      min = Math.min(min, spv);
-      max = Math.max(max, spv);
+      storedPixel = storedPixelData[index];
+      min = Math.min(min, storedPixel);
+      max = Math.max(max, storedPixel);
     }
 
     return {
@@ -674,15 +666,6 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 (function (cornerstoneWADOImageLoader) {
 
   "use strict";
-
-  var options = {
-    // callback allowing customization of the xhr (e.g. adding custom auth headers, cors, etc)
-    beforeSend : function(xhr) {}
-  };
-
-  function configure(opts) {
-    options = opts;
-  }
 
   function isColorImage(photoMetricInterpretation)
   {
@@ -789,7 +772,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       str += String.fromCharCode(data[i]);
     }
     return str;
-  };
+  }
 
   cornerstoneWADOImageLoader.wadors.getPixelData = function(uri, imageId, mediaType) {
     mediaType = mediaType || 'application/octet-stream';
@@ -800,7 +783,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     var deferred = $.Deferred();
 
     var loadPromise = cornerstoneWADOImageLoader.internal.xhrRequest(uri, imageId, headers);
-    loadPromise.then(function(imageFrameAsArrayBuffer, xhr) {
+    loadPromise.then(function(imageFrameAsArrayBuffer/*, xhr*/) {
 
       // request succeeded, Parse the multi-part mime response
       var response = new Uint8Array(imageFrameAsArrayBuffer);
@@ -1032,7 +1015,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
         planarConfiguration: getValue(metaData['00280006']),
         pixelAspectRatio: getValue(metaData['00280034']),
         smallestPixelValue: getValue(metaData['00280106']),
-        largestPixelValue: getValue(metaData['00280107']),
+        largestPixelValue: getValue(metaData['00280107'])
         // TODO Color Palette
       };
     }
@@ -1041,7 +1024,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       return {
         // TODO VOT LUT Sequence
         windowCenter : getNumberValues(metaData['00281050'], 1),
-        windowWidth : getNumberValues(metaData['00281051'], 1),
+        windowWidth : getNumberValues(metaData['00281051'], 1)
       };
     }
 
@@ -1057,7 +1040,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     if (type === 'sopCommonModule') {
       return {
         sopClassUID : getValue(metaData['00080016']),
-        sopInstanceUID : getValue(metaData['00080018']),
+        sopInstanceUID : getValue(metaData['00080018'])
       };
     }
 
@@ -1157,7 +1140,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
     // handle success and failure of the XHR request load
     var loadDeferred = $.Deferred();
-    promise.then(function(dicomPart10AsArrayBuffer, xhr) {
+    promise.then(function(dicomPart10AsArrayBuffer/*, xhr*/) {
       var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
       var dataSet = dicomParser.parseDicom(byteArray);
 
@@ -1290,15 +1273,16 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     var pixelDataOffset = pixelDataElement.dataOffset;
     var pixelsPerFrame = rows * columns * samplesPerPixel;
 
+    var frameOffset;
     if(bitsAllocated === 8) {
-      var frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame;
+      frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame;
       if(frameOffset >= dataSet.byteArray.length) {
         throw 'frame exceeds size of pixelData';
       }
       return new Uint8Array(dataSet.byteArray.buffer, frameOffset, pixelsPerFrame);
     }
     else if(bitsAllocated === 16) {
-      var frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame * 2;
+      frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame * 2;
       if(frameOffset >= dataSet.byteArray.length) {
         throw 'frame exceeds size of pixelData';
       }
@@ -1401,7 +1385,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       highBit: dataSet.uint16('x00280102'),
       pixelRepresentation: dataSet.uint16('x00280103'),
       planarConfiguration: dataSet.uint16('x00280006'),
-      pixelAspectRatio: dataSet.string('x00280034'),
+      pixelAspectRatio: dataSet.string('x00280034')
     };
     populateSmallestLargestPixelValues(dataSet, imagePixelModule);
     populatePaletteColorLut(dataSet, imagePixelModule);
@@ -1516,8 +1500,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
 
     // If no modality lut transform, output is same as pixel representation
-    var pixelRepresentation = dataSet.uint16('x00280103');
-    return pixelRepresentation;
+    return dataSet.uint16('x00280103');
   }
 
   // module exports
@@ -1601,7 +1584,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     if (type === 'sopCommonModule') {
       return {
         sopClassUID : dataSet.string('x00080016'),
-        sopInstanceUID : dataSet.string('x00080018'),
+        sopInstanceUID : dataSet.string('x00080018')
       };
     }
 
@@ -1668,7 +1651,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     numTasksExecuting : 0,
     numTasksCompleted: 0,
     totalTaskTimeInMS: 0,
-    totalTimeDelayedInMS: 0,
+    totalTimeDelayedInMS: 0
   };
 
   /**
@@ -1693,8 +1676,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
           // update stats with how long this task was delayed (waiting in queue)
           var end = new Date().getTime();
-          var delayed = end - task.added;
-          statistics.totalTimeDelayedInMS += delayed;
+          statistics.totalTimeDelayedInMS += end - task.added;
 
           // assign this task to this web worker and send the web worker
           // a message to execute it
@@ -1846,7 +1828,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     });
     
     // handle response data
-    xhr.onreadystatechange = function (oEvent) {
+    xhr.onreadystatechange = function () {
       // TODO: consider sending out progress messages here as we receive the pixel data
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {

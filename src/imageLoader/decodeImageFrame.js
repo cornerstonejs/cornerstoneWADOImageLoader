@@ -100,10 +100,6 @@
       }
       throw "no decoder for transfer syntax " + transferSyntax;
     }
-
-    var deferred = $.Deferred();
-    deferred.resolve(imageFrame);
-    return deferred.promise();
   }
 
   cornerstoneWADOImageLoader.decodeImageFrame = decodeImageFrame;

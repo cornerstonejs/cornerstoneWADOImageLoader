@@ -22,11 +22,11 @@
     }
   }
 
-  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame, sharedCacheKey, priority) {
+  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame/*, sharedCacheKey, priority*/) {
     var start = new Date().getTime();
     frame = frame || 0;
     var deferred = $.Deferred();
-    xhrRequestPromise.then(function(dataSet, xhr) {
+    xhrRequestPromise.then(function(dataSet/*, xhr*/) {
       var pixelData = getPixelData(dataSet, frame);
       var metaDataProvider = cornerstoneWADOImageLoader.wadouri.metaDataProvider;
       var transferSyntax =  dataSet.string('x00020010');

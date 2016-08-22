@@ -49,7 +49,7 @@
     if (type === 'sopCommonModule') {
       return {
         sopClassUID : dataSet.string('x00080016'),
-        sopInstanceUID : dataSet.string('x00080018'),
+        sopInstanceUID : dataSet.string('x00080018')
       };
     }
 

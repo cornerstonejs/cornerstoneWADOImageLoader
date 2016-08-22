@@ -16,8 +16,7 @@
 
   function getSizeInBytes(imageFrame) {
     var bytesPerPixel = Math.round(imageFrame.bitsAllocated / 8);
-    var sizeInBytes = imageFrame.rows * imageFrame.columns * bytesPerPixel * imageFrame.samplesPerPixel;
-    return sizeInBytes;
+    return imageFrame.rows * imageFrame.columns * bytesPerPixel * imageFrame.samplesPerPixel;
   }
 
   /**

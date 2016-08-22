@@ -36,7 +36,7 @@
       [dataPtr, data.length, imagePtrPtr, imageSizePtr, imageSizeXPtr, imageSizeYPtr, imageSizeCompPtr]);
     // add num vomp..etc
     if(ret !== 0){
-      console.log('[opj_decode] decoding failed!')
+      console.log('[opj_decode] decoding failed!');
       openJPEG._free(dataPtr);
       openJPEG._free(openJPEG.getValue(imagePtrPtr, '*'));
       openJPEG._free(imageSizeXPtr);

@@ -58,9 +58,9 @@ var registerTaskHandler;
   registerTaskHandler = function(taskHandler) {
     taskHandlers[taskHandler.taskId] = taskHandler;
     if(initialized) {
-      taskHandlers[key].initialize(config);
+      taskHandler.initialize(config);
     }
-  }
+  };
 
   /**
    * Web worker message handler - dispatches messages to the registered task handlers
@@ -135,7 +135,6 @@ cornerstoneWADOImageLoader = {};
 
   /**
    * Task initialization function
-   * @param config
    */
   function decodeTaskInitialize(config) {
     decodeConfig = config;
@@ -156,7 +155,6 @@ cornerstoneWADOImageLoader = {};
 
   /**
    * Task handler function
-   * @param data
    */
   function decodeTaskHandler(data, doneCallback) {
     // Load the codecs if they aren't already loaded
@@ -367,7 +365,7 @@ cornerstoneWADOImageLoader = {};
       [dataPtr, data.length, imagePtrPtr, imageSizePtr, imageSizeXPtr, imageSizeYPtr, imageSizeCompPtr]);
     // add num vomp..etc
     if(ret !== 0){
-      console.log('[opj_decode] decoding failed!')
+      console.log('[opj_decode] decoding failed!');
       openJPEG._free(dataPtr);
       openJPEG._free(openJPEG.getValue(imagePtrPtr, '*'));
       openJPEG._free(imageSizeXPtr);
@@ -678,20 +676,17 @@ cornerstoneWADOImageLoader = {};
     var imagePtr = charLS.getValue(imagePtrPtr, '*');
     if(image.bitsPerSample <= 8) {
       image.pixelData = new Uint8Array(image.width * image.height * image.components);
-      var src8 = new Uint8Array(charLS.HEAP8.buffer, imagePtr, image.pixelData.length);
-      image.pixelData.set(src8);
+      image.pixelData.set(new Uint8Array(charLS.HEAP8.buffer, imagePtr, image.pixelData.length));
     } else {
       // I have seen 16 bit signed images, but I don't know if 16 bit unsigned is valid, hoping to get
       // answer here:
       // https://github.com/team-charls/charls/issues/14
       if(isSigned) {
         image.pixelData = new Int16Array(image.width * image.height * image.components);
-        var src16 = new Int16Array(charLS.HEAP16.buffer, imagePtr, image.pixelData.length);
-        image.pixelData.set(src16);
+        image.pixelData.set(new Int16Array(charLS.HEAP16.buffer, imagePtr, image.pixelData.length));
       } else {
         image.pixelData = new Uint16Array(image.width * image.height * image.components);
-        var src16 = new Uint16Array(charLS.HEAP16.buffer, imagePtr, image.pixelData.length);
-        image.pixelData.set(src16);
+        image.pixelData.set(new Uint16Array(charLS.HEAP16.buffer, imagePtr, image.pixelData.length));
       }
     }
 
@@ -896,15 +891,14 @@ cornerstoneWADOImageLoader = {};
     // we always calculate the min max values since they are not always
     // present in DICOM and we don't want to trust them anyway as cornerstone
     // depends on us providing reliable values for these
-    var min = 65535;
-    var max = -32768;
+    var min = storedPixelData[0];
+    var max = storedPixelData[0];
+    var storedPixel;
     var numPixels = storedPixelData.length;
-    var pixelData = storedPixelData;
-    for(var index = 0; index < numPixels; index++) {
-      var spv = pixelData[index];
-      // TODO: test to see if it is faster to use conditional here rather than calling min/max functions
-      min = Math.min(min, spv);
-      max = Math.max(max, spv);
+    for(var index = 1; index < numPixels; index++) {
+      storedPixel = storedPixelData[index];
+      min = Math.min(min, storedPixel);
+      max = Math.max(max, storedPixel);
     }
 
     return {
@@ -912,7 +906,6 @@ cornerstoneWADOImageLoader = {};
       max: max
     };
   }
-
 
   // module exports
   cornerstoneWADOImageLoader.getMinMax = getMinMax;

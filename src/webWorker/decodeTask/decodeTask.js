@@ -35,7 +35,6 @@ cornerstoneWADOImageLoader = {};
 
   /**
    * Task initialization function
-   * @param config
    */
   function decodeTaskInitialize(config) {
     decodeConfig = config;
@@ -56,7 +55,6 @@ cornerstoneWADOImageLoader = {};
 
   /**
    * Task handler function
-   * @param data
    */
   function decodeTaskHandler(data, doneCallback) {
     // Load the codecs if they aren't already loaded

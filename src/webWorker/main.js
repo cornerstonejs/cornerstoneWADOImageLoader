@@ -57,9 +57,9 @@ var registerTaskHandler;
   registerTaskHandler = function(taskHandler) {
     taskHandlers[taskHandler.taskId] = taskHandler;
     if(initialized) {
-      taskHandlers[key].initialize(config);
+      taskHandler.initialize(config);
     }
-  }
+  };
 
   /**
    * Web worker message handler - dispatches messages to the registered task handlers
