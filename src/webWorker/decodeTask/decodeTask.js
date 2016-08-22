@@ -76,9 +76,9 @@ cornerstoneWADOImageLoader = {};
     // typed arrays
     imageFrame.pixelData = imageFrame.pixelData.buffer;
 
-    // invoke the callback with our result and pass the pixelData in the transferlist to move it to
-    // UI thread context and avoid a copy
-    doneCallback({imageFrame: imageFrame}, [imageFrame.pixelData]);
+    // invoke the callback with our result and pass the pixelData in the transferList to move it to
+    // UI thread without making a copy
+    doneCallback(imageFrame, [imageFrame.pixelData]);
   }
 
   // register our task

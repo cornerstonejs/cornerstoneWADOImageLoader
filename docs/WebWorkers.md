@@ -10,7 +10,7 @@ the utilization of the available CPU cores.
 
 Features
 --------
-* Allows applications to control how many cores are used by the web worker framework
+* Allows applications to control how web workers are spawned
 * Allows applications to add custom web worker tasks
 * Allows applications to assign a priority to web worker tasks
 * Allows applications to pass in web worker task specific configuration options

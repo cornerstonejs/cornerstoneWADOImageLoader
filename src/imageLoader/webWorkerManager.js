@@ -2,13 +2,13 @@
 
   "use strict";
 
-  // array of waiting decode tasks sorted with highest priority task first
+  // array of queued tasks sorted with highest priority task first
   var tasks = [];
 
   // array of web workers to dispatch decode tasks to
   var webWorkers = [];
 
-  var config = {
+  var defaultConfig = {
     maxWebWorkers: navigator.hardwareConcurrency || 1,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
     webWorkerTaskPaths: [],
@@ -21,6 +21,9 @@
       }
     }
   };
+
+
+  var config;
 
   var statistics = {
     numQueuedTasks : 0,
@@ -46,7 +49,7 @@
           // mark it as busy so tasks are not assigned to it
           webWorkers[i].status = 'busy';
 
-          // get the highest priority decode task
+          // get the highest priority task
           var task = tasks.shift();
           task.start = new Date().getTime();
 
@@ -55,8 +58,8 @@
           var delayed = end - task.added;
           statistics.totalTimeDelayedInMS += delayed;
 
-          // assign this decode task to this web worker and send the web worker
-          // a message to decode it
+          // assign this task to this web worker and send the web worker
+          // a message to execute it
           webWorkers[i].task = task;
           webWorkers[i].worker.postMessage({
             taskId: task.taskId,
@@ -71,44 +74,13 @@
   }
 
   /**
-   * Helper function to set pixel data to the right typed array.  This is needed because web workers
-   * can transfer array buffers but not typed arrays
-   * @param imageFrame
-   */
-  function setPixelDataType(imageFrame) {
-    if(imageFrame.bitsAllocated === 16) {
-      if(imageFrame.pixelRepresentation === 0) {
-        imageFrame.pixelData = new Uint16Array(imageFrame.pixelData);
-      } else {
-        imageFrame.pixelData = new Int16Array(imageFrame.pixelData);
-      }
-    } else {
-      imageFrame.pixelData = new Uint8Array(imageFrame.pixelData);
-    }
-  }
-
-  /**
    * Function to handle a message from a web worker
    * @param msg
    */
   function handleMessageFromWorker(msg) {
-    console.log('handleMessageFromWorker', msg.data);
+    //console.log('handleMessageFromWorker', msg.data);
     if(msg.data.taskId === 'initialize') {
       webWorkers[msg.data.workerIndex].status = 'ready';
-      startTaskOnWebWorker();
-    } else if(msg.data.taskId === 'decodeTask') {
-      statistics.numTasksExecuting--;
-      webWorkers[msg.data.workerIndex].status = 'ready';
-      setPixelDataType(msg.data.result.imageFrame);
-
-      statistics.numTasksCompleted++;
-      var end = new Date().getTime();
-      statistics.totalTaskTimeInMS += end - webWorkers[msg.data.workerIndex].task.start;
-
-      msg.data.result.imageFrame.webWorkerTimeInMS = end - webWorkers[msg.data.workerIndex].task.start;
-
-      webWorkers[msg.data.workerIndex].task.deferred.resolve(msg.data.result.imageFrame);
-      webWorkers[msg.data.workerIndex].task = undefined;
       startTaskOnWebWorker();
     } else {
       statistics.numTasksExecuting--;
@@ -123,28 +95,41 @@
   }
 
   /**
+   * Spawns a new web worker
+   */
+  function spawnWebWorker() {
+    var worker = new Worker(config.webWorkerPath);
+    webWorkers.push({
+      worker: worker,
+      status: 'initializing'
+    });
+    worker.addEventListener('message', handleMessageFromWorker);
+    worker.postMessage({
+      taskId: 'initialize',
+      workerIndex: webWorkers.length - 1,
+      config: config
+    });
+  }
+
+  /**
    * Initialization function for the web worker manager - spawns web workers
    * @param configObject
    */
   function initialize(configObject) {
-    if(configObject) {
-      config = configObject;
+    configObject = configObject || defaultConfig;
+
+    // prevent being initialized more than once
+    if(config) {
+      throw new Error('WebWorkerManager already initialized');
     }
+
+    config = configObject;
 
     config.maxWebWorkers = config.maxWebWorkers || (navigator.hardwareConcurrency || 1);
 
+    // Spawn new web workers
     for(var i=0; i < config.maxWebWorkers; i++) {
-      var worker = new Worker(config.webWorkerPath);
-      webWorkers.push({
-        worker: worker,
-        status: 'initializing'
-      });
-      worker.addEventListener('message', handleMessageFromWorker);
-      worker.postMessage({
-        taskId: 'initialize',
-        workerIndex: webWorkers.length - 1,
-        config: config
-      });
+      spawnWebWorker();
     }
   }
 
@@ -196,7 +181,6 @@
     statistics.numQueuedTasks = tasks.length;
     return statistics;
   }
-
 
   // module exports
   cornerstoneWADOImageLoader.webWorkerManager = {
