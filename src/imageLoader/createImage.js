@@ -36,18 +36,18 @@
     }
   }
 
-  function createImage(imageId, pixelData, transferSyntax, metaDataProvider, options) {
+  function createImage(imageId, pixelData, transferSyntax, options) {
     var deferred = $.Deferred();
-    var imageFrame = cornerstoneWADOImageLoader.getImageFrame(imageId, metaDataProvider);
+    var imageFrame = cornerstoneWADOImageLoader.getImageFrame(imageId);
     var decodePromise = cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options);
     decodePromise.then(function(imageFrame) {
       setPixelDataType(imageFrame);
 
       //var imagePixelModule = metaDataProvider('imagePixelModule', imageId);
-      var imagePlaneModule = metaDataProvider('imagePlaneModule', imageId);
-      var voiLutModule = metaDataProvider('voiLutModule', imageId);
-      var modalityLutModule = metaDataProvider('modalityLutModule', imageId);
-      var sopCommonModule = metaDataProvider('sopCommonModule', imageId);
+      var imagePlaneModule = cornerstone.metaData.get('imagePlaneModule', imageId);
+      var voiLutModule = cornerstone.metaData.get('voiLutModule', imageId);
+      var modalityLutModule = cornerstone.metaData.get('modalityLutModule', imageId);
+      var sopCommonModule = cornerstone.metaData.get('sopCommonModule', imageId);
 
       var image = {
         imageId: imageId,

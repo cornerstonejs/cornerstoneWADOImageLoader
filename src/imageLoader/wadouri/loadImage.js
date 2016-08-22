@@ -29,10 +29,9 @@
     var deferred = $.Deferred();
     xhrRequestPromise.then(function(dataSet/*, xhr*/) {
       var pixelData = getPixelData(dataSet, frame);
-      var metaDataProvider = cornerstoneWADOImageLoader.wadouri.metaDataProvider;
       var transferSyntax =  dataSet.string('x00020010');
       var loadEnd = new Date().getTime();
-      var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, metaDataProvider, options);
+      var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, options);
       imagePromise.then(function(image) {
         image.data = dataSet;
         var end = new Date().getTime();

@@ -4,8 +4,8 @@
 
   "use strict";
 
-  function getImageFrame(imageId, metaDataProvider) {
-    var imagePixelModule = metaDataProvider('imagePixelModule', imageId);
+  function getImageFrame(imageId) {
+    var imagePixelModule = cornerstone.metaData.get('imagePixelModule', imageId);
 
     return {
       samplesPerPixel : imagePixelModule.samplesPerPixel,

@@ -1,6 +1,6 @@
 /**
  */
-(function (cornerstoneWADOImageLoader) {
+(function (cornerstone, cornerstoneWADOImageLoader) {
 
   "use strict";
 
@@ -55,7 +55,11 @@
 
   }
 
+
+  // register our metadata provider
+  cornerstone.metaData.addProvider(metaDataProvider);
+
   // module exports
   cornerstoneWADOImageLoader.wadouri.metaDataProvider = metaDataProvider
 
-}(cornerstoneWADOImageLoader));
+}(cornerstone, cornerstoneWADOImageLoader));

@@ -59,10 +59,9 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     var deferred = $.Deferred();
     xhrRequestPromise.then(function(dataSet/*, xhr*/) {
       var pixelData = getPixelData(dataSet, frame);
-      var metaDataProvider = cornerstoneWADOImageLoader.wadouri.metaDataProvider;
       var transferSyntax =  dataSet.string('x00020010');
       var loadEnd = new Date().getTime();
-      var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, metaDataProvider, options);
+      var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, options);
       imagePromise.then(function(image) {
         image.data = dataSet;
         var end = new Date().getTime();
@@ -375,18 +374,18 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
-  function createImage(imageId, pixelData, transferSyntax, metaDataProvider, options) {
+  function createImage(imageId, pixelData, transferSyntax, options) {
     var deferred = $.Deferred();
-    var imageFrame = cornerstoneWADOImageLoader.getImageFrame(imageId, metaDataProvider);
+    var imageFrame = cornerstoneWADOImageLoader.getImageFrame(imageId);
     var decodePromise = cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options);
     decodePromise.then(function(imageFrame) {
       setPixelDataType(imageFrame);
 
       //var imagePixelModule = metaDataProvider('imagePixelModule', imageId);
-      var imagePlaneModule = metaDataProvider('imagePlaneModule', imageId);
-      var voiLutModule = metaDataProvider('voiLutModule', imageId);
-      var modalityLutModule = metaDataProvider('modalityLutModule', imageId);
-      var sopCommonModule = metaDataProvider('sopCommonModule', imageId);
+      var imagePlaneModule = cornerstone.metaData.get('imagePlaneModule', imageId);
+      var voiLutModule = cornerstone.metaData.get('voiLutModule', imageId);
+      var modalityLutModule = cornerstone.metaData.get('modalityLutModule', imageId);
+      var sopCommonModule = cornerstone.metaData.get('sopCommonModule', imageId);
 
       var image = {
         imageId: imageId,
@@ -604,8 +603,8 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   "use strict";
 
-  function getImageFrame(imageId, metaDataProvider) {
-    var imagePixelModule = metaDataProvider('imagePixelModule', imageId);
+  function getImageFrame(imageId) {
+    var imagePixelModule = cornerstone.metaData.get('imagePixelModule', imageId);
 
     return {
       samplesPerPixel : imagePixelModule.samplesPerPixel,
@@ -824,7 +823,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     return '1.2.840.10008.1.2'; // hard code to ILE for now
   }
 
-  function loadImage(imageId) {
+  function loadImage(imageId, options) {
     var start = new Date().getTime();
 
     var deferred = $.Deferred();
@@ -845,10 +844,9 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     // get the pixel data from the server
     cornerstoneWADOImageLoader.wadors.getPixelData(uri, imageId, mediaType).then(function(result) {
 
-      var metaDataProvider = cornerstoneWADOImageLoader.wadors.metaDataProvider;
       var transferSyntax = getTransferSyntaxForContentType(result.contentType);
-      var pixelData = result.imageFrame;
-      var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, metaDataProvider);
+      var pixelData = result.imageFrame.pixelData;
+      var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, options);
       imagePromise.then(function(image) {
         // add the loadTimeInMS property
         var end = new Date().getTime();
@@ -975,7 +973,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 }($, cornerstone, cornerstoneWADOImageLoader));
 /**
  */
-(function (cornerstoneWADOImageLoader) {
+(function (cornerstone, cornerstoneWADOImageLoader) {
 
   "use strict";
 
@@ -1043,10 +1041,13 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   }
 
+
+  cornerstone.metaData.addProvider(metaDataProvider);
+
   // module exports
   cornerstoneWADOImageLoader.wadors.metaDataProvider = metaDataProvider
 
-}(cornerstoneWADOImageLoader));
+}(cornerstone, cornerstoneWADOImageLoader));
 /**
  */
 (function (cornerstoneWADOImageLoader) {
@@ -1532,7 +1533,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 }(cornerstoneWADOImageLoader));
 /**
  */
-(function (cornerstoneWADOImageLoader) {
+(function (cornerstone, cornerstoneWADOImageLoader) {
 
   "use strict";
 
@@ -1587,10 +1588,14 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   }
 
+
+  // register our metadata provider
+  cornerstone.metaData.addProvider(metaDataProvider);
+
   // module exports
   cornerstoneWADOImageLoader.wadouri.metaDataProvider = metaDataProvider
 
-}(cornerstoneWADOImageLoader));
+}(cornerstone, cornerstoneWADOImageLoader));
 (function (cornerstoneWADOImageLoader) {
 
   "use strict";
