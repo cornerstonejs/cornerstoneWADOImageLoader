@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-22 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-22 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 var registerTaskHandler;
 
 (function () {
@@ -166,7 +166,12 @@ cornerstoneWADOImageLoader = {};
     // not typed arrays
     var pixelData = new Uint8Array(data.data.pixelData);
 
-    cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, data.data.transferSyntax, pixelData, decodeConfig.decodeTask);
+    cornerstoneWADOImageLoader.decodeImageFrame(
+      imageFrame,
+      data.data.transferSyntax,
+      pixelData,
+      decodeConfig.decodeTask,
+      data.data.options);
 
     calculateMinMax(imageFrame);
 
@@ -193,7 +198,7 @@ cornerstoneWADOImageLoader = {};
 
   "use strict";
 
-  function decodeImageFrame(imageFrame, transferSyntax, pixelData, decodeConfig) {
+  function decodeImageFrame(imageFrame, transferSyntax, pixelData, decodeConfig, options) {
     var start = new Date().getTime();
 
     // Implicit VR Little Endian
@@ -250,12 +255,12 @@ cornerstoneWADOImageLoader = {};
     // JPEG 2000 Lossless
     else if (transferSyntax === "1.2.840.10008.1.2.4.90")
     {
-      imageFrame = cornerstoneWADOImageLoader.decodeJPEG2000(imageFrame, pixelData, decodeConfig);
+      imageFrame = cornerstoneWADOImageLoader.decodeJPEG2000(imageFrame, pixelData, decodeConfig, options);
     }
     // JPEG 2000 Lossy
     else if (transferSyntax === "1.2.840.10008.1.2.4.91")
     {
-      imageFrame = cornerstoneWADOImageLoader.decodeJPEG2000(imageFrame, pixelData, decodeConfig);
+      imageFrame = cornerstoneWADOImageLoader.decodeJPEG2000(imageFrame, pixelData, decodeConfig, options);
     }
     /* Don't know if these work...
      // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
@@ -466,18 +471,20 @@ cornerstoneWADOImageLoader = {};
     }
   }
 
-  function decodeJPEG2000(imageFrame, pixelData, decodeConfig)
+  function decodeJPEG2000(imageFrame, pixelData, decodeConfig, options)
   {
+    options = options || {};
+
     initializeJPEG2000(decodeConfig);
 
-    if(!decodeConfig.usePDFJS) {
-      // OpenJPEG2000 https://github.com/jpambrun/openjpeg
-      //console.log('OpenJPEG')
-      return decodeOpenJpeg2000(imageFrame, pixelData);
-    } else {
+    if(options.usePDFJS || decodeConfig.usePDFJS) {
       // OHIF image-JPEG2000 https://github.com/OHIF/image-JPEG2000
       //console.log('PDFJS')
       return decodeJpx(imageFrame, pixelData);
+    } else {
+      // OpenJPEG2000 https://github.com/jpambrun/openjpeg
+      //console.log('OpenJPEG')
+      return decodeOpenJpeg2000(imageFrame, pixelData);
     }
   }
 

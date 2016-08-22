@@ -137,18 +137,20 @@
     }
   }
 
-  function decodeJPEG2000(imageFrame, pixelData, decodeConfig)
+  function decodeJPEG2000(imageFrame, pixelData, decodeConfig, options)
   {
+    options = options || {};
+
     initializeJPEG2000(decodeConfig);
 
-    if(!decodeConfig.usePDFJS) {
-      // OpenJPEG2000 https://github.com/jpambrun/openjpeg
-      //console.log('OpenJPEG')
-      return decodeOpenJpeg2000(imageFrame, pixelData);
-    } else {
+    if(options.usePDFJS || decodeConfig.usePDFJS) {
       // OHIF image-JPEG2000 https://github.com/OHIF/image-JPEG2000
       //console.log('PDFJS')
       return decodeJpx(imageFrame, pixelData);
+    } else {
+      // OpenJPEG2000 https://github.com/jpambrun/openjpeg
+      //console.log('OpenJPEG')
+      return decodeOpenJpeg2000(imageFrame, pixelData);
     }
   }
 

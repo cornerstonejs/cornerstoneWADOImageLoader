@@ -1,13 +1,6 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-22 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-22 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
-// This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
-// transfer syntaxes, check here to see what is currently supported:
-//
-// https://github.com/chafey/cornerstoneWADOImageLoader/blob/master/docs/TransferSyntaxes.md
-//
-// It will support implicit little endian transfer syntaxes but explicit little endian is strongly preferred
-// to avoid any parsing issues related to SQ elements.  To request that the WADO object be returned as explicit little endian, append
-// the following on your WADO url: &transferSyntax=1.2.840.10008.1.2.1
+// This is a cornerstone image loader for WADO-URI requests.
 //
 
 if(typeof cornerstone === 'undefined'){
@@ -59,7 +52,8 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
-  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame/*, sharedCacheKey, priority*/) {
+  function loadDataSetFromPromise(xhrRequestPromise, imageId, frame, sharedCacheKey, options) {
+
     var start = new Date().getTime();
     frame = frame || 0;
     var deferred = $.Deferred();
@@ -68,7 +62,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       var metaDataProvider = cornerstoneWADOImageLoader.wadouri.metaDataProvider;
       var transferSyntax =  dataSet.string('x00020010');
       var loadEnd = new Date().getTime();
-      var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, metaDataProvider);
+      var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, metaDataProvider, options);
       imagePromise.then(function(image) {
         image.data = dataSet;
         var end = new Date().getTime();
@@ -92,19 +86,18 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
-  function loadImage(imageId, priority) {
-
+  function loadImage(imageId, options) {
     var parsedImageId = cornerstoneWADOImageLoader.wadouri.parseImageId(imageId);
 
     var loader = getLoaderForScheme(parsedImageId.scheme);
 
     // if the dataset for this url is already loaded, use it
     if(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.isLoaded(parsedImageId.url)) {
-      return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url, priority);
+      return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url, options);
     }
 
     // load the dataSet via the dataSetCacheManager
-    return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url, priority);
+    return loadDataSetFromPromise(cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(parsedImageId.url, loader), imageId, parsedImageId.frame, parsedImageId.url, options);
   }
 
   // register dicomweb and wadouri image loader prefixes
@@ -382,10 +375,10 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   }
 
-  function createImage(imageId, pixelData, transferSyntax, metaDataProvider) {
+  function createImage(imageId, pixelData, transferSyntax, metaDataProvider, options) {
     var deferred = $.Deferred();
     var imageFrame = cornerstoneWADOImageLoader.getImageFrame(imageId, metaDataProvider);
-    var decodePromise = cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas);
+    var decodePromise = cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options);
     decodePromise.then(function(imageFrame) {
       setPixelDataType(imageFrame);
 
@@ -501,37 +494,41 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   "use strict";
 
-  function addDecodeTask(imageFrame, transferSyntax, pixelData) {
+  function addDecodeTask(imageFrame, transferSyntax, pixelData, options) {
+    var priority = options.priority || 5;
     return cornerstoneWADOImageLoader.webWorkerManager.addTask(
       'decodeTask',
       {
         imageFrame : imageFrame,
         transferSyntax : transferSyntax,
-        pixelData : pixelData
-      }, 5);
+        pixelData : pixelData,
+        options: options
+      }, priority);
   }
 
-  function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas) {
+  function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options) {
+    options = options || {};
+
     // Implicit VR Little Endian
     if(transferSyntax === "1.2.840.10008.1.2") {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // Explicit VR Little Endian
     else if(transferSyntax === "1.2.840.10008.1.2.1") {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // Explicit VR Big Endian (retired)
     else if (transferSyntax === "1.2.840.10008.1.2.2" ) {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // Deflate transfer syntax (deflated by dicomParser)
     else if(transferSyntax === '1.2.840.10008.1.2.1.99') {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // RLE Lossless
     else if (transferSyntax === "1.2.840.10008.1.2.5" )
     {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // JPEG Baseline lossy process 1 (8 bit)
     else if (transferSyntax === "1.2.840.10008.1.2.4.50")
@@ -540,43 +537,43 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       {
         return cornerstoneWADOImageLoader.decodeJPEGBaseline8Bit(imageFrame, canvas);
       } else {
-        return addDecodeTask(imageFrame, transferSyntax, pixelData);
+        return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
       }
     }
     // JPEG Baseline lossy process 2 & 4 (12 bit)
     else if (transferSyntax === "1.2.840.10008.1.2.4.51")
     {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // JPEG Lossless, Nonhierarchical (Processes 14)
     else if (transferSyntax === "1.2.840.10008.1.2.4.57")
     {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // JPEG Lossless, Nonhierarchical (Processes 14 [Selection 1])
     else if (transferSyntax === "1.2.840.10008.1.2.4.70" )
     {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // JPEG-LS Lossless Image Compression
     else if (transferSyntax === "1.2.840.10008.1.2.4.80" )
     {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // JPEG-LS Lossy (Near-Lossless) Image Compression
     else if (transferSyntax === "1.2.840.10008.1.2.4.81" )
     {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
      // JPEG 2000 Lossless
     else if (transferSyntax === "1.2.840.10008.1.2.4.90")
     {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     // JPEG 2000 Lossy
     else if (transferSyntax === "1.2.840.10008.1.2.4.91")
     {
-      return addDecodeTask(imageFrame, transferSyntax, pixelData);
+      return addDecodeTask(imageFrame, transferSyntax, pixelData, options);
     }
     /* Don't know if these work...
      // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)

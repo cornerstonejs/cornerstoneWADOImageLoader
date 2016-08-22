@@ -167,7 +167,7 @@
         var element = $('#dicomImage').get(0);
         try {
             var start = new Date().getTime();
-            cornerstone.loadAndCacheImage(imageId).then(function(image) {
+            cornerstone.loadAndCacheImage(imageId, {usePDFJS: true}).then(function(image) {
                 console.log(typeof image.getPixelData());
                 console.log(image);
                 loadedImage = image;

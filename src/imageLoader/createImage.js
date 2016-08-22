@@ -36,10 +36,10 @@
     }
   }
 
-  function createImage(imageId, pixelData, transferSyntax, metaDataProvider) {
+  function createImage(imageId, pixelData, transferSyntax, metaDataProvider, options) {
     var deferred = $.Deferred();
     var imageFrame = cornerstoneWADOImageLoader.getImageFrame(imageId, metaDataProvider);
-    var decodePromise = cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas);
+    var decodePromise = cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options);
     decodePromise.then(function(imageFrame) {
       setPixelDataType(imageFrame);
 

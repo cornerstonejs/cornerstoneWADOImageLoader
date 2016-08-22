@@ -23,59 +23,42 @@ You can also see it in action with the
 Install
 -------
 
-Get a packaged source file:
+Get the distributed unminimized files:
 
 * [cornerstoneWADOImageLoader.js](https://raw.githubusercontent.com/chafey/cornerstoneWADOImageLoader/master/dist/cornerstoneWADOImageLoader.js)
+* [cornerstoneWADOImageLoaderCodecs.js](https://raw.githubusercontent.com/chafey/cornerstoneWADOImageLoader/master/dist/cornerstoneWADOImageLoaderCodecs.js)
+* [cornerstoneWADOImageLoaderWebWorker.js](https://raw.githubusercontent.com/chafey/cornerstoneWADOImageLoader/master/dist/cornerstoneWADOImageLoaderWebWorker.js)
+
+or the distributed minimized files:
+
 * [cornerstoneWADOImageLoader.min.js](https://raw.githubusercontent.com/chafey/cornerstoneWADOImageLoader/master/dist/cornerstoneWADOImageLoader.min.js)
-
-or from bower:
-
-> bower install cornerstoneWADOImageLoader
+* [cornerstoneWADOImageLoaderCodecs.min.js](https://raw.githubusercontent.com/chafey/cornerstoneWADOImageLoader/master/dist/cornerstoneWADOImageLoaderCodecs.min.js)
+* [cornerstoneWADOImageLoaderWebWorker.min.js](https://raw.githubusercontent.com/chafey/cornerstoneWADOImageLoader/master/dist/cornerstoneWADOImageLoaderWebWorker.min.js)
 
 Usage
 -------
 
-The cornerstoneWADOImageLoader depends on the following external libraries:
+The cornerstoneWADOImageLoader depends on the following external libraries which should be loaded before cornerstoneWADOImageLoad.js:
 
 1. [jQuery](https://github.com/jquery/jquery)
 2. [dicomParser](https://github.com/chafey/dicomParser) 
 3. [cornerstone](https://github.com/chafey/cornerStone)
 
-ImageIds
---------
+Have your code configure the web worker framework with the paths to the web worker and the codecs:
 
-The image loader prefix is 'wadouri' (note that the prefix dicomweb is also supported but is deprecated and will eventually
-be removed).  Here are some example imageId's:
-
-absolute url:
-
-```
-wadouri:http://cornerstonetech.org/images/ClearCanvas/USEcho/IM00001
-```
-
-relative url:
-
-```
-wadouri:/images/ClearCanvas/USEcho/IM00001
+``` javascript
+   var config = {
+        webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
+        taskConfiguration: {
+            'decodeTask' : {
+                codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js'
+            }
+        }
+    };
+    cornerstoneWADOImageLoader.webWorkerManager.initialize(config);
 ```
 
-WADO-URI url:
-
-```
-wadouri:http://localhost:3333/wado?requestType=WADO&studyUID=1.3.6.1.4.1.25403.166563008443.5076.20120418075541.1&seriesUID=1.3.6.1.4.1.25403.166563008443.5076.20120418075541.2&objectUID=1.3.6.1.4.1.25403.166563008443.5076.20120418075557.1&contentType=application%2Fdicom&transferSyntax=1.2.840.10008.1.2.1
-```
-
-[Orthanc](http://www.orthanc-server.com/) file endpoint URL:
-
-```
-wadouri:http://localhost:8042/instances/8cce70aa-576ad738-b76cb63f-caedb3c7-2b213aae/file
-```
-
-Note that the web server must support [Cross origin resource sharing](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing) 
-or the image will fail to load.  If you are unable to get CORS enabled on the web server that you are loading DICOM P10
-instances from, you can use a [reverse proxy](http://en.wikipedia.org/wiki/Reverse_proxy).  Here is a 
-[simple Node.js based http-proxy](http://chafey.blogspot.com/2014/09/working-around-cors.html) that adds CORS headers
-that you might find useful.
+See the [web workers](docs/WebWorkers.md) documentation for more details on configuring.
 
 Key Features
 ------------
@@ -86,7 +69,7 @@ Key Features
   * Can be used with any server that returns DICOM P10 instances via HTTP GET
 * Implements a [cornerstone ImageLoader](https://github.com/chafey/cornerstone/wiki/ImageLoader) for WADO-RS (DICOMWeb)
 * Supports many popular transfer syntaxes and photometric interpretations [see full list](https://github.com/chafey/cornerstoneWADOImageLoader/blob/master/docs/TransferSyntaxes.md) and [codec](docs/Codecs.md) for more information.
-* Framework to execute CPU intensive tasks in (web workers)[docs/WebWorkers.md]
+* Framework to execute CPU intensive tasks in [web workers](docs/WebWorkers.md)
   * Used for image decoding
   * Can be used for your own CPU intensive tasks (e.g. image processing)
 
@@ -123,6 +106,10 @@ See the documentation [here](docs/Building.md)
 _How do I add my own custom web worker tasks?_
 
 See the documentation [here](docs/WebWorkers.md)
+
+_How do I create imageIds that work with this image loader?_
+
+See the documentation [here](docs/ImageIds.md)
 
 Copyright
 ============
