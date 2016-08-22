@@ -136,13 +136,12 @@
   /**
    * Function to add a decode task to be performed
    *
-   * @param imageFrame
-   * @param transferSyntax
-   * @param pixelData
-   * @param priority
+   * @param taskId - the taskId for this task
+   * @param data - data specific to the task
+   * @param priority - optional priority of the task (defaults to 0)
    * @returns {*}
    */
-  function addTask(message, data, priority) {
+  function addTask(taskId, data, priority) {
     if(!webWorkers.length) {
       initialize();
     }
@@ -159,7 +158,7 @@
 
     // insert the decode task in the sorted position
     tasks.splice(i, 0, {
-      taskId: message,
+      taskId: taskId,
       status: 'ready',
       added : new Date().getTime(),
       data: data,
@@ -175,7 +174,7 @@
 
   /**
    * Function to return the statistics on running web workers
-   * @returns {{numDecodeTasksCompleted: number, totalDecodeTimeInMS: number, totalTimeDelayedInMS: number}}
+   * @returns object containing statistics
    */
   function getStatistics() {
     statistics.numQueuedTasks = tasks.length;

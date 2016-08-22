@@ -143,11 +143,11 @@
 
     if(!decodeConfig.usePDFJS) {
       // OpenJPEG2000 https://github.com/jpambrun/openjpeg
-      console.log('OpenJPEG')
+      //console.log('OpenJPEG')
       return decodeOpenJpeg2000(imageFrame, pixelData);
     } else {
       // OHIF image-JPEG2000 https://github.com/OHIF/image-JPEG2000
-      console.log('PDFJS')
+      //console.log('PDFJS')
       return decodeJpx(imageFrame, pixelData);
     }
   }

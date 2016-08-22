@@ -1,32 +1,37 @@
 Web Workers
 ===========
 
+Introduction
+------------
+
 Medical Imaging applications often involve CPU intensive computation for tasks such as image decompression
-and image processing.  CornerstoneWADOImageLoader includes a framework for executing such tasks as web workers
-thus allowing your application to take advantage of all CPU cores and avoid locking up the UI thread.  This
-web worker framework is used for image decompression but is designed to be usable for custom tasks as well.
+and image processing.  CornerstoneWADOImageLoader includes a framework for executing such tasks in a pool of
+web workers thus allowing your application to take advantage of all CPU cores and avoid locking up the UI thread.
+This web worker framework is used for image decompression but is designed to be usable for custom tasks as well.
 By using the cornerstone web worker framework for your CPU intensive tasks, you can better control
 the utilization of the available CPU cores.
 
 Features
 --------
-* Allows applications to control how web workers are spawned
+* Allows applications to control how many web workers are spawned
+* Includes a task for decoding DICOM Images
 * Allows applications to add custom web worker tasks
 * Allows applications to assign a priority to web worker tasks
 * Allows applications to pass in web worker task specific configuration options
 
 Examples
 --------
-See the [Custom Web Worker Task Example](../examples/customWebWorkerTask/index.html) to see how the above features in action.
+See the [Custom Web Worker Task Example](../examples/customWebWorkerTask/index.html) to see the above
+features in action.
 
 Configuration
 -------------
 
-The web worker framework requires a bit of configuration since web workers are designed to load javascript with paths
-relative to the root url.  Since cornerstone does not enforce a convention for source file location, you
-must tell the cornerstone web worker framework where the web worker files are so it can load them properly.  This
-is done via the cornerstoneWADOImageLoader.webWorkerManager.initialize() function.  You must call this
-function before using starting a web worker task (or loading an image with cornerstone) so the web worker
+The web worker framework requires a bit of configuration since web workers require paths to source files.
+Since cornerstone does not enforce a convention for source file location, you must tell the cornerstone
+web worker framework where the web worker files are so it can load them properly.  This is done via the
+cornerstoneWADOImageLoader.webWorkerManager.initialize() function.  You must call this function before
+using starting a web worker task (or loading an image with cornerstone) so the web worker
 code is properly loaded.
 
 Minimal Configuration
@@ -104,7 +109,7 @@ this flag.
   decoding JPEG2000 images.  Set this to true to use the PDF.JS codec.  The PDF.js codec is faster than the
   OpenJPEG based codec but does not properly decode all images and is therefore not recommended.
 
-* taskConfiguration.sleepTask.sleepTime - This is a configuratio option for a custom web worker task,
+* taskConfiguration.sleepTask.sleepTime - This is a configuration option for a custom web worker task,
 See "Custom Web Worker Tasks" section below.
 
 Custom Web Worker Tasks

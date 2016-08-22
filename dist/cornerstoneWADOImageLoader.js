@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-21 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-22 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -1765,7 +1765,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
     config.maxWebWorkers = config.maxWebWorkers || (navigator.hardwareConcurrency || 1);
 
-    // Spawn new web workers if needed
+    // Spawn new web workers
     for(var i=0; i < config.maxWebWorkers; i++) {
       spawnWebWorker();
     }
@@ -1774,13 +1774,12 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
   /**
    * Function to add a decode task to be performed
    *
-   * @param imageFrame
-   * @param transferSyntax
-   * @param pixelData
-   * @param priority
+   * @param taskId - the taskId for this task
+   * @param data - data specific to the task
+   * @param priority - optional priority of the task (defaults to 0)
    * @returns {*}
    */
-  function addTask(message, data, priority) {
+  function addTask(taskId, data, priority) {
     if(!webWorkers.length) {
       initialize();
     }
@@ -1797,7 +1796,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
     // insert the decode task in the sorted position
     tasks.splice(i, 0, {
-      taskId: message,
+      taskId: taskId,
       status: 'ready',
       added : new Date().getTime(),
       data: data,
@@ -1813,7 +1812,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   /**
    * Function to return the statistics on running web workers
-   * @returns {{numDecodeTasksCompleted: number, totalDecodeTimeInMS: number, totalTimeDelayedInMS: number}}
+   * @returns object containing statistics
    */
   function getStatistics() {
     statistics.numQueuedTasks = tasks.length;

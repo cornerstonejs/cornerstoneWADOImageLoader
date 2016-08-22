@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-21 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-22 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 var registerTaskHandler;
 
 (function () {
@@ -474,11 +474,11 @@ cornerstoneWADOImageLoader = {};
 
     if(!decodeConfig.usePDFJS) {
       // OpenJPEG2000 https://github.com/jpambrun/openjpeg
-      console.log('OpenJPEG')
+      //console.log('OpenJPEG')
       return decodeOpenJpeg2000(imageFrame, pixelData);
     } else {
       // OHIF image-JPEG2000 https://github.com/OHIF/image-JPEG2000
-      console.log('PDFJS')
+      //console.log('PDFJS')
       return decodeJpx(imageFrame, pixelData);
     }
   }
