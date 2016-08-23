@@ -1,5 +1,8 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-22 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
-var registerTaskHandler;
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-23 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+
+cornerstoneWADOImageLoaderWebWorker = {
+  registerTaskHandler : undefined
+};
 
 (function () {
 
@@ -55,7 +58,11 @@ var registerTaskHandler;
    * Function exposed to web worker tasks to register themselves
    * @param taskHandler
    */
-  registerTaskHandler = function(taskHandler) {
+  cornerstoneWADOImageLoaderWebWorker.registerTaskHandler = function(taskHandler) {
+    if(taskHandlers[taskHandler.taskId]) {
+      console.log('attempt to register duplicate task handler "', taskHandler.taskId, '"');
+      return false;
+    }
     taskHandlers[taskHandler.taskId] = taskHandler;
     if(initialized) {
       taskHandler.initialize(config);
@@ -185,7 +192,7 @@ cornerstoneWADOImageLoader = {};
   }
 
   // register our task
-  registerTaskHandler({
+  cornerstoneWADOImageLoaderWebWorker.registerTaskHandler({
     taskId: 'decodeTask',
     handler: decodeTaskHandler,
     initialize: decodeTaskInitialize

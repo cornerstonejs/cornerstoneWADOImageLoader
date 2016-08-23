@@ -106,6 +106,7 @@
             </div>
         </div>
         <div class="col-md-6">
+            <span>Num Web Workers: </span><span id="numWebWorkers"></span><br>
             <span>Num Queued Tasks: </span><span id="numQueuedTasks"></span><br>
             <span>Num Tasks Executing: </span><span id="numTasksExecuting"></span><br>
             <span>Total Tasks Executed: </span><span id="totalTasksExecuted"></span><br>
@@ -158,6 +159,8 @@
         }
     };
     cornerstoneWADOImageLoader.webWorkerManager.initialize(config);
+    $('#numWebWorkers').text(config.maxWebWorkers);
+
 
     var loaded = false;
 

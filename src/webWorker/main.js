@@ -1,4 +1,7 @@
-var registerTaskHandler;
+
+cornerstoneWADOImageLoaderWebWorker = {
+  registerTaskHandler : undefined
+};
 
 (function () {
 
@@ -54,7 +57,11 @@ var registerTaskHandler;
    * Function exposed to web worker tasks to register themselves
    * @param taskHandler
    */
-  registerTaskHandler = function(taskHandler) {
+  cornerstoneWADOImageLoaderWebWorker.registerTaskHandler = function(taskHandler) {
+    if(taskHandlers[taskHandler.taskId]) {
+      console.log('attempt to register duplicate task handler "', taskHandler.taskId, '"');
+      return false;
+    }
     taskHandlers[taskHandler.taskId] = taskHandler;
     if(initialized) {
       taskHandler.initialize(config);
