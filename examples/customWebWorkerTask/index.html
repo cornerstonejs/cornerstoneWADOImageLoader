@@ -229,7 +229,7 @@
     }
 
     function startWebWorker() {
-        var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('sleepTask', {}, 10);
+        var promise = cornerstoneWADOImageLoader.webWorkerManager.addTask('sleepTask', {},-10);
         promise.then(function(result) {
             console.log('sleep task completed');
             updateStatistics();
@@ -266,7 +266,7 @@
                     width : loadedImage.width,
                     height : loadedImage.height
                 }
-            }, 1);
+            }, -8);
             promise.then(function(result) {
                 console.log('convolveTask task completed');
                 result.pixelData = new Int16Array(result.pixelData);

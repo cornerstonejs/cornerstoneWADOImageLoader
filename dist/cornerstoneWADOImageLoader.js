@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-25 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-30 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.
 //
@@ -494,7 +494,9 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
   "use strict";
 
   function addDecodeTask(imageFrame, transferSyntax, pixelData, options) {
-    var priority = options.priority || 5;
+    var priority = options.priority || undefined;
+    var transferList = options.transferPixelData ? [pixelData.buffer] : undefined;
+
     return cornerstoneWADOImageLoader.webWorkerManager.addTask(
       'decodeTask',
       {
@@ -502,7 +504,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
         transferSyntax : transferSyntax,
         pixelData : pixelData,
         options: options
-      }, priority);
+      }, priority, transferList);
   }
 
   function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options) {
@@ -1771,7 +1773,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
             taskId: task.taskId,
             workerIndex: i,
             data: task.data
-          });
+          }, task.transferList);
           statistics.numTasksExecuting++;
           return;
         }
@@ -1844,10 +1846,11 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
    *
    * @param taskId - the taskId for this task
    * @param data - data specific to the task
-   * @param priority - optional priority of the task (defaults to 0)
+   * @param priority - optional priority of the task (defaults to 0), > 0 is higher, < 0 is lower
+   * @param transferList - optional array of data to transfer to web worker
    * @returns {*}
    */
-  function addTask(taskId, data, priority) {
+  function addTask(taskId, data, priority, transferList) {
     if(!webWorkers.length) {
       initialize();
     }
@@ -1857,19 +1860,20 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
     // find the right spot to insert this decode task (based on priority)
     for(var i=0; i < tasks.length; i++) {
-      if(tasks[i].priority >= priority) {
+      if(tasks[i].priority <= priority) {
         break;
       }
     }
 
-    // insert the decode task in the sorted position
+    // insert the decode task at position i
     tasks.splice(i, 0, {
       taskId: taskId,
       status: 'ready',
       added : new Date().getTime(),
       data: data,
       deferred: deferred,
-      priority: priority
+      priority: priority,
+      transferList: transferList
     });
 
     // try to start a task on the web worker since we just added a new task and a web worker may be available

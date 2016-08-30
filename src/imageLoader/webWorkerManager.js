@@ -64,7 +64,7 @@
             taskId: task.taskId,
             workerIndex: i,
             data: task.data
-          });
+          }, task.transferList);
           statistics.numTasksExecuting++;
           return;
         }
@@ -137,10 +137,11 @@
    *
    * @param taskId - the taskId for this task
    * @param data - data specific to the task
-   * @param priority - optional priority of the task (defaults to 0)
+   * @param priority - optional priority of the task (defaults to 0), > 0 is higher, < 0 is lower
+   * @param transferList - optional array of data to transfer to web worker
    * @returns {*}
    */
-  function addTask(taskId, data, priority) {
+  function addTask(taskId, data, priority, transferList) {
     if(!webWorkers.length) {
       initialize();
     }
@@ -150,19 +151,20 @@
 
     // find the right spot to insert this decode task (based on priority)
     for(var i=0; i < tasks.length; i++) {
-      if(tasks[i].priority >= priority) {
+      if(tasks[i].priority <= priority) {
         break;
       }
     }
 
-    // insert the decode task in the sorted position
+    // insert the decode task at position i
     tasks.splice(i, 0, {
       taskId: taskId,
       status: 'ready',
       added : new Date().getTime(),
       data: data,
       deferred: deferred,
-      priority: priority
+      priority: priority,
+      transferList: transferList
     });
 
     // try to start a task on the web worker since we just added a new task and a web worker may be available

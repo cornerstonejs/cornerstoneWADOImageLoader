@@ -87,6 +87,8 @@ Backlog
 * Add support for dynamically loading custom web worker tasks in webWorkerManager
 * Add support for adjusting # of web workers dynamically (adding, removing)
 * Add support for issuing progress events from web worker tasks
+* Add support for changing priority of tasks in web worker queue
+* Add support for canceling tasks in web worker queue
 
 FAQ
 ===
