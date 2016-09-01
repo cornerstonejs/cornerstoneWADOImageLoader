@@ -106,6 +106,7 @@
             </div>
         </div>
         <div class="col-md-6">
+            <span>Max Web Workers: </span><span id="maxWebWorkers"></span><br>
             <span>Num Web Workers: </span><span id="numWebWorkers"></span><br>
             <span>Num Queued Tasks: </span><span id="numQueuedTasks"></span><br>
             <span>Num Tasks Executing: </span><span id="numTasksExecuting"></span><br>
@@ -140,6 +141,7 @@
     // Initialize the web worker manager with our custom web worker task
     var config = {
         maxWebWorkers: navigator.hardwareConcurrency || 1,
+        startWebWorkersOnDemand: true,
         webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
         webWorkerTaskPaths: [
             '../examples/customWebWorkerTask/sleepTask.js',
@@ -221,7 +223,9 @@
 
     function updateStatistics() {
         var stats = cornerstoneWADOImageLoader.webWorkerManager.getStatistics();
-        $('#numQueuedTasks').text(stats.numQueuedTasks);
+        $('#maxWebWorkers').text(stats.maxWebWorkers);
+        $('#numWebWorkers').text(stats.numWebWorkers);
+        $('#numQueuedTasks').text(stats.numTasksQueued);
         $('#numTasksExecuting').text(stats.numTasksExecuting);
         $('#totalTasksExecuted').text(stats.numTasksCompleted);
         $('#totalTaskExecutionTime').text(stats.totalTaskTimeInMS);

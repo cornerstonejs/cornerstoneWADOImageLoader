@@ -63,6 +63,7 @@ Building on the prior minimal example, you can configure the web worker framewor
 ``` javascript
     var config = {
         maxWebWorkers: navigator.hardwareConcurrency || 1,
+        startWebWorkersOnDemand : true,
         webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
         webWorkerTaskPaths: [
             '../examples/customWebWorkerTask/sleepTask.js',
@@ -91,6 +92,9 @@ the default number of web workers is set to 1.  The web worker framework will au
 or set to 1 web worker if not available.  You can override the number of web workers by setting this property
 yourself.  You may want to do this to add support for additional web workers on browsers that don't support
 navigator.hardwareConcurrency or if you find that using all cores slows down the main ui thread too much.
+
+* startWebWorkersOnDemand - true if you want to create web workers only when needed, false if you want them all
+created on initialize (default).
 
 * webWorkerTaskPaths - This is an array of paths to custom web worker tasks.  See section "Custom Web Worker Tasks"
 below for more information.

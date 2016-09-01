@@ -2,6 +2,7 @@
 
   "use strict";
 
+  // the taskId to assign to the next task added via addTask()
   var nextTaskId = 0;
 
   // array of queued tasks sorted with highest priority task first
@@ -12,6 +13,7 @@
 
   var defaultConfig = {
     maxWebWorkers: navigator.hardwareConcurrency || 1,
+    startWebWorkersOnDemand: true,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
     webWorkerTaskPaths: [],
     taskConfiguration: {
@@ -24,11 +26,12 @@
     }
   };
 
-
   var config;
 
   var statistics = {
-    numQueuedTasks : 0,
+    maxWebWorkers : 0,
+    numWebWorkers : 0,
+    numTasksQueued : 0,
     numTasksExecuting : 0,
     numTasksCompleted: 0,
     totalTaskTimeInMS: 0,
@@ -72,6 +75,11 @@
         }
       }
     }
+
+    // if no available web workers and we haven't started max web workers, start a new one
+    if(webWorkers.length < config.maxWebWorkers) {
+      spawnWebWorker();
+    }
   }
 
   /**
@@ -99,6 +107,12 @@
    * Spawns a new web worker
    */
   function spawnWebWorker() {
+    // prevent exceeding maxWebWorkers
+    if(webWorkers.length >= config.maxWebWorkers) {
+      return;
+    }
+
+    // spawn the webworker
     var worker = new Worker(config.webWorkerPath);
     webWorkers.push({
       worker: worker,
@@ -129,8 +143,10 @@
     config.maxWebWorkers = config.maxWebWorkers || (navigator.hardwareConcurrency || 1);
 
     // Spawn new web workers
-    for(var i=0; i < config.maxWebWorkers; i++) {
-      spawnWebWorker();
+    if(!config.startWebWorkersOnDemand) {
+      for(var i=0; i < config.maxWebWorkers; i++) {
+        spawnWebWorker();
+      }
     }
   }
 
@@ -144,7 +160,7 @@
    * @returns {*}
    */
   function addTask(taskType, data, priority, transferList) {
-    if (!webWorkers.length) {
+    if (!config) {
       initialize();
     }
 
@@ -236,7 +252,9 @@
    * @returns object containing statistics
    */
   function getStatistics() {
-    statistics.numQueuedTasks = tasks.length;
+    statistics.maxWebWorkers = config.maxWebWorkers;
+    statistics.numWebWorkers = webWorkers.length;
+    statistics.numTasksQueued = tasks.length;
     return statistics;
   }
 
