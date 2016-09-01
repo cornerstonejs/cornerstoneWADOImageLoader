@@ -61,7 +61,7 @@
           // a message to execute it
           webWorkers[i].task = task;
           webWorkers[i].worker.postMessage({
-            taskId: task.taskId,
+            taskType: task.taskType,
             workerIndex: i,
             data: task.data
           }, task.transferList);
@@ -78,7 +78,7 @@
    */
   function handleMessageFromWorker(msg) {
     //console.log('handleMessageFromWorker', msg.data);
-    if(msg.data.taskId === 'initialize') {
+    if(msg.data.taskType === 'initialize') {
       webWorkers[msg.data.workerIndex].status = 'ready';
       startTaskOnWebWorker();
     } else {
@@ -104,7 +104,7 @@
     });
     worker.addEventListener('message', handleMessageFromWorker);
     worker.postMessage({
-      taskId: 'initialize',
+      taskType: 'initialize',
       workerIndex: webWorkers.length - 1,
       config: config
     });
@@ -135,13 +135,13 @@
   /**
    * Function to add a decode task to be performed
    *
-   * @param taskId - the taskId for this task
+   * @param taskType - the taskType for this task
    * @param data - data specific to the task
    * @param priority - optional priority of the task (defaults to 0), > 0 is higher, < 0 is lower
    * @param transferList - optional array of data to transfer to web worker
    * @returns {*}
    */
-  function addTask(taskId, data, priority, transferList) {
+  function addTask(taskType, data, priority, transferList) {
     if(!webWorkers.length) {
       initialize();
     }
@@ -158,7 +158,7 @@
 
     // insert the decode task at position i
     tasks.splice(i, 0, {
-      taskId: taskId,
+      taskType: taskType,
       status: 'ready',
       added : new Date().getTime(),
       data: data,

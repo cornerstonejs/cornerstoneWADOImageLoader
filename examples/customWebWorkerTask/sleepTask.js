@@ -18,7 +18,7 @@
   
   // register ourselves to receive messages
   cornerstoneWADOImageLoaderWebWorker.registerTaskHandler({
-    taskId :'sleepTask',
+    taskType :'sleepTask',
     handler: sleepTaskHandler  ,
     initialize: sleepTaskInitialize
   });

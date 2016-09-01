@@ -86,7 +86,7 @@ cornerstoneWADOImageLoader = {};
 
   // register our task
   cornerstoneWADOImageLoaderWebWorker.registerTaskHandler({
-    taskId: 'decodeTask',
+    taskType: 'decodeTask',
     handler: decodeTaskHandler,
     initialize: decodeTaskInitialize
   });
