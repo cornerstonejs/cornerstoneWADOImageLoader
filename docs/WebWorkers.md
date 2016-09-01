@@ -124,7 +124,7 @@ If you want to create your own custom web worker tasks, follow the following ste
 3) Register your custom web worker task with the framework by calling
    cornerstoneWADOImageLoaderWebWorker.registerTaskHandler() function.  This function accepts an object with
    three properties:
-   * taskId - A unique string used to dispatch task requests to your custom web worker task
+   * taskType - A unique string used to dispatch task requests to your custom web worker task
    * handler - function that is called when work is dispatched to your custom web worker task
    * initialize - function that is called when the web worker is first initialized and passed in the taskConfiguration
       object passed to the web worker framework when initialize() is called
@@ -138,12 +138,14 @@ If you want to create your own custom web worker tasks, follow the following ste
 
 6) Queue a task for your custom web worker from the UI Thread using cornerstoneWADOImageLoader.webWorkerManager.addTask.
   This function takes three parameters:
-  * taskId - This should match the taskId registered by your custom web worker task in step 6 above
+  * taskType - This should match the taskId registered by your custom web worker task in step 6 above
   * data - This is an object you want passed to your web worker task.  This can include pixel data or
            whatever else you want
   * priority - integer with lower numbers being higher priority.  if not specified a priority of 0 is used.
            Note that decode tasks currently use a priority of 5
-
+  And returns an object with the following properties
+  * taskId - unique id for this task
+  * promise - a promise that is resolved when the task completes
 7) Have the UI thread set a then handler on the returned promise to get the result the custom web worker returned
    in step 5 above.
 

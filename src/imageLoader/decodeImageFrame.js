@@ -15,7 +15,7 @@
         transferSyntax : transferSyntax,
         pixelData : pixelData,
         options: options
-      }, priority, transferList);
+      }, priority, transferList).promise;
   }
 
   function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options) {

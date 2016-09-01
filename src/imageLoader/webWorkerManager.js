@@ -2,6 +2,8 @@
 
   "use strict";
 
+  var nextTaskId = 0;
+
   // array of queued tasks sorted with highest priority task first
   var tasks = [];
 
@@ -142,7 +144,7 @@
    * @returns {*}
    */
   function addTask(taskType, data, priority, transferList) {
-    if(!webWorkers.length) {
+    if (!webWorkers.length) {
       initialize();
     }
 
@@ -150,17 +152,20 @@
     var deferred = $.Deferred();
 
     // find the right spot to insert this decode task (based on priority)
-    for(var i=0; i < tasks.length; i++) {
-      if(tasks[i].priority <= priority) {
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].priority <= priority) {
         break;
       }
     }
 
+    var taskId = nextTaskId++;
+
     // insert the decode task at position i
     tasks.splice(i, 0, {
+      taskId: taskId,
       taskType: taskType,
       status: 'ready',
-      added : new Date().getTime(),
+      added: new Date().getTime(),
       data: data,
       deferred: deferred,
       priority: priority,
@@ -170,7 +175,60 @@
     // try to start a task on the web worker since we just added a new task and a web worker may be available
     startTaskOnWebWorker();
 
-    return deferred.promise();
+    return {
+      taskId: taskId,
+      promise: deferred.promise()
+    };
+  }
+
+  /**
+   * Changes the priority of a queued task
+   * @param taskId - the taskId to change the priority of
+   * @param priority - priority of the task (defaults to 0), > 0 is higher, < 0 is lower
+   * @returns boolean - true on success, false if taskId not found
+   */
+  function setTaskPriority(taskId, priority) {
+    // search for this taskId
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].taskId === taskId) {
+        // taskId found, remove it
+        var task = tasks.splice(i, 1)[0];
+
+        // set its prioirty
+        task.priority = priority;
+
+        // find the right spot to insert this decode task (based on priority)
+        for (i = 0; i < tasks.length; i++) {
+          if (tasks[i].priority <= priority) {
+            break;
+          }
+        }
+
+        // insert the decode task at position i
+        tasks.splice(i, 0, task);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Cancels a queued task and rejects
+   * @param taskId - the taskId to cancel
+   * @param reason - optional reason the task was rejected
+   * @returns boolean - true on success, false if taskId not found
+   */
+  function cancelTask(taskId, reason) {
+    // search for this taskId
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].taskId === taskId) {
+        // taskId found, remove it
+        var task = tasks.splice(i, 1);
+        task.promise.reject(reason);
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -186,7 +244,9 @@
   cornerstoneWADOImageLoader.webWorkerManager = {
     initialize : initialize,
     addTask : addTask,
-    getStatistics: getStatistics
+    getStatistics: getStatistics,
+    setTaskPriority: setTaskPriority,
+    cancelTask: cancelTask
   };
 
 }($, cornerstoneWADOImageLoader));
