@@ -64,9 +64,18 @@ cornerstoneWADOImageLoaderWebWorker = {
     }
     taskHandlers[taskHandler.taskType] = taskHandler;
     if(initialized) {
-      taskHandler.initialize(config);
+      taskHandler.initialize(config.taskConfiguration);
     }
   };
+
+  /**
+   * Function to load a new web worker task with updated configuration
+   * @param data
+   */
+  function loadWebWorkerTask(data) {
+    config = data.config;
+    self.importScripts(data.sourcePath);
+  }
 
   /**
    * Web worker message handler - dispatches messages to the registered task handlers
@@ -74,8 +83,16 @@ cornerstoneWADOImageLoaderWebWorker = {
    */
   self.onmessage = function(msg) {
     //console.log('web worker onmessage', msg.data);
+
+    // handle initialize message
     if(msg.data.taskType === 'initialize') {
       initialize(msg.data);
+      return;
+    }
+
+    // handle loadWebWorkerTask message
+    if(msg.data.taskType === 'loadWebWorkerTask') {
+      loadWebWorkerTask(msg.data);
       return;
     }
 

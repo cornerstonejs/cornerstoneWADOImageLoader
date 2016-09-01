@@ -144,7 +144,7 @@
         startWebWorkersOnDemand: true,
         webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
         webWorkerTaskPaths: [
-            '../examples/customWebWorkerTask/sleepTask.js',
+
             '../examples/customWebWorkerTask/convolveTask.js'
 
         ],
@@ -154,9 +154,6 @@
                 initializeCodecsOnStartup: false,
                 codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
                 usePDFJS: false
-            },
-            'sleepTask' : {
-                sleepTime: 3000
             }
         }
     };
@@ -232,7 +229,21 @@
         $('#totalTaskDelayTime').text(stats.totalTimeDelayedInMS);
     }
 
+    var sleepTaskLoaded = false;
+
     function startWebWorker() {
+        // dyanmically load the sleep task
+        if(!sleepTaskLoaded) {
+            sleepTaskLoaded = true;
+            cornerstoneWADOImageLoader.webWorkerManager.loadWebWorkerTask(
+                    '../examples/customWebWorkerTask/sleepTask.js',{
+                        'sleepTask' : {
+                            sleepTime: 3000
+                        }
+                    }
+            );
+        }
+
         var task = cornerstoneWADOImageLoader.webWorkerManager.addTask('sleepTask', {},-10);
         var promise = task.promise;
         promise.then(function(result) {

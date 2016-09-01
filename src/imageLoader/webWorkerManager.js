@@ -151,6 +151,32 @@
   }
 
   /**
+   * dynamically loads a web worker task
+   * @param sourcePath
+   * @param taskConfig
+   */
+  function loadWebWorkerTask(sourcePath, taskConfig) {
+    // add it to the list of web worker tasks paths so on demand web workers
+    // load this properly
+    config.webWorkerTaskPaths.push(sourcePath);
+
+    // if a task specific configuration is provided, merge it into the config
+    if(taskConfig) {
+      config.taskConfiguration = Object.assign(config.taskConfiguration, taskConfig);
+    }
+
+    // tell each spawned web worker to load this task
+    for(var i=0; i < webWorkers.length; i++) {
+      webWorkers[i].worker.postMessage({
+        taskType: 'loadWebWorkerTask',
+        workerIndex: webWorkers.length - 1,
+        sourcePath: sourcePath,
+        config: config
+      });
+    }
+  }
+
+  /**
    * Function to add a decode task to be performed
    *
    * @param taskType - the taskType for this task
@@ -261,6 +287,7 @@
   // module exports
   cornerstoneWADOImageLoader.webWorkerManager = {
     initialize : initialize,
+    loadWebWorkerTask: loadWebWorkerTask,
     addTask : addTask,
     getStatistics: getStatistics,
     setTaskPriority: setTaskPriority,

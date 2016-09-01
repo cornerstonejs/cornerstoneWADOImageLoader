@@ -84,7 +84,6 @@ Backlog
 * Consolidate all EMSCRIPTEN codecs into one build to cut down on memory use and startup times
 * Add support for bulk data items to WADO-RS Loader
 * Add events to webWorkerManager so its activity can be monitored
-* Add support for dynamically loading custom web worker tasks in webWorkerManager
 * Add support for issuing progress events from web worker tasks
 
 FAQ
