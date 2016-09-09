@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-09-01 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-09-09 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 
 cornerstoneWADOImageLoaderWebWorker = {
   registerTaskHandler : undefined
@@ -151,8 +151,8 @@ cornerstoneWADOImageLoader = {};
     // Initialize the codecs
     if (config.decodeTask.initializeCodecsOnStartup) {
       //console.time('initializeCodecs');
-      cornerstoneWADOImageLoader.initializeJPEG2000();
-      cornerstoneWADOImageLoader.initializeJPEGLS();
+      cornerstoneWADOImageLoader.initializeJPEG2000(config);
+      cornerstoneWADOImageLoader.initializeJPEGLS(config);
       //console.timeEnd('initializeCodecs');
     }
   }
