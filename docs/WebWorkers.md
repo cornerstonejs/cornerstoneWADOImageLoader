@@ -63,6 +63,7 @@ Building on the prior minimal example, you can configure the web worker framewor
 ``` javascript
     var config = {
         maxWebWorkers: navigator.hardwareConcurrency || 1,
+        startWebWorkersOnDemand : true,
         webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
         webWorkerTaskPaths: [
             '../examples/customWebWorkerTask/sleepTask.js',
@@ -91,6 +92,9 @@ the default number of web workers is set to 1.  The web worker framework will au
 or set to 1 web worker if not available.  You can override the number of web workers by setting this property
 yourself.  You may want to do this to add support for additional web workers on browsers that don't support
 navigator.hardwareConcurrency or if you find that using all cores slows down the main ui thread too much.
+
+* startWebWorkersOnDemand - true if you want to create web workers only when needed, false if you want them all
+created on initialize (default).
 
 * webWorkerTaskPaths - This is an array of paths to custom web worker tasks.  See section "Custom Web Worker Tasks"
 below for more information.
@@ -124,7 +128,7 @@ If you want to create your own custom web worker tasks, follow the following ste
 3) Register your custom web worker task with the framework by calling
    cornerstoneWADOImageLoaderWebWorker.registerTaskHandler() function.  This function accepts an object with
    three properties:
-   * taskId - A unique string used to dispatch task requests to your custom web worker task
+   * taskType - A unique string used to dispatch task requests to your custom web worker task
    * handler - function that is called when work is dispatched to your custom web worker task
    * initialize - function that is called when the web worker is first initialized and passed in the taskConfiguration
       object passed to the web worker framework when initialize() is called
@@ -138,12 +142,14 @@ If you want to create your own custom web worker tasks, follow the following ste
 
 6) Queue a task for your custom web worker from the UI Thread using cornerstoneWADOImageLoader.webWorkerManager.addTask.
   This function takes three parameters:
-  * taskId - This should match the taskId registered by your custom web worker task in step 6 above
+  * taskType - This should match the taskId registered by your custom web worker task in step 6 above
   * data - This is an object you want passed to your web worker task.  This can include pixel data or
            whatever else you want
   * priority - integer with lower numbers being higher priority.  if not specified a priority of 0 is used.
            Note that decode tasks currently use a priority of 5
-
+  And returns an object with the following properties
+  * taskId - unique id for this task
+  * promise - a promise that is resolved when the task completes
 7) Have the UI thread set a then handler on the returned promise to get the result the custom web worker returned
    in step 5 above.
 

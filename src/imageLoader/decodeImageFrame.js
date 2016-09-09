@@ -5,7 +5,9 @@
   "use strict";
 
   function addDecodeTask(imageFrame, transferSyntax, pixelData, options) {
-    var priority = options.priority || 5;
+    var priority = options.priority || undefined;
+    var transferList = options.transferPixelData ? [pixelData.buffer] : undefined;
+
     return cornerstoneWADOImageLoader.webWorkerManager.addTask(
       'decodeTask',
       {
@@ -13,7 +15,7 @@
         transferSyntax : transferSyntax,
         pixelData : pixelData,
         options: options
-      }, priority);
+      }, priority, transferList).promise;
   }
 
   function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options) {

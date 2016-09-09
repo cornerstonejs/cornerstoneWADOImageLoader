@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-25 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-09-01 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.
 //
@@ -494,7 +494,9 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
   "use strict";
 
   function addDecodeTask(imageFrame, transferSyntax, pixelData, options) {
-    var priority = options.priority || 5;
+    var priority = options.priority || undefined;
+    var transferList = options.transferPixelData ? [pixelData.buffer] : undefined;
+
     return cornerstoneWADOImageLoader.webWorkerManager.addTask(
       'decodeTask',
       {
@@ -502,7 +504,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
         transferSyntax : transferSyntax,
         pixelData : pixelData,
         options: options
-      }, priority);
+      }, priority, transferList).promise;
   }
 
   function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options) {
@@ -1709,6 +1711,9 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   "use strict";
 
+  // the taskId to assign to the next task added via addTask()
+  var nextTaskId = 0;
+
   // array of queued tasks sorted with highest priority task first
   var tasks = [];
 
@@ -1717,6 +1722,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   var defaultConfig = {
     maxWebWorkers: navigator.hardwareConcurrency || 1,
+    startWebWorkersOnDemand: true,
     webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
     webWorkerTaskPaths: [],
     taskConfiguration: {
@@ -1729,11 +1735,12 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     }
   };
 
-
   var config;
 
   var statistics = {
-    numQueuedTasks : 0,
+    maxWebWorkers : 0,
+    numWebWorkers : 0,
+    numTasksQueued : 0,
     numTasksExecuting : 0,
     numTasksCompleted: 0,
     totalTaskTimeInMS: 0,
@@ -1768,14 +1775,19 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
           // a message to execute it
           webWorkers[i].task = task;
           webWorkers[i].worker.postMessage({
-            taskId: task.taskId,
+            taskType: task.taskType,
             workerIndex: i,
             data: task.data
-          });
+          }, task.transferList);
           statistics.numTasksExecuting++;
           return;
         }
       }
+    }
+
+    // if no available web workers and we haven't started max web workers, start a new one
+    if(webWorkers.length < config.maxWebWorkers) {
+      spawnWebWorker();
     }
   }
 
@@ -1785,7 +1797,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
    */
   function handleMessageFromWorker(msg) {
     //console.log('handleMessageFromWorker', msg.data);
-    if(msg.data.taskId === 'initialize') {
+    if(msg.data.taskType === 'initialize') {
       webWorkers[msg.data.workerIndex].status = 'ready';
       startTaskOnWebWorker();
     } else {
@@ -1804,6 +1816,12 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
    * Spawns a new web worker
    */
   function spawnWebWorker() {
+    // prevent exceeding maxWebWorkers
+    if(webWorkers.length >= config.maxWebWorkers) {
+      return;
+    }
+
+    // spawn the webworker
     var worker = new Worker(config.webWorkerPath);
     webWorkers.push({
       worker: worker,
@@ -1811,7 +1829,7 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     });
     worker.addEventListener('message', handleMessageFromWorker);
     worker.postMessage({
-      taskId: 'initialize',
+      taskType: 'initialize',
       workerIndex: webWorkers.length - 1,
       config: config
     });
@@ -1834,21 +1852,50 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     config.maxWebWorkers = config.maxWebWorkers || (navigator.hardwareConcurrency || 1);
 
     // Spawn new web workers
-    for(var i=0; i < config.maxWebWorkers; i++) {
-      spawnWebWorker();
+    if(!config.startWebWorkersOnDemand) {
+      for(var i=0; i < config.maxWebWorkers; i++) {
+        spawnWebWorker();
+      }
+    }
+  }
+
+  /**
+   * dynamically loads a web worker task
+   * @param sourcePath
+   * @param taskConfig
+   */
+  function loadWebWorkerTask(sourcePath, taskConfig) {
+    // add it to the list of web worker tasks paths so on demand web workers
+    // load this properly
+    config.webWorkerTaskPaths.push(sourcePath);
+
+    // if a task specific configuration is provided, merge it into the config
+    if(taskConfig) {
+      config.taskConfiguration = Object.assign(config.taskConfiguration, taskConfig);
+    }
+
+    // tell each spawned web worker to load this task
+    for(var i=0; i < webWorkers.length; i++) {
+      webWorkers[i].worker.postMessage({
+        taskType: 'loadWebWorkerTask',
+        workerIndex: webWorkers.length - 1,
+        sourcePath: sourcePath,
+        config: config
+      });
     }
   }
 
   /**
    * Function to add a decode task to be performed
    *
-   * @param taskId - the taskId for this task
+   * @param taskType - the taskType for this task
    * @param data - data specific to the task
-   * @param priority - optional priority of the task (defaults to 0)
+   * @param priority - optional priority of the task (defaults to 0), > 0 is higher, < 0 is lower
+   * @param transferList - optional array of data to transfer to web worker
    * @returns {*}
    */
-  function addTask(taskId, data, priority) {
-    if(!webWorkers.length) {
+  function addTask(taskType, data, priority, transferList) {
+    if (!config) {
       initialize();
     }
 
@@ -1856,26 +1903,83 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
     var deferred = $.Deferred();
 
     // find the right spot to insert this decode task (based on priority)
-    for(var i=0; i < tasks.length; i++) {
-      if(tasks[i].priority >= priority) {
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].priority <= priority) {
         break;
       }
     }
 
-    // insert the decode task in the sorted position
+    var taskId = nextTaskId++;
+
+    // insert the decode task at position i
     tasks.splice(i, 0, {
       taskId: taskId,
+      taskType: taskType,
       status: 'ready',
-      added : new Date().getTime(),
+      added: new Date().getTime(),
       data: data,
       deferred: deferred,
-      priority: priority
+      priority: priority,
+      transferList: transferList
     });
 
     // try to start a task on the web worker since we just added a new task and a web worker may be available
     startTaskOnWebWorker();
 
-    return deferred.promise();
+    return {
+      taskId: taskId,
+      promise: deferred.promise()
+    };
+  }
+
+  /**
+   * Changes the priority of a queued task
+   * @param taskId - the taskId to change the priority of
+   * @param priority - priority of the task (defaults to 0), > 0 is higher, < 0 is lower
+   * @returns boolean - true on success, false if taskId not found
+   */
+  function setTaskPriority(taskId, priority) {
+    // search for this taskId
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].taskId === taskId) {
+        // taskId found, remove it
+        var task = tasks.splice(i, 1)[0];
+
+        // set its prioirty
+        task.priority = priority;
+
+        // find the right spot to insert this decode task (based on priority)
+        for (i = 0; i < tasks.length; i++) {
+          if (tasks[i].priority <= priority) {
+            break;
+          }
+        }
+
+        // insert the decode task at position i
+        tasks.splice(i, 0, task);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Cancels a queued task and rejects
+   * @param taskId - the taskId to cancel
+   * @param reason - optional reason the task was rejected
+   * @returns boolean - true on success, false if taskId not found
+   */
+  function cancelTask(taskId, reason) {
+    // search for this taskId
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].taskId === taskId) {
+        // taskId found, remove it
+        var task = tasks.splice(i, 1);
+        task.promise.reject(reason);
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -1883,15 +1987,20 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
    * @returns object containing statistics
    */
   function getStatistics() {
-    statistics.numQueuedTasks = tasks.length;
+    statistics.maxWebWorkers = config.maxWebWorkers;
+    statistics.numWebWorkers = webWorkers.length;
+    statistics.numTasksQueued = tasks.length;
     return statistics;
   }
 
   // module exports
   cornerstoneWADOImageLoader.webWorkerManager = {
     initialize : initialize,
+    loadWebWorkerTask: loadWebWorkerTask,
     addTask : addTask,
-    getStatistics: getStatistics
+    getStatistics: getStatistics,
+    setTaskPriority: setTaskPriority,
+    cancelTask: cancelTask
   };
 
 }($, cornerstoneWADOImageLoader));

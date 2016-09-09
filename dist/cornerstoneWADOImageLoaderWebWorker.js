@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.14.0 - 2016-08-25 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.14.0 - 2016-09-01 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 
 cornerstoneWADOImageLoaderWebWorker = {
   registerTaskHandler : undefined
@@ -44,7 +44,7 @@ cornerstoneWADOImageLoaderWebWorker = {
 
     // tell main ui thread that we have completed initialization
     self.postMessage({
-      taskId: 'initialize',
+      taskType: 'initialize',
       status: 'success',
       result: {
       },
@@ -59,15 +59,24 @@ cornerstoneWADOImageLoaderWebWorker = {
    * @param taskHandler
    */
   cornerstoneWADOImageLoaderWebWorker.registerTaskHandler = function(taskHandler) {
-    if(taskHandlers[taskHandler.taskId]) {
-      console.log('attempt to register duplicate task handler "', taskHandler.taskId, '"');
+    if(taskHandlers[taskHandler.taskType]) {
+      console.log('attempt to register duplicate task handler "', taskHandler.taskType, '"');
       return false;
     }
-    taskHandlers[taskHandler.taskId] = taskHandler;
+    taskHandlers[taskHandler.taskType] = taskHandler;
     if(initialized) {
-      taskHandler.initialize(config);
+      taskHandler.initialize(config.taskConfiguration);
     }
   };
+
+  /**
+   * Function to load a new web worker task with updated configuration
+   * @param data
+   */
+  function loadWebWorkerTask(data) {
+    config = data.config;
+    self.importScripts(data.sourcePath);
+  }
 
   /**
    * Web worker message handler - dispatches messages to the registered task handlers
@@ -75,16 +84,24 @@ cornerstoneWADOImageLoaderWebWorker = {
    */
   self.onmessage = function(msg) {
     //console.log('web worker onmessage', msg.data);
-    if(msg.data.taskId === 'initialize') {
+
+    // handle initialize message
+    if(msg.data.taskType === 'initialize') {
       initialize(msg.data);
       return;
     }
 
+    // handle loadWebWorkerTask message
+    if(msg.data.taskType === 'loadWebWorkerTask') {
+      loadWebWorkerTask(msg.data);
+      return;
+    }
+
     // dispatch the message if there is a handler registered for it
-    if(taskHandlers[msg.data.taskId]) {
-      taskHandlers[msg.data.taskId].handler(msg.data, function(result, transferList) {
+    if(taskHandlers[msg.data.taskType]) {
+      taskHandlers[msg.data.taskType].handler(msg.data, function(result, transferList) {
         self.postMessage({
-          taskId: msg.data.taskId,
+          taskType: msg.data.taskType,
           status: 'success',
           result: result,
           workerIndex: msg.data.workerIndex
@@ -94,10 +111,10 @@ cornerstoneWADOImageLoaderWebWorker = {
     }
 
     // not task handler registered - send a failure message back to ui thread
-    console.log('no task handler for ', msg.data.taskId);
+    console.log('no task handler for ', msg.data.taskType);
     console.log(taskHandlers);
     self.postMessage({
-      taskId: msg.data.taskId,
+      taskType: msg.data.taskType,
       status: 'failed - no task handler registered',
       workerIndex: msg.data.workerIndex
     });
@@ -193,7 +210,7 @@ cornerstoneWADOImageLoader = {};
 
   // register our task
   cornerstoneWADOImageLoaderWebWorker.registerTaskHandler({
-    taskId: 'decodeTask',
+    taskType: 'decodeTask',
     handler: decodeTaskHandler,
     initialize: decodeTaskInitialize
   });
