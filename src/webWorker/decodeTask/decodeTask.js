@@ -27,8 +27,8 @@ cornerstoneWADOImageLoader = {};
     // Initialize the codecs
     if (config.decodeTask.initializeCodecsOnStartup) {
       //console.time('initializeCodecs');
-      cornerstoneWADOImageLoader.initializeJPEG2000();
-      cornerstoneWADOImageLoader.initializeJPEGLS();
+      cornerstoneWADOImageLoader.initializeJPEG2000(config);
+      cornerstoneWADOImageLoader.initializeJPEGLS(config);
       //console.timeEnd('initializeCodecs');
     }
   }

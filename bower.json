@@ -14,7 +14,7 @@
     ],
     "dependencies": {
       "dicomParser" : "~1.7.4",
-      "cornerstone": "~0.10.0",
+      "cornerstone": "dev",
       "jquery" : "~2.1.1",
       "image-jpeg2000" : "~0.3.1"
     },
