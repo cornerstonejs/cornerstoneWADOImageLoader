@@ -31,8 +31,11 @@
 
   function decode8( frameData, outFrame, frameSize, samplesSize ) {
     var header=new DataView(frameData.buffer, frameData.byteOffset);
-    var data=new DataView( frameData.buffer, frameData.byteOffset );
-    var out=new DataView( outFrame );
+    // var data = new DataView(frameData.buffer, frameData.byteOffset);
+    // var out = new DataView(outFrame);
+    // YV: DataView is much slower than native Int8Array, below changes make this code ~10x faster
+    var data = new Int8Array(frameData.buffer, frameData.byteOffset);
+    var out = new Int8Array(outFrame);
 
     var outIndex=0;
     var numSegments = header.getInt32(0,true);
@@ -47,18 +50,22 @@
       var endOfSegment = frameSize * numSegments;
 
       while( inIndex < maxIndex ) {
-        var n=data.getInt8(inIndex++);
+        // var n = data.getInt8(inIndex++);
+        var n = data[inIndex++];
         if( n >=0 && n <=127 ) {
           // copy n bytes
           for( var i=0 ; i < n+1 && outIndex < endOfSegment; ++i ) {
-            out.setInt8(outIndex, data.getInt8(inIndex++));
+            // out.setInt8(outIndex, data.getInt8(inIndex++));
+            out[outIndex] = data[inIndex++];
             outIndex+=samplesSize;
           }
         } else if( n<= -1 && n>=-127 ) {
-          var value=data.getInt8(inIndex++);
+          // var value = data.getInt8(inIndex++);
+          var value = data[inIndex++];
           // run of n bytes
           for( var j=0 ; j < -n+1 && outIndex < endOfSegment; ++j ) {
-            out.setInt8(outIndex, value );
+            // out.setInt8(outIndex, value);
+            out[outIndex] = value;
             outIndex+=samplesSize;
           }
         } else if (n===-128)
@@ -69,8 +76,11 @@
 
   function decode16( frameData, outFrame, frameSize ) {
     var header=new DataView(frameData.buffer, frameData.byteOffset);
-    var data=new DataView( frameData.buffer, frameData.byteOffset );
-    var out=new DataView( outFrame );
+    // var data=new DataView( frameData.buffer, frameData.byteOffset );
+    // var out=new DataView( outFrame );
+    // YV: DataView is much slower than native Int8Array, below changes make this code ~10x faster
+    var data = new Int8Array(frameData.buffer, frameData.byteOffset);
+    var out = new Int8Array(outFrame);
 
     var numSegments = header.getInt32(0,true);
     for( var s=0 ; s < numSegments ; ++s ) {
@@ -83,16 +93,20 @@
         maxIndex = frameData.length;
 
       while( inIndex < maxIndex ) {
-        var n=data.getInt8(inIndex++);
+        // var n = data.getInt8(inIndex++);
+        var n = data[inIndex++];
         if( n >=0 && n <=127 ) {
           for( var i=0 ; i < n+1 && outIndex < frameSize ; ++i ) {
-            out.setInt8( (outIndex*2)+highByte, data.getInt8(inIndex++) );
+            // out.setInt8((outIndex * 2) + highByte, data.getInt8(inIndex++));
+            out[(outIndex * 2) + highByte] = data[inIndex++];
             outIndex++;
           }
         } else if( n<= -1 && n>=-127 ) {
-          var value=data.getInt8(inIndex++);
+          // var value = data.getInt8(inIndex++);
+          var value = data[inIndex++];
           for( var j=0 ; j < -n+1 && outIndex < frameSize ; ++j ) {
-            out.setInt8( (outIndex*2)+highByte, value );
+            // out.setInt8((outIndex * 2) + highByte, value);
+            out[(outIndex * 2) + highByte] = value;
             outIndex++;
           }
         } else if (n===-128)
