@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.13.3 - 2016-06-02 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.13.3 - 2016-10-28 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -750,6 +750,33 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 "use strict";
 (function (cornerstoneWADOImageLoader) {
 
+  function decodeJPEGLossless(dataSet, frame) {
+    var bitsAllocated = dataSet.uint16('x00280100');
+    var pixelRepresentation = dataSet.uint16('x00280103');
+    var encodedImageFrame = cornerstoneWADOImageLoader.getEncodedImageFrame(dataSet, frame);
+    var byteOutput = bitsAllocated <= 8 ? 1 : 2;
+    //console.time('jpeglossless');
+    var decoder = new jpeg.lossless.Decoder();
+    var decompressedData = decoder.decode(encodedImageFrame.buffer, encodedImageFrame.byteOffset, encodedImageFrame.length, byteOutput);
+    //console.timeEnd('jpeglossless');
+    if (pixelRepresentation === 0) {
+      if (byteOutput === 2) {
+        return new Uint16Array(decompressedData.buffer);
+      } else {
+        // untested!
+        return new Uint8Array(decompressedData.buffer);
+      }
+    } else {
+      return new Int16Array(decompressedData.buffer);
+    }
+  }
+  // module exports
+  cornerstoneWADOImageLoader.decodeJPEGLossless = decodeJPEGLossless;
+
+}(cornerstoneWADOImageLoader));
+"use strict";
+(function (cornerstoneWADOImageLoader) {
+
 
   var charLS;
 
@@ -862,33 +889,6 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
   cornerstoneWADOImageLoader.decodeJPEGLS = decodeJPEGLS;
 
 }(cornerstoneWADOImageLoader));
-"use strict";
-(function (cornerstoneWADOImageLoader) {
-
-  function decodeJPEGLossless(dataSet, frame) {
-    var bitsAllocated = dataSet.uint16('x00280100');
-    var pixelRepresentation = dataSet.uint16('x00280103');
-    var encodedImageFrame = cornerstoneWADOImageLoader.getEncodedImageFrame(dataSet, frame);
-    var byteOutput = bitsAllocated <= 8 ? 1 : 2;
-    //console.time('jpeglossless');
-    var decoder = new jpeg.lossless.Decoder();
-    var decompressedData = decoder.decode(encodedImageFrame.buffer, encodedImageFrame.byteOffset, encodedImageFrame.length, byteOutput);
-    //console.timeEnd('jpeglossless');
-    if (pixelRepresentation === 0) {
-      if (byteOutput === 2) {
-        return new Uint16Array(decompressedData.buffer);
-      } else {
-        // untested!
-        return new Uint8Array(decompressedData.buffer);
-      }
-    } else {
-      return new Int16Array(decompressedData.buffer);
-    }
-  }
-  // module exports
-  cornerstoneWADOImageLoader.decodeJPEGLossless = decodeJPEGLossless;
-
-}(cornerstoneWADOImageLoader));
 /**
  */
 (function (cornerstoneWADOImageLoader) {
@@ -922,8 +922,11 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   function decode8( frameData, outFrame, frameSize, samplesSize ) {
     var header=new DataView(frameData.buffer, frameData.byteOffset);
-    var data=new DataView( frameData.buffer, frameData.byteOffset );
-    var out=new DataView( outFrame );
+    // var data = new DataView(frameData.buffer, frameData.byteOffset);
+    // var out = new DataView(outFrame);
+    // YV: DataView is much slower than native Int8Array, below changes make this code ~10x faster
+    var data = new Int8Array(frameData.buffer, frameData.byteOffset);
+    var out = new Int8Array(outFrame);
 
     var outIndex=0;
     var numSegments = header.getInt32(0,true);
@@ -938,18 +941,22 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
       var endOfSegment = frameSize * numSegments;
 
       while( inIndex < maxIndex ) {
-        var n=data.getInt8(inIndex++);
+        // var n = data.getInt8(inIndex++);
+        var n = data[inIndex++];
         if( n >=0 && n <=127 ) {
           // copy n bytes
           for( var i=0 ; i < n+1 && outIndex < endOfSegment; ++i ) {
-            out.setInt8(outIndex, data.getInt8(inIndex++));
+            // out.setInt8(outIndex, data.getInt8(inIndex++));
+            out[outIndex] = data[inIndex++];
             outIndex+=samplesSize;
           }
         } else if( n<= -1 && n>=-127 ) {
-          var value=data.getInt8(inIndex++);
+          // var value = data.getInt8(inIndex++);
+          var value = data[inIndex++];
           // run of n bytes
           for( var j=0 ; j < -n+1 && outIndex < endOfSegment; ++j ) {
-            out.setInt8(outIndex, value );
+            // out.setInt8(outIndex, value);
+            out[outIndex] = value;
             outIndex+=samplesSize;
           }
         } else if (n===-128)
@@ -960,8 +967,11 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
 
   function decode16( frameData, outFrame, frameSize ) {
     var header=new DataView(frameData.buffer, frameData.byteOffset);
-    var data=new DataView( frameData.buffer, frameData.byteOffset );
-    var out=new DataView( outFrame );
+    // var data=new DataView( frameData.buffer, frameData.byteOffset );
+    // var out=new DataView( outFrame );
+    // YV: DataView is much slower than native Int8Array, below changes make this code ~10x faster
+    var data = new Int8Array(frameData.buffer, frameData.byteOffset);
+    var out = new Int8Array(outFrame);
 
     var numSegments = header.getInt32(0,true);
     for( var s=0 ; s < numSegments ; ++s ) {
@@ -974,16 +984,20 @@ if(typeof cornerstoneWADOImageLoader === 'undefined'){
         maxIndex = frameData.length;
 
       while( inIndex < maxIndex ) {
-        var n=data.getInt8(inIndex++);
+        // var n = data.getInt8(inIndex++);
+        var n = data[inIndex++];
         if( n >=0 && n <=127 ) {
           for( var i=0 ; i < n+1 && outIndex < frameSize ; ++i ) {
-            out.setInt8( (outIndex*2)+highByte, data.getInt8(inIndex++) );
+            // out.setInt8((outIndex * 2) + highByte, data.getInt8(inIndex++));
+            out[(outIndex * 2) + highByte] = data[inIndex++];
             outIndex++;
           }
         } else if( n<= -1 && n>=-127 ) {
-          var value=data.getInt8(inIndex++);
+          // var value = data.getInt8(inIndex++);
+          var value = data[inIndex++];
           for( var j=0 ; j < -n+1 && outIndex < frameSize ; ++j ) {
-            out.setInt8( (outIndex*2)+highByte, value );
+            // out.setInt8((outIndex * 2) + highByte, value);
+            out[(outIndex * 2) + highByte] = value;
             outIndex++;
           }
         } else if (n===-128)
