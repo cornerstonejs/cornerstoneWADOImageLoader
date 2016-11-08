@@ -14,6 +14,7 @@
       rows : imagePixelModule.rows,
       columns : imagePixelModule.columns,
       bitsAllocated : imagePixelModule.bitsAllocated,
+      bitsStored : imagePixelModule.bitsStored,
       pixelRepresentation : imagePixelModule.pixelRepresentation, // 0 = unsigned,
       smallestPixelValue: imagePixelModule.smallestPixelValue,
       largestPixelValue: imagePixelModule.largestPixelValue,

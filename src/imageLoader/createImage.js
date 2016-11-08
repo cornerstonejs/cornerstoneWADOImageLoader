@@ -51,6 +51,7 @@
 
       var image = {
         imageId: imageId,
+        bitsStored: imageFrame.bitsStored,
         color: cornerstoneWADOImageLoader.isColorImage(imageFrame.photometricInterpretation),
         columnPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[1] : undefined,
         columns: imageFrame.columns,
