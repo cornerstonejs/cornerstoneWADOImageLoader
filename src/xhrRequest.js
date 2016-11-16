@@ -20,9 +20,12 @@
           // Parse the DICOM File
           var dicomPart10AsArrayBuffer = xhr.response;
           var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
-          var dataSet = dicomParser.parseDicom(byteArray);
-
-          deferred.resolve(dataSet);
+          try{
+            var dataSet = dicomParser.parseDicom(byteArray);
+            deferred.resolve(dataSet);
+          }catch(e){
+            deferred.reject(e);
+          }
         }
         else {
           // request failed, reject the deferred
