@@ -45,7 +45,7 @@
       deferred.reject(reason);
     });
 
-    return deferred.promise();
+    return deferred;
   }
 
   // registery dicomweb and wadouri image loader prefixes
