@@ -27,8 +27,7 @@
         var rescaleSlopeAndIntercept = cornerstoneWADOImageLoader.getRescaleSlopeAndIntercept(dataSet);
         var bytesPerPixel = 4;
         var numPixels = rows * columns;
-        //var sizeInBytes = numPixels * bytesPerPixel;
-        var sizeInBytes = dataSet.byteArray.length;
+        var sizeInBytes = numPixels * bytesPerPixel;
         var windowWidthAndCenter = cornerstoneWADOImageLoader.getWindowWidthAndCenter(dataSet);
 
         // clear the lastImageIdDrawn so we update the canvas
