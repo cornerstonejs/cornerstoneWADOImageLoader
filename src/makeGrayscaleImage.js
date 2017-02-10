@@ -71,8 +71,7 @@
         }
 
         var numPixels = rows * columns;
-        //var sizeInBytes = numPixels * bytesPerPixel;
-        var sizeInBytes = dataSet.byteArray.length;
+        var sizeInBytes = numPixels * bytesPerPixel;
         var photometricInterpretation = dataSet.string('x00280004');
         var invert = (photometricInterpretation === "MONOCHROME1");
         var windowWidthAndCenter = cornerstoneWADOImageLoader.getWindowWidthAndCenter(dataSet);
