@@ -67,7 +67,9 @@
       var length = endIndex - offset;
       deferred.resolve({
         contentType: findContentType(split),
-        imageFrame: new Uint8Array(imageFrameAsArrayBuffer, offset, length)
+        imageFrame: {
+          pixelData: new Uint8Array(imageFrameAsArrayBuffer, offset, length)
+        }
       });
     });
     return deferred.promise();    
