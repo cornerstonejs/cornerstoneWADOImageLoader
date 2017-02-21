@@ -24,11 +24,11 @@
     }
   }
 
-  function decodeJPEGBaseline8Bit(imageFrame, canvas) {
+  function decodeJPEGBaseline8Bit(imageFrame, pixelData, canvas) {
     var start = new Date().getTime();
     var deferred = $.Deferred();
 
-    var imgBlob = new Blob([imageFrame.pixelData], {type: "image/jpeg"});
+    var imgBlob = new Blob([pixelData], {type: "image/jpeg"});
 
     var r = new FileReader();
     if(r.readAsBinaryString === undefined) {

@@ -40,18 +40,37 @@
     var deferred = $.Deferred();
     var imageFrame = cornerstoneWADOImageLoader.getImageFrame(imageId);
     var decodePromise = cornerstoneWADOImageLoader.decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options);
-    decodePromise.then(function(imageFrame) {
-      setPixelDataType(imageFrame);
-
+    decodePromise.then(function(imageFrame) {      
       //var imagePixelModule = metaDataProvider('imagePixelModule', imageId);
       var imagePlaneModule = cornerstone.metaData.get('imagePlaneModule', imageId);
       var voiLutModule = cornerstone.metaData.get('voiLutModule', imageId);
       var modalityLutModule = cornerstone.metaData.get('modalityLutModule', imageId);
       var sopCommonModule = cornerstone.metaData.get('sopCommonModule', imageId);
+      var isColorImage = cornerstoneWADOImageLoader.isColorImage(imageFrame.photometricInterpretation);
+      var isJPEGBaseline8Bits = (transferSyntax === "1.2.840.10008.1.2.4.50") && (imageFrame.bitsAllocated === 8);
+
+      // JPEGBaseline (8 bits) is already returning the pixel data in the right format (rgba)
+      // because it's using a canvas to load and decode the image.
+      if(!isJPEGBaseline8Bits) {
+        setPixelDataType(imageFrame);
+
+        // convert color space
+        if(isColorImage) {
+          // setup the canvas context
+          canvas.height = imageFrame.rows;
+          canvas.width = imageFrame.columns;
+
+          var context = canvas.getContext('2d');
+          var imageData = context.createImageData(imageFrame.columns, imageFrame.rows);
+          cornerstoneWADOImageLoader.convertColorSpace(imageFrame, imageData);
+          imageFrame.imageData = imageData;
+          imageFrame.pixelData = imageData.data;
+        }
+      }
 
       var image = {
         imageId: imageId,
-        color: cornerstoneWADOImageLoader.isColorImage(imageFrame.photometricInterpretation),
+        color: isColorImage,
         columnPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[1] : undefined,
         columns: imageFrame.columns,
         height: imageFrame.rows,
@@ -71,24 +90,10 @@
         webWorkerTimeInMS: imageFrame.webWorkerTimeInMS
       };
 
-
       // add function to return pixel data
       image.getPixelData = function() {
         return imageFrame.pixelData;
       };
-
-      // convert color space
-      if(image.color) {
-        // setup the canvas context
-        canvas.height = imageFrame.rows;
-        canvas.width = imageFrame.columns;
-
-        var context = canvas.getContext('2d');
-        var imageData = context.createImageData(imageFrame.columns, imageFrame.rows);
-        cornerstoneWADOImageLoader.convertColorSpace(imageFrame, imageData);
-        imageFrame.imageData = imageData;
-        imageFrame.pixelData = imageData.data;
-      }
 
       // Setup the renderer
       if(image.color) {
