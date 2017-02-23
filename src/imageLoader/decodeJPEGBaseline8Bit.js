@@ -68,10 +68,10 @@
     return deferred.promise();
   }
 
-  function isJPEGBaseline8Bit(imageFrame) {
-    if((imageFrame.bitsAllocated === 8) &&
-      imageFrame.transferSyntax === "1.2.840.10008.1.2.4.50")
-    {
+  function isJPEGBaseline8Bit(imageFrame, transferSyntax) {
+    transferSyntax = transferSyntax || imageFrame.transferSyntax;
+
+    if((imageFrame.bitsAllocated === 8) && (transferSyntax === "1.2.840.10008.1.2.4.50")) {
       return true;
     }
 

@@ -47,11 +47,10 @@
       var modalityLutModule = cornerstone.metaData.get('modalityLutModule', imageId);
       var sopCommonModule = cornerstone.metaData.get('sopCommonModule', imageId);
       var isColorImage = cornerstoneWADOImageLoader.isColorImage(imageFrame.photometricInterpretation);
-      var isJPEGBaseline8Bits = (transferSyntax === "1.2.840.10008.1.2.4.50") && (imageFrame.bitsAllocated === 8);
 
       // JPEGBaseline (8 bits) is already returning the pixel data in the right format (rgba)
-      // because it's using a canvas to load and decode the image.
-      if(!isJPEGBaseline8Bits) {
+      // because it's using a canvas to load and decode images.
+      if(!cornerstoneWADOImageLoader.isJPEGBaseline8Bit(imageFrame, transferSyntax)) {
         setPixelDataType(imageFrame);
 
         // convert color space
