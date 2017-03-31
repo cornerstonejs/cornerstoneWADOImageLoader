@@ -93,7 +93,7 @@
 
       return {
         radiopharmaceuticalInfo: {
-          radiopharmaceuticalStartTime: dicomParser.parseTM(getValue(radiopharmaceuticalInfo['00181072'])),
+          radiopharmaceuticalStartTime: dicomParser.parseTM(getValue(radiopharmaceuticalInfo['00181072'], 0, '')),
           radionuclideTotalDose: getNumberValue(radiopharmaceuticalInfo['00181074']),
           radionuclideHalfLife: getNumberValue(radiopharmaceuticalInfo['00181075'])
         }

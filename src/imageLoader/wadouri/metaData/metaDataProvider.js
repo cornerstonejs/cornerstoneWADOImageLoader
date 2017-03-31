@@ -22,7 +22,7 @@
         studyInstanceUID: dataSet.string('x0020000d'),
         seriesInstanceUID: dataSet.string('x0020000e'),
         seriesDate: dicomParser.parseDA(dataSet.string('x00080021')),
-        seriesTime: dicomParser.parseTM(dataSet.string('x00080031'))
+        seriesTime: dicomParser.parseTM(dataSet.string('x00080031') || '')
       };
     }
 
@@ -83,7 +83,7 @@
       var firstRadiopharmaceuticalInfoDataSet = radiopharmaceuticalInfo.items[0].dataSet;
       return {
         radiopharmaceuticalInfo: {
-          radiopharmaceuticalStartTime: dicomParser.parseTM(firstRadiopharmaceuticalInfoDataSet.string('x00181072')),
+          radiopharmaceuticalStartTime: dicomParser.parseTM(firstRadiopharmaceuticalInfoDataSet.string('x00181072') || ''),
           radionuclideTotalDose: firstRadiopharmaceuticalInfoDataSet.floatString('x00181074'),
           radionuclideHalfLife: firstRadiopharmaceuticalInfoDataSet.floatString('x00181075')
         }
