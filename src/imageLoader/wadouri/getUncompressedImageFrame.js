@@ -7,6 +7,8 @@
 
   function getUncompressedImageFrame(dataSet, frameIndex) {
     var pixelDataElement = dataSet.elements.x7fe00010;
+    if (pixelDataElement===undefined || pixelDataElement.length===0) throw 'missing pixel data';
+
     var bitsAllocated = dataSet.uint16('x00280100');
     var rows = dataSet.uint16('x00280010');
     var columns = dataSet.uint16('x00280011');
