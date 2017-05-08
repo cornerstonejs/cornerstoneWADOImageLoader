@@ -14,7 +14,8 @@
 
   function getPixelData(dataSet, frameIndex) {
     var pixelDataElement = dataSet.elements.x7fe00010;
-
+    if (!pixelDataElement) return;
+    
     if(pixelDataElement.encapsulatedPixelData) {
       return cornerstoneWADOImageLoader.wadouri.getEncapsulatedImageFrame(dataSet, frameIndex);
     } else {
@@ -29,6 +30,11 @@
     var deferred = $.Deferred();
     xhrRequestPromise.then(function(dataSet/*, xhr*/) {
       var pixelData = getPixelData(dataSet, frame);
+      if (!pixelData) {
+        deferred.reject('image missing pixel data');
+        return;
+      }
+      
       var transferSyntax =  dataSet.string('x00020010');
       var loadEnd = new Date().getTime();
       var imagePromise = cornerstoneWADOImageLoader.createImage(imageId, pixelData, transferSyntax, options);
