@@ -14,7 +14,7 @@
 
   function getPixelData(dataSet, frameIndex) {
     var pixelDataElement = dataSet.elements.x7fe00010;
-    if (pixelDataElement===undefined || pixelDataElement.length===0) return;
+    if (!pixelDataElement || pixelDataElement.length===0) return;
     
     if(pixelDataElement.encapsulatedPixelData) {
       return cornerstoneWADOImageLoader.wadouri.getEncapsulatedImageFrame(dataSet, frameIndex);
