@@ -76,6 +76,6 @@
   },
   "dependencies": {
     "cornerstone-core": "^0.10.9",
-    "jquery": "^3.2.1"
+    "jquery": "^2.2.4"
   }
 }
