@@ -29,14 +29,14 @@ function getPixelData (dataSet, frameIndex) {
 
 }
 
-function loadImageFromPromise (xhrRequestPromise, imageId, frame, sharedCacheKey, options) {
+function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, options) {
 
   const start = new Date().getTime();
 
   frame = frame || 0;
   const deferred = $.Deferred();
 
-  xhrRequestPromise.then(function (dataSet/* , xhr*/) {
+  dataSetPromise.then(function (dataSet/* , xhr*/) {
     const pixelData = getPixelData(dataSet, frame);
     const transferSyntax = dataSet.string('x00020010');
     const loadEnd = new Date().getTime();
