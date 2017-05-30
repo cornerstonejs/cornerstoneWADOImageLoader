@@ -5,7 +5,6 @@ import unpackBinaryFrame from './unpackBinaryFrame';
  */
 function getUncompressedImageFrame (dataSet, frameIndex) {
   const pixelDataElement = dataSet.elements.x7fe00010;
-  if (!pixelDataElement || pixelDataElement.length===0) throw 'missing pixel data';
   const bitsAllocated = dataSet.uint16('x00280100');
   const rows = dataSet.uint16('x00280010');
   const columns = dataSet.uint16('x00280011');
