@@ -1,6 +1,6 @@
 /* eslint import/extensions: 0 */
 import { expect } from 'chai';
-import { external } from '../src/externalModules.js';
+import external from '../src/externalModules.js';
 import { initializeJPEGLS } from '../src/webWorker/decodeTask/decoders/decodeJPEGLS.js';
 import { initializeJPEG2000 } from '../src/webWorker/decodeTask/decoders/decodeJPEG2000.js';
 import decodeImageFrame from '../src/webWorker/decodeTask/decodeImageFrame.js';
@@ -38,7 +38,7 @@ const transferSyntaxes = {
 };
 
 const base = 'CTImage.dcm';
-const url = 'dicomweb://localhost:9876/base/testImages/';
+const url = 'wadouri://localhost:9876/base/testImages/';
 
 describe('decodeImageFrame', function () {
   this.timeout(0);
@@ -52,7 +52,7 @@ describe('decodeImageFrame', function () {
     initializeJPEGLS(decodeTask);
   });
 
-  after(function () {
+  afterEach(function () {
     dataSetCacheManager.purge();
   });
 

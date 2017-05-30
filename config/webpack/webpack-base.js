@@ -19,20 +19,7 @@ module.exports = {
     umdNamedDefine: true
   },
   devtool: 'source-map',
-  externals: {
-    jquery: {
-      commonjs: "jquery",
-      commonjs2: "jquery",
-      amd: "jquery",
-      root: '$'
-    },
-    'dicom-parser': {
-      commonjs: "dicom-parser",
-      commonjs2: "dicom-parser",
-      amd: "dicom-parser",
-      root: 'dicomParser'
-    },
-  },
+  externals: {},
   module: {
     rules: [{
       enforce: 'pre',

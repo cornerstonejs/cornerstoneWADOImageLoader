@@ -1,4 +1,4 @@
-import { $ } from '../../externalModules.js';
+import external from '../../externalModules.js';
 import metaDataManager from './metaDataManager.js';
 import getPixelData from './getPixelData.js';
 import createImage from '../createImage.js';
@@ -11,7 +11,7 @@ function loadImage (imageId, options) {
   const start = new Date().getTime();
   const uri = imageId.substring(7);
 
-  const deferred = $.Deferred();
+  const deferred = external.$.Deferred();
 
   // check to make sure we have metadata for this imageId
   const metaData = metaDataManager.get(imageId);
@@ -47,6 +47,8 @@ function loadImage (imageId, options) {
 
   return deferred;
 }
+external.registerImageLoader('wadors', loadImage);
+
 
 export default loadImage;
 

@@ -1,4 +1,4 @@
-import { dicomParser } from '../../../externalModules.js';
+import external from '../../../externalModules.js';
 import getNumberValues from './getNumberValues.js';
 import parseImageId from '../parseImageId.js';
 import dataSetCacheManager from '../dataSetCacheManager.js';
@@ -14,6 +14,8 @@ function metaDataProvider (type, imageId) {
   if (!dataSet) {
     return;
   }
+
+  const { dicomParser } = external;
 
   if (type === 'generalSeriesModule') {
     return {
@@ -122,5 +124,7 @@ function metaDataProvider (type, imageId) {
     };
   }
 }
+
+external.addMetaDataProvider(metaDataProvider);
 
 export default metaDataProvider;

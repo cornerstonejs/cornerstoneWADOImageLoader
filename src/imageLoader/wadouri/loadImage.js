@@ -1,4 +1,4 @@
-import { $ } from '../../externalModules.js';
+import external from '../../externalModules.js';
 import createImage from '../createImage.js';
 import parseImageId from './parseImageId.js';
 import dataSetCacheManager from './dataSetCacheManager.js';
@@ -18,7 +18,7 @@ function addDecache (image) {
 
 function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKey, options) {
   const start = new Date().getTime();
-  const deferred = $.Deferred();
+  const deferred = external.$.Deferred();
 
   dataSetPromise.then(function (dataSet/* , xhr*/) {
     const pixelData = getPixelData(dataSet, frame);
@@ -47,7 +47,7 @@ function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKe
 
 function loadImageFromDataSet (dataSet, imageId, frame = 0, sharedCacheKey, options) {
   const start = new Date().getTime();
-  const deferred = $.Deferred();
+  const deferred = external.$.Deferred();
 
   const pixelData = getPixelData(dataSet, frame);
   const transferSyntax = dataSet.string('x00020010');
@@ -94,5 +94,9 @@ function loadImage (imageId, options) {
 
   return loadImageFromPromise(dataSetPromise, imageId, parsedImageId.frame, parsedImageId.url, options);
 }
+
+external.registerImageLoader('dicomweb', loadImage);
+external.registerImageLoader('wadouri', loadImage);
+external.registerImageLoader('dicomfile', loadImage);
 
 export { loadImageFromPromise, getLoaderForScheme, loadImage };

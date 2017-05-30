@@ -8,7 +8,6 @@ import findIndexOfString from './findIndexOfString.js';
 import getPixelData from './getPixelData.js';
 import metaDataManager from './metaDataManager.js';
 import loadImage from './loadImage.js';
-import register from './register.js';
 
 const metaData = {
   getNumberString,
@@ -23,6 +22,5 @@ export default {
   findIndexOfString,
   getPixelData,
   loadImage,
-  metaDataManager,
-  register
+  metaDataManager
 };

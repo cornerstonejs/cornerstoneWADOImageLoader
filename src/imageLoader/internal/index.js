@@ -1,4 +1,4 @@
-import { default as xhrRequest } from './xhrRequest.js';
+import xhrRequest from './xhrRequest.js';
 import { setOptions, getOptions } from './options.js';
 
 const internal = {
@@ -7,4 +7,5 @@ const internal = {
   getOptions
 };
 
-export { setOptions, getOptions, xhrRequest, internal };
+export { setOptions, getOptions, xhrRequest };
+export default internal;
