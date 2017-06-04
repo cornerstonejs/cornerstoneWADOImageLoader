@@ -1,6 +1,16 @@
 import webWorkerManager from './webWorkerManager';
 import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor';
 
+/**
+ * Add decode task
+ *
+ * @param imageFrame
+ * @param transferSyntax
+ * @param pixelData
+ * @param options
+ *
+ * @return {Object}
+ */
 function addDecodeTask (imageFrame, transferSyntax, pixelData, options) {
   const priority = options.priority || undefined;
   const transferList = options.transferPixelData ? [pixelData.buffer] : undefined;
@@ -15,6 +25,17 @@ function addDecodeTask (imageFrame, transferSyntax, pixelData, options) {
     }, priority, transferList).promise;
 }
 
+/**
+ * Decode image frame
+ *
+ * @param {ImageFrame} imageFrame
+ * @param {String} transferSyntax
+ * @param {Array} pixelData
+ * @param {HTMLCanvasElement} canvas
+ * @param {Object} options
+ *
+ * @return {Object}
+ */
 function decodeImageFrame (imageFrame, transferSyntax, pixelData, canvas, options) {
   options = options || {};
 

@@ -1,6 +1,12 @@
 import getValue from './getValue';
 
-function getNumberValue (element, index) {
+/**
+ *
+ * @param element
+ * @param {Number} index
+ * @return {Number|Undefined}
+ */
+export default function (element, index) {
   const value = getValue(element, index);
 
   if (value === undefined) {
@@ -9,5 +15,3 @@ function getNumberValue (element, index) {
 
   return parseFloat(value);
 }
-
-export default getNumberValue;

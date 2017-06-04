@@ -11,22 +11,40 @@ import { xhrRequest } from '../internal';
 let loadedDataSets = {};
 let promises = {};
 
-// returns true if the wadouri for the specified index has been loaded
+/**
+ * Returns true if the wadouri for the specified index has been loaded
+ *
+ * @param uri
+ * @return {boolean} Whether or not the DataSet is in the cache
+ */
 function isLoaded (uri) {
   return loadedDataSets[uri] !== undefined;
 }
 
+/**
+ * Retrieve a loaded DataSet from the cache
+ *
+ * @param {String} uri
+ * @return {DataSet}
+ * @throws If the DataSet is not in the cache
+ */
 function get (uri) {
   // if already loaded return it right away
   if (!loadedDataSets[uri]) {
-    return;
+    throw new Error('dataSetCacheManager.get: DataSet has not been loaded yet');
   }
 
   return loadedDataSets[uri].dataSet;
 }
 
-
-  // loads the dicom dataset from the wadouri sp
+/**
+ * Loads the dicom dataset from the wadouri sp
+ *
+ * @param {String} uri
+ * @param loadRequest
+ * @param {String} imageId
+ * @return {*}
+ */
 function load (uri, loadRequest, imageId) {
   loadRequest = loadRequest || xhrRequest;
 
@@ -88,7 +106,11 @@ function load (uri, loadRequest, imageId) {
   return loadDeferred;
 }
 
-// remove the cached/loaded dicom dataset for the specified wadouri to free up memory
+/**
+ * Remove the cached/loaded dicom dataset for the specified wadouri to free up memory
+ *
+ * @param {String} uri
+ */
 function unload (uri) {
   // console.log('unload for ' + uri);
   if (loadedDataSets[uri]) {
@@ -100,7 +122,9 @@ function unload (uri) {
   }
 }
 
-// removes all cached datasets from memory
+/**
+ * Removes all cached datasets from memory
+ */
 function purge () {
   loadedDataSets = {};
   promises = {};

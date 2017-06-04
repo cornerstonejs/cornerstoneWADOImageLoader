@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import getImageFrame from './getImageFrame';
 import decodeImageFrame from './decodeImageFrame';
-import { default as isColorImageFn } from './isColorImage';
+import isColorImageFn from './isColorImage';
 import convertColorSpace from './convertColorSpace';
 import getMinMax from './getMinMax';
 import isJPEGBaseline8BitColor from './isJPEGBaseline8BitColor';
@@ -9,9 +9,16 @@ import * as cornerstone from 'cornerstone-core';
 
 let lastImageIdDrawn = '';
 
+/**
+ * Check whether the modality LUT is meant to be used for display purposes
+ * For XA and XRF images, the modality LUT is not meant to be used.
+ *
+ * See https://groups.google.com/forum/#!searchin/comp.protocols.dicom/Modality$20LUT$20XA/comp.protocols.dicom/UBxhOZ2anJ0/D0R_QP8V2wIJ
+ *
+ * @param {String} sopClassUid
+ * @return {boolean} Whether or not the Modality LUT should be used for image display
+ */
 function isModalityLUTForDisplay (sopClassUid) {
-  // special case for XA and XRF
-  // https://groups.google.com/forum/#!searchin/comp.protocols.dicom/Modality$20LUT$20XA/comp.protocols.dicom/UBxhOZ2anJ0/D0R_QP8V2wIJ
   return sopClassUid !== '1.2.840.10008.5.1.4.1.1.12.1' && // XA
          sopClassUid !== '1.2.840.10008.5.1.4.1.1.12.2.1'; // XRF
 }
@@ -33,7 +40,17 @@ function setPixelDataType (imageFrame) {
   }
 }
 
-function createImage (imageId, pixelData, transferSyntax, options) {
+/**
+ * Create an Image
+ *
+ * @param {String} imageId
+ * @param {Array} pixelData
+ * @param {String} transferSyntax
+ * @param {Object} options
+ *
+ * @returns {Promise}
+ */
+export default function (imageId, pixelData, transferSyntax, options) {
   const canvas = document.createElement('canvas');
   const deferred = $.Deferred();
   const imageFrame = getImageFrame(imageId);
@@ -45,7 +62,7 @@ function createImage (imageId, pixelData, transferSyntax, options) {
     const voiLutModule = cornerstone.metaData.get('voiLutModule', imageId) || {};
     const modalityLutModule = cornerstone.metaData.get('modalityLutModule', imageId) || {};
     const sopCommonModule = cornerstone.metaData.get('sopCommonModule', imageId) || {};
-    const isColorImage = isColorImageFn(imageFrame.photometricInterpretation);
+    const color = isColorImageFn(imageFrame.photometricInterpretation);
 
     // JPEGBaseline (8 bits) is already returning the pixel data in the right format (rgba)
     // because it's using a canvas to load and decode images.
@@ -53,7 +70,7 @@ function createImage (imageId, pixelData, transferSyntax, options) {
       setPixelDataType(imageFrame);
 
       // convert color space
-      if (isColorImage) {
+      if (color) {
         // setup the canvas context
         canvas.height = imageFrame.rows;
         canvas.width = imageFrame.columns;
@@ -75,20 +92,20 @@ function createImage (imageId, pixelData, transferSyntax, options) {
 
     const image = {
       imageId,
-      color: isColorImage,
-      columnPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[1] : undefined,
+      color,
       columns: imageFrame.columns,
+      rows: imageFrame.rows,
+      width: imageFrame.columns,
       height: imageFrame.rows,
-      intercept: modalityLutModule.rescaleIntercept ? modalityLutModule.rescaleIntercept : 0,
+      intercept: modalityLutModule.rescaleIntercept || 0,
+      slope: modalityLutModule.rescaleSlope || 1,
       invert: imageFrame.photometricInterpretation === 'MONOCHROME1',
       minPixelValue: imageFrame.smallestPixelValue,
       maxPixelValue: imageFrame.largestPixelValue,
       render: undefined, // set below
-      rowPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[0] : undefined,
-      rows: imageFrame.rows,
       sizeInBytes: imageFrame.pixelData.length,
-      slope: modalityLutModule.rescaleSlope ? modalityLutModule.rescaleSlope : 1,
-      width: imageFrame.columns,
+      rowPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[0] : undefined,
+      columnPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[1] : undefined,
       windowCenter: voiLutModule.windowCenter ? voiLutModule.windowCenter[0] : undefined,
       windowWidth: voiLutModule.windowWidth ? voiLutModule.windowWidth[0] : undefined,
       decodeTimeInMS: imageFrame.decodeTimeInMS
@@ -150,5 +167,3 @@ function createImage (imageId, pixelData, transferSyntax, options) {
 
   return deferred.promise();
 }
-
-export default createImage;

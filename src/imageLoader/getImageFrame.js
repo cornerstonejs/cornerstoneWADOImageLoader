@@ -1,6 +1,33 @@
 import * as cornerstone from 'cornerstone-core';
 
-function getImageFrame (imageId) {
+/**
+ * @typedef {Object} ImageFrame
+ *
+ * @param {Number} samplesPerPixel
+ * @param {String} photometricInterpretation
+ * @param {Number} planarConfiguration
+ * @param {Number} rows
+ * @param {Number} columns
+ * @param {Number} bitsAllocated
+ * @param {Number} pixelRepresentation
+ * @param {Number} smallestPixelValue
+ * @param {Number} largestPixelValue
+ * @param {String} redPaletteColorLookupTableDescriptor
+ * @param {String} greenPaletteColorLookupTableDescriptor
+ * @param {String} bluePaletteColorLookupTableDescriptor
+ * @param {Array} redPaletteColorLookupTableData
+ * @param {Array} greenPaletteColorLookupTableData
+ * @param {Array} bluePaletteColorLookupTableData
+ * @param {Array} pixelData
+ */
+
+/**
+ * Construct an ImageFrame object from an image's metadata
+ *
+ * @param imageId The image id
+ * @return {ImageFrame} The image frame structure
+ */
+export default function (imageId) {
   const imagePixelModule = cornerstone.metaData.get('imagePixelModule', imageId);
 
   return {
@@ -22,5 +49,3 @@ function getImageFrame (imageId) {
     pixelData: undefined // populated later after decoding
   };
 }
-
-export default getImageFrame;

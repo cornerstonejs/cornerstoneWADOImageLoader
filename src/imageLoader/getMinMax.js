@@ -1,14 +1,18 @@
-export default function getMinMax (storedPixelData) {
-  // we always calculate the min max values since they are not always
-  // present in DICOM and we don't want to trust them anyway as cornerstone
-  // depends on us providing reliable values for these
+/**
+ * Calculate the minimum and maximum pixel values in the input
+ * pixel data array
+ *
+ * @param storedPixelData
+ * @return {{min: Number, max: Number}} Minimum and maximum values in the input array
+ */
+export default function (storedPixelData) {
   let min = storedPixelData[0];
   let max = storedPixelData[0];
-  let storedPixel;
   const numPixels = storedPixelData.length;
 
   for (let index = 0; index < numPixels; index++) {
-    storedPixel = storedPixelData[index];
+    const storedPixel = storedPixelData[index];
+
     min = Math.min(min, storedPixel);
     max = Math.max(max, storedPixel);
   }

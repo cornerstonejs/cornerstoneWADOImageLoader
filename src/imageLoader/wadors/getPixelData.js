@@ -1,40 +1,42 @@
 import $ from 'jquery';
 import { xhrRequest } from '../internal';
 import findIndexOfString from './findIndexOfString';
+import uint8ArrayToString from './uint8ArrayToString';
 
+/**
+ *
+ * @param header
+ * @return {*}
+ */
 function findBoundary (header) {
   for (let i = 0; i < header.length; i++) {
     if (header[i].substr(0, 2) === '--') {
       return header[i];
     }
   }
-
-  return undefined;
 }
 
+/**
+ *
+ * @param header
+ * @return {String|Undefined}
+ */
 function findContentType (header) {
   for (let i = 0; i < header.length; i++) {
     if (header[i].substr(0, 13) === 'Content-Type:') {
       return header[i].substr(13).trim();
     }
   }
-
-  return undefined;
 }
 
-function uint8ArrayToString (data, offset, length) {
-  offset = offset || 0;
-  length = length || data.length - offset;
-  let str = '';
-
-  for (let i = offset; i < offset + length; i++) {
-    str += String.fromCharCode(data[i]);
-  }
-
-  return str;
-}
-
-function getPixelData (uri, imageId, mediaType) {
+/**
+ *
+ * @param {String} uri
+ * @param {String} imageId
+ * @param {String} mediaType
+ * @returns {Promise}
+ */
+export default function (uri, imageId, mediaType) {
   mediaType = mediaType || 'application/octet-stream';
   const headers = {
     accept: mediaType
@@ -56,7 +58,8 @@ function getPixelData (uri, imageId, mediaType) {
       deferred.reject('invalid response - no multipart mime header');
     }
     const header = uint8ArrayToString(response, 0, tokenIndex);
-    // Now find the boundary  marker
+
+    // Now find the boundary marker
     const split = header.split('\r\n');
     const boundary = findBoundary(split);
 
@@ -86,5 +89,3 @@ function getPixelData (uri, imageId, mediaType) {
 
   return deferred.promise();
 }
-
-export default getPixelData;

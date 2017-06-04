@@ -10,11 +10,11 @@ import * as cornerstone from 'cornerstone-core';
 function metaDataProvider (type, imageId) {
   const parsedImageId = parseImageId(imageId);
 
-  const dataSet = dataSetCacheManager.get(parsedImageId.url);
-
-  if (!dataSet) {
+  if (!dataSetCacheManager.isLoaded(parsedImageId.url)) {
     return;
   }
+
+  const dataSet = dataSetCacheManager.get(parsedImageId.url);
 
   if (type === 'generalSeriesModule') {
     return {

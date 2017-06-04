@@ -1,13 +1,26 @@
 /* eslint no-bitwise: 0 */
 
+/**
+ * Check whether a bit position is set inside a byte
+ *
+ * @param {Number} byte The input byte
+ * @param {Number} bitPos The bit position
+ * @return {Boolean} Whether or not the bit is set
+ */
 function isBitSet (byte, bitPos) {
-  return byte & (1 << bitPos);
+  return Boolean(byte & (1 << bitPos));
 }
 
 /**
  * Function to deal with unpacking a binary frame
+ *
+ * @param byteArray
+ * @param {Number} frameOffset
+ * @param pixelsPerFrame
+ *
+ * @return {Uint8Array}
  */
-function unpackBinaryFrame (byteArray, frameOffset, pixelsPerFrame) {
+export default function (byteArray, frameOffset, pixelsPerFrame) {
   // Create a new pixel array given the image size
   const pixelData = new Uint8Array(pixelsPerFrame);
 
@@ -27,5 +40,3 @@ function unpackBinaryFrame (byteArray, frameOffset, pixelsPerFrame) {
 
   return pixelData;
 }
-
-export default unpackBinaryFrame;

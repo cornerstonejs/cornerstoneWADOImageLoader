@@ -8,7 +8,13 @@ function getTransferSyntaxForContentType (/* contentType */) {
   return '1.2.840.10008.1.2'; // hard code to ILE for now
 }
 
-function loadImage (imageId, options) {
+/**
+ *
+ * @param {string} imageId
+ * @param {Object} options
+ * @returns {Deferred}
+ */
+export default function loadImage (imageId, options) {
   const start = new Date().getTime();
 
   const deferred = $.Deferred();
@@ -51,6 +57,3 @@ function loadImage (imageId, options) {
 
 // register wadors scheme
 cornerstone.registerImageLoader('wadors', loadImage);
-
-export default loadImage;
-

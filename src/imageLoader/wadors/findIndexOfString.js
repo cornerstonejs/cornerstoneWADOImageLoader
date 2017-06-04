@@ -1,5 +1,14 @@
-function checkToken (token, data, dataOffset) {
+import stringToUint8Array from './stringToUint8Array';
 
+/**
+ * checkToken
+ *
+ * @param token
+ * @param data
+ * @param dataOffset
+ * @return {boolean}
+ */
+function checkToken (token, data, dataOffset) {
   if (dataOffset + token.length > data.length) {
     return false;
   }
@@ -15,17 +24,14 @@ function checkToken (token, data, dataOffset) {
   return true;
 }
 
-function stringToUint8Array (str) {
-  const uint = new Uint8Array(str.length);
-
-  for (let i = 0, j = str.length; i < j; i++) {
-    uint[i] = str.charCodeAt(i);
-  }
-
-  return uint;
-}
-
-function findIndexOfString (data, str, offset) {
+/**
+ *
+ * @param data
+ * @param str
+ * @param offset
+ * @return {*}
+ */
+export default function findIndexOfString (data, str, offset) {
 
   offset = offset || 0;
 
@@ -42,4 +48,3 @@ function findIndexOfString (data, str, offset) {
 
   return -1;
 }
-export default findIndexOfString;

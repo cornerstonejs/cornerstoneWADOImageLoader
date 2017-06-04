@@ -1,9 +1,5 @@
 import $ from 'jquery';
 
-/**
- * Special decoder for 8 bit jpeg that leverages the browser's built in JPEG decoder for increased performance
- */
-
 function arrayBufferToString (buffer) {
   return binaryToString(String.fromCharCode.apply(null, Array.prototype.slice.apply(new Uint8Array(buffer))));
 }
@@ -23,7 +19,14 @@ function binaryToString (binary) {
   }
 }
 
-function decodeJPEGBaseline8BitColor (imageFrame, pixelData, canvas) {
+/**
+ * Special decoder for 8 bit jpeg that leverages the browser's built in JPEG decoder for increased performance
+ *
+ * @param {ImageFrame} imageFrame
+ * @param {Uint8Array} pixelData
+ * @param {HTMLCanvasElement} canvas
+ */
+export default function (imageFrame, pixelData, canvas) {
   const start = new Date().getTime();
   const deferred = $.Deferred();
 
@@ -69,5 +72,3 @@ function decodeJPEGBaseline8BitColor (imageFrame, pixelData, canvas) {
 
   return deferred.promise();
 }
-
-export default decodeJPEGBaseline8BitColor;

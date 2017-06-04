@@ -194,7 +194,8 @@ function loadWebWorkerTask (sourcePath, taskConfig) {
  * @param data - data specific to the task
  * @param priority - optional priority of the task (defaults to 0), > 0 is higher, < 0 is lower
  * @param transferList - optional array of data to transfer to web worker
- * @returns {*}
+ *
+ * @returns {Object}
  */
 function addTask (taskType, data, priority = 0, transferList) {
   if (!config) {

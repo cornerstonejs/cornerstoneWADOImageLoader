@@ -1,7 +1,11 @@
 import { setOptions } from './internal';
 
-function configure (options) {
+/**
+ * Configures CornerstoneWADOImageLoader with the supplied options.
+ * Note: Overwrites all currently set options.
+ *
+ * @param {Object} options
+ */
+export default function (options) {
   setOptions(options);
 }
-
-export default configure;

@@ -1,13 +1,11 @@
-
-
 /**
- * Returns the values as an array of javascript numbers
+ * Returns the values as an array of numbers
  *
  * @param element - The javascript object for the specified element in the metadata
- * @param [minimumLength] - the minimum number of values
- * @returns {*}
+ * @param {Number} [minimumLength] - the minimum number of values
+ * @returns {Array|Undefined}
  */
-function getNumberValues (element, minimumLength) {
+export default function (element, minimumLength) {
   if (!element) {
     return;
   }
@@ -28,5 +26,3 @@ function getNumberValues (element, minimumLength) {
 
   return values;
 }
-
-export default getNumberValues;

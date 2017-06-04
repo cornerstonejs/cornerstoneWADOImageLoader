@@ -66,7 +66,7 @@ function metaDataProvider (type, imageId) {
 
   if (type === 'voiLutModule') {
     return {
-      // TODO VOT LUT Sequence
+      // TODO: VOI LUT Sequence
       windowCenter: getNumberValues(metaData['00281050'], 1),
       windowWidth: getNumberValues(metaData['00281051'], 1)
     };
@@ -74,7 +74,6 @@ function metaDataProvider (type, imageId) {
 
   if (type === 'modalityLutModule') {
     return {
-      // TODO VOT LUT Sequence
       rescaleIntercept: getNumberValue(metaData['00281052']),
       rescaleSlope: getNumberValue(metaData['00281053']),
       rescaleType: getValue(metaData['00281054'])

@@ -1,5 +1,4 @@
-
-
+// TODO: Is this being used at all???
 let imageIds = [];
 
 function add (imageId, metadata) {

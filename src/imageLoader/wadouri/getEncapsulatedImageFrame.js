@@ -1,10 +1,10 @@
 import * as dicomParser from 'dicom-parser';
 
 /**
- * Function to deal with extracting an image frame from an encapsulated data set.
+ *
+ * @param dataSet
+ * @return {boolean} Whether or not the frames are fragmented
  */
-
-
 function framesAreFragmented (dataSet) {
   const numberOfFrames = dataSet.intString('x00280008');
   const pixelDataElement = dataSet.elements.x7fe00010;
@@ -12,6 +12,13 @@ function framesAreFragmented (dataSet) {
   return (numberOfFrames !== pixelDataElement.fragments.length);
 }
 
+/**
+ * Function to deal with extracting an image frame from an encapsulated data set.
+ *
+ * @param dataSet
+ * @param frameIndex
+ * @return {*}
+ */
 export default function getEncapsulatedImageFrame (dataSet, frameIndex) {
   if (dataSet.elements.x7fe00010.basicOffsetTable.length) {
     // Basic Offset Table is not empty
@@ -19,7 +26,6 @@ export default function getEncapsulatedImageFrame (dataSet, frameIndex) {
   }
 
   // Empty basic offset table
-
   if (framesAreFragmented(dataSet)) {
     const basicOffsetTable = dicomParser.createJPEGBasicOffsetTable(dataSet, dataSet.elements.x7fe00010);
 

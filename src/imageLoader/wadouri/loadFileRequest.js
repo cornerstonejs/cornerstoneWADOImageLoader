@@ -2,14 +2,17 @@ import $ from 'jquery';
 import parseImageId from './parseImageId';
 import fileManager from './fileManager';
 
-function loadFileRequest (uri) {
+/**
+ * Loads a file using the browser(?)
+ *
+ * @param uri
+ * @returns {Promise}
+ */
+export default function (uri) {
   const parsedImageId = parseImageId(uri);
   const fileIndex = parseInt(parsedImageId.url, 10);
   const file = fileManager.get(fileIndex);
-
-  // create a deferred object
   const deferred = $.Deferred();
-
   const fileReader = new FileReader();
 
   fileReader.onload = function (e) {
@@ -17,9 +20,8 @@ function loadFileRequest (uri) {
 
     deferred.resolve(dicomPart10AsArrayBuffer);
   };
+
   fileReader.readAsArrayBuffer(file);
 
   return deferred.promise();
 }
-
-export default loadFileRequest;
