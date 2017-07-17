@@ -1,34 +1,26 @@
-/**
- */
-(function (cornerstoneWADOImageLoader) {
+let files = [];
 
-  "use strict";
+function add (file) {
+  const fileIndex = files.push(file);
 
-  var files = [];
+  return `dicomfile:${fileIndex - 1}`;
+}
 
-  function add(file) {
-    var fileIndex =  files.push(file);
-    return 'dicomfile:' + (fileIndex - 1);
-  }
+function get (index) {
+  return files[index];
+}
 
-  function get(index) {
-    return files[index];
-  }
+function remove (index) {
+  files[index] = undefined;
+}
 
-  function remove(index) {
-    files[index] = undefined;
-  }
+function purge () {
+  files = [];
+}
 
-  function purge() {
-    files = [];
-  }
-
-  // module exports
-  cornerstoneWADOImageLoader.wadouri.fileManager = {
-    add : add,
-    get : get,
-    remove:remove,
-    purge: purge
-  };
-
-}(cornerstoneWADOImageLoader));
+export default {
+  add,
+  get,
+  remove,
+  purge
+};
