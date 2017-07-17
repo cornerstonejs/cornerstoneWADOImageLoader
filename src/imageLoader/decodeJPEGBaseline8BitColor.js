@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 /**
  * Special decoder for 8 bit jpeg that leverages the browser's built in JPEG decoder for increased performance
  */

@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 // the taskId to assign to the next task added via addTask()
 let nextTaskId = 0;
 
