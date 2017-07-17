@@ -3,6 +3,7 @@ import { getImagePixelModule,
          getModalityLUTOutputPixelRepresentation,
          getNumberValues,
          metaDataProvider } from './metaData/index.js';
+
 import dataSetCacheManager from './dataSetCacheManager.js';
 import fileManager from './fileManager.js';
 import getEncapsulatedImageFrame from './getEncapsulatedImageFrame.js';
