@@ -16,6 +16,20 @@ function xhrRequest (url, imageId, headers = {}) {
     xhr.setRequestHeader(key, headers[key]);
   });
 
+  // Event triggered when downloading an image starts
+  xhr.onloadstart = function () {
+    $(cornerstone.events).trigger('CornerstoneImageLoadStart', {
+      url
+    });
+  };
+
+  // Event triggered when downloading an image ends
+  xhr.onloadend = function () {
+    $(cornerstone.events).trigger('CornerstoneImageLoadEnd', {
+      url
+    });
+  };
+
   // handle response data
   xhr.onreadystatechange = function () {
     // TODO: consider sending out progress messages here as we receive the pixel data
@@ -28,23 +42,27 @@ function xhrRequest (url, imageId, headers = {}) {
       }
     }
   };
+
+  // Event triggered when downloading an image progresses
   xhr.onprogress = function (oProgress) {
     // console.log('progress:',oProgress)
 
-    if (oProgress.lengthComputable) {  // evt.loaded the bytes browser receive
-      // evt.total the total bytes seted by the header
-      //
-      const loaded = oProgress.loaded;
-      const total = oProgress.total;
-      const percentComplete = Math.round((loaded / total) * 100);
+    const loaded = oProgress.loaded; // evt.loaded the bytes browser receive
+    let total;
+    let percentComplete;
 
-      $(cornerstone.events).trigger('CornerstoneImageLoadProgress', {
-        imageId,
-        loaded,
-        total,
-        percentComplete
-      });
+    if (oProgress.lengthComputable) {
+      total = oProgress.total; // evt.total the total bytes seted by the header
+      percentComplete = Math.round((loaded / total) * 100);
     }
+
+    $(cornerstone.events).trigger('CornerstoneImageLoadProgress', {
+      url,
+      imageId,
+      loaded,
+      total,
+      percentComplete
+    });
   };
 
   xhr.send();
