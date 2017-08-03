@@ -50,6 +50,12 @@ function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, o
       image.totalTimeInMS = end - start;
       addDecache(image);
       deferred.resolve(image);
+    }, function (error) {
+      // Return the error, and the dataSet
+      deferred.reject({
+        error,
+        dataSet
+      });
     });
   }, function (error) {
     deferred.reject(error);
