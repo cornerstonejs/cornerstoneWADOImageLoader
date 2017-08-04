@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import * as dicomParser from 'dicom-parser';
 import { xhrRequest } from '../internal';
+import events from '../events.js';
 
 /**
  * This object supports loading of DICOM P10 dataset from a uri and caching it so it can be accessed
@@ -73,6 +74,12 @@ function load (uri, loadRequest, imageId) {
       dataSet,
       cacheCount: 1
     };
+    $(events).trigger('DataSetsCacheChanged', {
+      uri,
+      action: 'loaded',
+      dataSet: loadedDataSets[uri].dataSet
+    });
+
     loadDeferred.resolve(dataSet);
     // done loading, remove the promise
     delete promises[uri];
@@ -93,6 +100,11 @@ function unload (uri) {
     loadedDataSets[uri].cacheCount--;
     if (loadedDataSets[uri].cacheCount === 0) {
       // console.log('removing loaded dataset for ' + uri);
+      $(events).trigger('DataSetsCacheChanged', {
+        uri,
+        action: 'unloaded',
+        dataSet: loadedDataSets[uri].dataSet
+      });
       delete loadedDataSets[uri];
     }
   }
