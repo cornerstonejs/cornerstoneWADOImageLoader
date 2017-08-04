@@ -1,6 +1,17 @@
 
-
+/**
+ * @param {Object|string} imageId
+ *    {Object}: { scheme, url, frame }
+ *    {string}: scheme:url[?frame={int}]
+ *
+ * @returns {Object} parsed imageId
+ */
 function parseImageId (imageId) {
+  // If the imageId is already parsed, return it directly
+  if (typeof imageId !== 'string') {
+    return imageId;
+  }
+
   // build a url by parsing out the url scheme and frame index from the imageId
   const firstColonIndex = imageId.indexOf(':');
   let url = imageId.substring(firstColonIndex + 1);
