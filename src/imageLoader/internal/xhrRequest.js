@@ -2,7 +2,7 @@ import $ from 'jquery';
 import { getOptions } from './options';
 import * as cornerstone from 'cornerstone-core';
 
-function xhrRequest (url, imageId, headers = {}) {
+function xhrRequest (url, imageId, headers = {}, params = {}) {
   const deferred = $.Deferred();
   const options = getOptions();
 
@@ -16,46 +16,63 @@ function xhrRequest (url, imageId, headers = {}) {
     xhr.setRequestHeader(key, headers[key]);
   });
 
+  params.deferred = deferred;
+  params.url = url;
+  params.imageId = imageId;
+
   // Event triggered when downloading an image starts
-  xhr.onloadstart = function () {
+  xhr.onloadstart = function (event) {
+    if (options.onloadstart) {
+      options.onloadstart(event, params);
+    }
     $(cornerstone.events).trigger('CornerstoneImageLoadStart', {
       url
     });
   };
 
   // Event triggered when downloading an image ends
-  xhr.onloadend = function () {
+  xhr.onloadend = function (event) {
+    if (options.onloadend) {
+      options.onloadend(event, params);
+    }
     $(cornerstone.events).trigger('CornerstoneImageLoadEnd', {
       url
     });
   };
 
   // handle response data
-  xhr.onreadystatechange = function () {
-    // TODO: consider sending out progress messages here as we receive the pixel data
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        deferred.resolve(xhr.response, xhr);
-      } else {
-        // request failed, reject the deferred
-        deferred.reject(xhr);
+  xhr.onreadystatechange = function (event) {
+    if (options.onreadystatechange) {
+      options.onreadystatechange(event, params);
+    }
+    else {
+      // Default onreadystatechange action
+      // TODO: consider sending out progress messages here as we receive the pixel data
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          deferred.resolve(xhr.response, xhr);
+        } else {
+          // request failed, reject the deferred
+          deferred.reject(xhr);
+        }
       }
     }
   };
 
   // Event triggered when downloading an image progresses
   xhr.onprogress = function (oProgress) {
-    // console.log('progress:',oProgress)
+    if (options.onprogress) {
+      options.onprogress(oProgress, params);
+    }
 
+    // console.log('progress:',oProgress)
     const loaded = oProgress.loaded; // evt.loaded the bytes browser receive
     let total;
     let percentComplete;
-
     if (oProgress.lengthComputable) {
       total = oProgress.total; // evt.total the total bytes seted by the header
       percentComplete = Math.round((loaded / total) * 100);
     }
-
     $(cornerstone.events).trigger('CornerstoneImageLoadProgress', {
       url,
       imageId,
