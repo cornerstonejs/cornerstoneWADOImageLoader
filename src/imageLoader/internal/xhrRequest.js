@@ -22,9 +22,12 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
 
   // Event triggered when downloading an image starts
   xhr.onloadstart = function (event) {
+    // Action
     if (options.onloadstart) {
       options.onloadstart(event, params);
     }
+
+    // Event
     $(cornerstone.events).trigger('CornerstoneImageLoadStart', {
       url
     });
@@ -32,9 +35,12 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
 
   // Event triggered when downloading an image ends
   xhr.onloadend = function (event) {
+    // Action
     if (options.onloadend) {
       options.onloadend(event, params);
     }
+
+    // Event
     $(cornerstone.events).trigger('CornerstoneImageLoadEnd', {
       url
     });
@@ -42,37 +48,43 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
 
   // handle response data
   xhr.onreadystatechange = function (event) {
+    // Action
     if (options.onreadystatechange) {
       options.onreadystatechange(event, params);
+
+      return;
     }
-    else {
-      // Default onreadystatechange action
-      // TODO: consider sending out progress messages here as we receive the pixel data
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          deferred.resolve(xhr.response, xhr);
-        } else {
-          // request failed, reject the deferred
-          deferred.reject(xhr);
-        }
+
+    // Default action
+    // TODO: consider sending out progress messages here as we receive the pixel data
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        deferred.resolve(xhr.response, xhr);
+      } else {
+        // request failed, reject the deferred
+        deferred.reject(xhr);
       }
     }
   };
 
   // Event triggered when downloading an image progresses
   xhr.onprogress = function (oProgress) {
-    if (options.onprogress) {
-      options.onprogress(oProgress, params);
-    }
-
     // console.log('progress:',oProgress)
     const loaded = oProgress.loaded; // evt.loaded the bytes browser receive
     let total;
     let percentComplete;
+
     if (oProgress.lengthComputable) {
       total = oProgress.total; // evt.total the total bytes seted by the header
       percentComplete = Math.round((loaded / total) * 100);
     }
+
+    // Action
+    if (options.onprogress) {
+      options.onprogress(oProgress, params);
+    }
+
+    // Event
     $(cornerstone.events).trigger('CornerstoneImageLoadProgress', {
       url,
       imageId,
