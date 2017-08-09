@@ -59,13 +59,11 @@ function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, o
         });
       });
     } catch (error) {
-      // Return the error and the dataSet before throwing the error
+      // Return the error, and the dataSet
       deferred.reject({
         error,
         dataSet
       });
-      // Throw the error
-      throw error;
     }
   }, function (error) {
     deferred.reject(error);
