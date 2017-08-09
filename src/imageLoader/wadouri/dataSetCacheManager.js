@@ -87,11 +87,11 @@ function load (uri, loadRequest, imageId) {
 }
 
 // remove the cached/loaded dicom dataset for the specified wadouri to free up memory
-function unload (uri) {
+function unload (uri, force) {
   // console.log('unload for ' + uri);
   if (loadedDataSets[uri]) {
     loadedDataSets[uri].cacheCount--;
-    if (loadedDataSets[uri].cacheCount === 0) {
+    if (force || loadedDataSets[uri].cacheCount === 0) {
       // console.log('removing loaded dataset for ' + uri);
       delete loadedDataSets[uri];
     }
