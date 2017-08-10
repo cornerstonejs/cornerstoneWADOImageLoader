@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import * as dicomParser from 'dicom-parser';
 import { xhrRequest } from '../internal';
+import storeVoiPresetTab from '../storeVoiPresetTab';
 
 /**
  * This object supports loading of DICOM P10 dataset from a uri and caching it so it can be accessed
@@ -63,6 +64,8 @@ function load (uri, loadRequest, imageId) {
 
     try {
       dataSet = dicomParser.parseDicom(byteArray);
+      // Store the VOI preset tab (in dataSet.storedValues.voiPresetTab)
+      storeVoiPresetTab(dataSet);
     } catch (error) {
       loadDeferred.reject(error);
 
