@@ -8,6 +8,8 @@ import { xhrRequest } from '../internal';
  * image loader mechanism.  One reason a caller may need to do this is to determine the number of frames
  * in a multiframe sop instance so it can create the imageId's correctly.
  */
+let cacheSizeInBytes = 0;
+
 let loadedDataSets = {};
 let promises = {};
 
@@ -73,6 +75,7 @@ function load (uri, loadRequest, imageId) {
       dataSet,
       cacheCount: 1
     };
+    cacheSizeInBytes += dataSet.byteArray.length;
     loadDeferred.resolve(dataSet);
     // done loading, remove the promise
     delete promises[uri];
@@ -95,9 +98,17 @@ function unload (uri) {
     loadedDataSets[uri].cacheCount--;
     if (loadedDataSets[uri].cacheCount === 0) {
       // console.log('removing loaded dataset for ' + uri);
+      cacheSizeInBytes -= loadedDataSets[uri].dataSet.byteArray.length;
       delete loadedDataSets[uri];
     }
   }
+}
+
+export function getCacheInfo () {
+  return {
+    cacheSizeInBytes,
+    numberOfDataSetsCached: loadedDataSets.length
+  };
 }
 
 // removes all cached datasets from memory
@@ -110,6 +121,7 @@ export default {
   isLoaded,
   load,
   unload,
+  getCacheInfo,
   purge,
   get
 };
