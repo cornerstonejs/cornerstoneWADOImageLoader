@@ -9,10 +9,10 @@ import loadFileRequest from './loadFileRequest';
 import { xhrRequest } from '../internal';
 
 // add a decache callback function to clear out our dataSetCacheManager
-function addDecache (image) {
-  image.decache = function () {
+function addDecache (imagePromise, imageId) {
+  imagePromise.decache = function () {
     // console.log('decache');
-    const parsedImageId = parseImageId(image.imageId);
+    const parsedImageId = parseImageId(imageId);
 
     dataSetCacheManager.unload(parsedImageId.url);
   };
@@ -37,20 +37,35 @@ function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, o
   const deferred = $.Deferred();
 
   dataSetPromise.then(function (dataSet/* , xhr*/) {
-    const pixelData = getPixelData(dataSet, frame);
-    const transferSyntax = dataSet.string('x00020010');
-    const loadEnd = new Date().getTime();
-    const imagePromise = createImage(imageId, pixelData, transferSyntax, options);
+    try {
+      const pixelData = getPixelData(dataSet, frame);
+      const transferSyntax = dataSet.string('x00020010');
+      const loadEnd = new Date().getTime();
+      const imagePromise = createImage(imageId, pixelData, transferSyntax, options);
 
-    imagePromise.then(function (image) {
-      image.data = dataSet;
-      const end = new Date().getTime();
+      addDecache(imagePromise, imageId);
 
-      image.loadTimeInMS = loadEnd - start;
-      image.totalTimeInMS = end - start;
-      addDecache(image);
-      deferred.resolve(image);
-    });
+      imagePromise.then(function (image) {
+        image.data = dataSet;
+        const end = new Date().getTime();
+
+        image.loadTimeInMS = loadEnd - start;
+        image.totalTimeInMS = end - start;
+        deferred.resolve(image);
+      }, function (error) {
+        // Return the error, and the dataSet
+        deferred.reject({
+          error,
+          dataSet
+        });
+      });
+    } catch (error) {
+      // Return the error, and the dataSet
+      deferred.reject({
+        error,
+        dataSet
+      });
+    }
   }, function (error) {
     deferred.reject(error);
   });
