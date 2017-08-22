@@ -99,4 +99,5 @@ cornerstone.registerImageLoader('dicomweb', loadImage);
 cornerstone.registerImageLoader('wadouri', loadImage);
 cornerstone.registerImageLoader('dicomfile', loadImage);
 
+export { loadImageFromPromise, getLoaderForScheme };
 export default loadImage;
