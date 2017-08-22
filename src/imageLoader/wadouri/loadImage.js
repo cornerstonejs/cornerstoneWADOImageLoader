@@ -29,7 +29,7 @@ function getPixelData (dataSet, frameIndex) {
 
 }
 
-function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, createImageOptions) {
+function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, createImageOptions, callbacks) {
 
   const start = new Date().getTime();
 
@@ -51,6 +51,9 @@ function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, c
 
         image.loadTimeInMS = loadEnd - start;
         image.totalTimeInMS = end - start;
+        if (callbacks !== undefined && callbacks.imageDoneCallback !== undefined) {
+          callbacks.imageDoneCallback(image);
+        }
         deferred.resolve(image);
       }, function (error) {
         // Return the error, and the dataSet
