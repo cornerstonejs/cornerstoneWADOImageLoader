@@ -29,7 +29,7 @@ function getPixelData (dataSet, frameIndex) {
 
 }
 
-function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, options) {
+function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, createImageOptions) {
 
   const start = new Date().getTime();
 
@@ -41,7 +41,7 @@ function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, o
       const pixelData = getPixelData(dataSet, frame);
       const transferSyntax = dataSet.string('x00020010');
       const loadEnd = new Date().getTime();
-      const imagePromise = createImage(imageId, pixelData, transferSyntax, options);
+      const imagePromise = createImage(imageId, pixelData, transferSyntax, createImageOptions);
 
       addDecache(imagePromise, imageId);
 
