@@ -43,7 +43,7 @@ function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, c
       const loadEnd = new Date().getTime();
       const imagePromise = createImage(imageId, pixelData, transferSyntax, createImageOptions);
 
-      addDecache(imagePromise, imageId);
+      addDecache(deferred, imageId);
 
       imagePromise.then(function (image) {
         image.data = dataSet;
