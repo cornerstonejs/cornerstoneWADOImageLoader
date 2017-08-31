@@ -29,7 +29,8 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
 
     // Event
     $(cornerstone.events).trigger('CornerstoneImageLoadStart', {
-      url
+      url,
+      imageId
     });
   };
 
@@ -42,7 +43,8 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
 
     // Event
     $(cornerstone.events).trigger('CornerstoneImageLoadEnd', {
-      url
+      url,
+      imageId
     });
   };
 
