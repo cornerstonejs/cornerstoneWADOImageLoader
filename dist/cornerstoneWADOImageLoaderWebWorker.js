@@ -962,7 +962,7 @@ function decode8(imageFrame, pixelData) {
           outIndex += imageFrame.samplesPerPixel;
         }
       } /* else if (n === -128) {
-           } // do nothing */
+         } // do nothing */
     }
   }
   imageFrame.pixelData = new Uint8Array(outFrame);
@@ -1011,7 +1011,7 @@ function decode8Planar(imageFrame, pixelData) {
           outIndex++;
         }
       } /* else if (n === -128) {
-           } // do nothing */
+         } // do nothing */
     }
   }
   imageFrame.pixelData = new Uint8Array(outFrame);
@@ -1057,7 +1057,7 @@ function decode16(imageFrame, pixelData) {
           outIndex++;
         }
       } /* else if (n === -128) {
-           } // do nothing */
+         } // do nothing */
     }
   }
   if (imageFrame.pixelRepresentation === 0) {
