@@ -71,7 +71,9 @@ function loadImageFromPromise (dataSetPromise, imageId, frame, sharedCacheKey, o
       });
     });
   }, function (error) {
-    deferred.reject(error);
+    deferred.reject({
+      error
+    });
   });
 
   return deferred;
