@@ -40,10 +40,10 @@ function createImage (imageId, pixelData, transferSyntax, options) {
 
   decodePromise.then(function (imageFrame) {
     // var imagePixelModule = metaDataProvider('imagePixelModule', imageId);
-    const imagePlaneModule = cornerstone.metaData.get('imagePlaneModule', imageId);
-    const voiLutModule = cornerstone.metaData.get('voiLutModule', imageId);
-    const modalityLutModule = cornerstone.metaData.get('modalityLutModule', imageId);
-    const sopCommonModule = cornerstone.metaData.get('sopCommonModule', imageId);
+    const imagePlaneModule = cornerstone.metaData.get('imagePlaneModule', imageId) || {};
+    const voiLutModule = cornerstone.metaData.get('voiLutModule', imageId) || {};
+    const modalityLutModule = cornerstone.metaData.get('modalityLutModule', imageId) || {};
+    const sopCommonModule = cornerstone.metaData.get('sopCommonModule', imageId) || {};
     const isColorImage = isColorImageFn(imageFrame.photometricInterpretation);
 
     // JPEGBaseline (8 bits) is already returning the pixel data in the right format (rgba)
@@ -63,6 +63,12 @@ function createImage (imageId, pixelData, transferSyntax, options) {
         convertColorSpace(imageFrame, imageData);
         imageFrame.imageData = imageData;
         imageFrame.pixelData = imageData.data;
+
+        // calculate smallest and largest PixelValue of the converted pixelData
+        const minMax = getMinMax(imageFrame.pixelData);
+
+        imageFrame.smallestPixelValue = minMax.min;
+        imageFrame.largestPixelValue = minMax.max;
       }
     }
 
@@ -110,14 +116,6 @@ function createImage (imageId, pixelData, transferSyntax, options) {
 
     } else {
       image.render = cornerstone.renderGrayscaleImage;
-    }
-
-    // calculate min/max if not supplied
-    if (image.minPixelValue === undefined || image.maxPixelValue === undefined) {
-      const minMax = getMinMax(imageFrame.pixelData);
-
-      image.minPixelValue = minMax.min;
-      image.maxPixelValue = minMax.max;
     }
 
     // Modality LUT
