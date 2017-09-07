@@ -1,3 +1,4 @@
+import $ from '../jquery.js';
 import * as dicomParser from 'dicom-parser';
 import { xhrRequest } from '../internal/index.js';
 
