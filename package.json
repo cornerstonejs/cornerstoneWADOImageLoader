@@ -1,6 +1,6 @@
 {
   "name": "cornerstone-wado-image-loader",
-  "version": "0.14.6",
+  "version": "0.14.7",
   "description": "Cornerstone ImageLoader for DICOM WADO-URI",
   "keywords": [
     "DICOM",
@@ -76,8 +76,9 @@
     "webpack": "^2.4.1"
   },
   "dependencies": {
-    "cornerstone-core": "^0.11.0",
+    "cornerstone-core": "^0.12.2",
     "dicom-parser": "^1.7.4",
-    "jquery": "^2.2.4"
+    "jquery": "^2.2.4",
+    "lodash": "^4.17.4"
   }
 }

@@ -1,3 +1,7 @@
+# Version 0.14.7
+
+- Bumped up cornerstone version to 0.12.2
+
 # Version 0.14.5
 
 - Rename loadDataSetFromPromise to loadImageFromPromise (https://github.com/chafey/cornerstoneWADOImageLoader/pull/94)
