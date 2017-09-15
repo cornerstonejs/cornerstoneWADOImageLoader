@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - 0.14.6 - 2017-06-08 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - 0.14.6 - 2017-09-09 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -444,14 +444,20 @@ function decodeTaskInitialize(config) {
 }
 
 function calculateMinMax(imageFrame) {
-  if (imageFrame.smallestPixelValue !== undefined && imageFrame.largestPixelValue !== undefined) {
-    return;
-  }
-
   var minMax = (0, _getMinMax2.default)(imageFrame.pixelData);
 
-  imageFrame.smallestPixelValue = minMax.min;
-  imageFrame.largestPixelValue = minMax.max;
+  if (decodeConfig.decodeTask.strict === true) {
+    if (imageFrame.smallestPixelValue !== minMax.min) {
+      console.warn('Image smallestPixelValue tag is incorrect. Rendering performance will suffer considerably.');
+    }
+
+    if (imageFrame.largestPixelValue !== minMax.max) {
+      console.warn('Image largestPixelValue tag is incorrect. Rendering performance will suffer considerably.');
+    }
+  } else {
+    imageFrame.smallestPixelValue = minMax.min;
+    imageFrame.largestPixelValue = minMax.max;
+  }
 }
 
 /**
@@ -764,7 +770,7 @@ function decodeBigEndian(imageFrame, pixelData) {
     }
     // Do the byte swap
     for (var i = 0; i < imageFrame.pixelData.length; i++) {
-      imageFrame[i] = swap16(imageFrame.pixelData[i]);
+      imageFrame.pixelData[i] = swap16(imageFrame.pixelData[i]);
     }
   } else if (imageFrame.bitsAllocated === 8) {
     imageFrame.pixelData = pixelData;
@@ -910,6 +916,10 @@ Object.defineProperty(exports, "__esModule", {
 function decodeRLE(imageFrame, pixelData) {
 
   if (imageFrame.bitsAllocated === 8) {
+    if (imageFrame.planarConfiguration) {
+      return decode8Planar(imageFrame, pixelData);
+    }
+
     return decode8(imageFrame, pixelData);
   } else if (imageFrame.bitsAllocated === 16) {
     return decode16(imageFrame, pixelData);
@@ -956,6 +966,55 @@ function decode8(imageFrame, pixelData) {
         for (var j = 0; j < -n + 1 && outIndex < endOfSegment; ++j) {
           out[outIndex] = value;
           outIndex += imageFrame.samplesPerPixel;
+        }
+      } /* else if (n === -128) {
+        } // do nothing */
+    }
+  }
+  imageFrame.pixelData = new Uint8Array(outFrame);
+
+  return imageFrame;
+}
+
+function decode8Planar(imageFrame, pixelData) {
+  var frameData = pixelData;
+  var frameSize = imageFrame.rows * imageFrame.columns;
+  var outFrame = new ArrayBuffer(frameSize * imageFrame.samplesPerPixel);
+  var header = new DataView(frameData.buffer, frameData.byteOffset);
+  var data = new Int8Array(frameData.buffer, frameData.byteOffset);
+  var out = new Int8Array(outFrame);
+
+  var outIndex = 0;
+  var numSegments = header.getInt32(0, true);
+
+  for (var s = 0; s < numSegments; ++s) {
+    outIndex = s * frameSize;
+
+    var inIndex = header.getInt32((s + 1) * 4, true);
+    var maxIndex = header.getInt32((s + 2) * 4, true);
+
+    if (maxIndex === 0) {
+      maxIndex = frameData.length;
+    }
+
+    var endOfSegment = frameSize * numSegments;
+
+    while (inIndex < maxIndex) {
+      var n = data[inIndex++];
+
+      if (n >= 0 && n <= 127) {
+        // copy n bytes
+        for (var i = 0; i < n + 1 && outIndex < endOfSegment; ++i) {
+          out[outIndex] = data[inIndex++];
+          outIndex++;
+        }
+      } else if (n <= -1 && n >= -127) {
+        var value = data[inIndex++];
+        // run of n bytes
+
+        for (var j = 0; j < -n + 1 && outIndex < endOfSegment; ++j) {
+          out[outIndex] = value;
+          outIndex++;
         }
       } /* else if (n === -128) {
         } // do nothing */

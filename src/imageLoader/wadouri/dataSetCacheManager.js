@@ -1,7 +1,7 @@
-import $ from 'jquery';
-import * as dicomParser from 'dicom-parser';
-import { xhrRequest } from '../internal';
-import storeVoiPresetTab from '../storeVoiPresetTab';
+import $ from '../jquery.js';
+import * as dicomParser from '../dicom-parser.js';
+import { xhrRequest } from '../internal/index.js';
+import storeVoiPresetTab from '../storeVoiPresetTab.js';
 
 /**
  * This object supports loading of DICOM P10 dataset from a uri and caching it so it can be accessed
@@ -79,6 +79,8 @@ function load (uri, loadRequest, imageId) {
     loadDeferred.resolve(dataSet);
     // done loading, remove the promise
     delete promises[uri];
+  }, function (error) {
+    loadDeferred.reject(error);
   }).always(function () {
       // error thrown, remove the promise
     delete promises[uri];
