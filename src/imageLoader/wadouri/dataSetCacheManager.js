@@ -1,6 +1,6 @@
-import $ from 'jquery';
-import * as dicomParser from 'dicom-parser';
-import { xhrRequest } from '../internal';
+import $ from '../jquery.js';
+import * as dicomParser from '../dicom-parser.js';
+import { xhrRequest } from '../internal/index.js';
 import events from '../events.js';
 
 /**
