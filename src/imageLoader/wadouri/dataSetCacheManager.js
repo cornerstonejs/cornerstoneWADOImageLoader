@@ -1,6 +1,6 @@
-import $ from 'jquery';
-import * as dicomParser from 'dicom-parser';
-import { xhrRequest } from '../internal';
+import $ from '../jquery.js';
+import * as dicomParser from '../dicom-parser.js';
+import { xhrRequest } from '../internal/index.js';
 
 /**
  * This object supports loading of DICOM P10 dataset from a uri and caching it so it can be accessed
