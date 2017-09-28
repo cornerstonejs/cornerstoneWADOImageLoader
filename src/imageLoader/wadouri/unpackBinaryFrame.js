@@ -1,34 +1,31 @@
+/* eslint no-bitwise: 0 */
+
+function isBitSet (byte, bitPos) {
+  return byte & (1 << bitPos);
+}
+
 /**
  * Function to deal with unpacking a binary frame
  */
-(function ($, cornerstone, cornerstoneWADOImageLoader) {
+function unpackBinaryFrame (byteArray, frameOffset, pixelsPerFrame) {
+  // Create a new pixel array given the image size
+  const pixelData = new Uint8Array(pixelsPerFrame);
 
-  "use strict";
+  for (let i = 0; i < pixelsPerFrame; i++) {
+    // Compute byte position
+    const bytePos = Math.floor(i / 8);
 
-  function isBitSet(byte, bitPos) {
-    return byte & (1 << bitPos);
+    // Get the current byte
+    const byte = byteArray[bytePos + frameOffset];
+
+    // Bit position (0-7) within byte
+    const bitPos = (i % 8);
+
+    // Check whether bit at bitpos is set
+    pixelData[i] = isBitSet(byte, bitPos) ? 1 : 0;
   }
 
-  function unpackBinaryFrame(byteArray, frameOffset, pixelsPerFrame) {
-    // Create a new pixel array given the image size
-    var pixelData = new Uint8Array(pixelsPerFrame);
+  return pixelData;
+}
 
-    for (var i = 0; i < pixelsPerFrame; i++) {
-      // Compute byte position
-      var bytePos = Math.floor(i / 8);
-      
-      // Get the current byte
-      var byte = byteArray[bytePos + frameOffset];
-
-      // Bit position (0-7) within byte
-      var bitPos = (i % 8);
-
-      // Check whether bit at bitpos is set
-      pixelData[i] = isBitSet(byte, bitPos) ? 1 : 0;
-    }
-
-    return pixelData;
-  }
-
-  cornerstoneWADOImageLoader.wadouri.unpackBinaryFrame = unpackBinaryFrame;
-}($, cornerstone, cornerstoneWADOImageLoader));
+export default unpackBinaryFrame;

@@ -98,7 +98,6 @@
             <span>Total Time: </span><span id="totalTime"></span><br>
             <span>Load Time: </span><span id="loadTime"></span><br>
             <span>Decode Time: </span><span id="decodeTime"></span><br>
-            <span>WebWorker Time: </span><span id="webWorkerTime"></span><br>
 
         </div>
     </div>
@@ -184,7 +183,7 @@
         beforeSend: function(xhr) {
             // Add custom headers here (e.g. auth tokens)
             //xhr.setRequestHeader('x-auth-token', 'my auth token');
-        }
+        },
     });
 
     var loaded = false;
@@ -206,6 +205,8 @@
                 cornerstoneTools.pan.activate(element, 2); // pan is the default tool for middle mouse button
                 cornerstoneTools.zoom.activate(element, 4); // zoom is the default tool for right mouse button
                 cornerstoneTools.zoomWheel.activate(element); // zoom is the default tool for middle mouse wheel
+
+                cornerstoneTools.imageStats.enable(element);
                 loaded = true;
             }
 
@@ -261,7 +262,6 @@
             $('#totalTime').text(time + "ms");
             $('#loadTime').text(image.loadTimeInMS + "ms");
             $('#decodeTime').text(image.decodeTimeInMS + "ms");
-            $('#webWorkerTime').text(image.webWorkerTimeInMS + "ms");
 
         }, function(err) {
             alert(err);
@@ -272,7 +272,7 @@
          }*/
     }
 
-    $(cornerstone).bind('CornerstoneImageLoadProgress', function(event, eventData) {
+    $(cornerstone.events).on('CornerstoneImageLoadProgress', function(event, eventData) {
         $('#loadProgress').text('Image Load Progress: ' + eventData.percentComplete + "%");
     });
 
