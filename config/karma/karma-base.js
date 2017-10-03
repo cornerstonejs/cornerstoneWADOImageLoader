@@ -5,11 +5,17 @@ const webpackConfig = require('../webpack');
 // when running testes (var test/foo_test.js = ...)
 delete webpackConfig.output.library;
 
+// Karma will build the dependecy tree by itself
+delete webpackConfig.entry;
+
 // Code coverage
 webpackConfig.module.rules.push({
   test: /\.js$/,
   include: path.resolve('./src/'),
-  loader: 'istanbul-instrumenter-loader'
+  loader: 'istanbul-instrumenter-loader',
+  query: {
+    esModules: true
+  }
 });
 
 module.exports = {
@@ -17,7 +23,9 @@ module.exports = {
   frameworks: ['mocha'],
   reporters: ['progress', 'coverage'],
   files: [
-    'test/*_test.js',
+    'node_modules/jquery/dist/jquery.js',
+    'node_modules/cornerstone-core/dist/cornerstone.js',
+    'node_modules/dicom-parser/dist/dicomParser.js',
     'test/**/*_test.js'
   ],
 
@@ -54,10 +62,10 @@ module.exports = {
   coverageReporter: {
     dir: './coverage',
     reporters: [
-      {type: 'html', subdir: 'html'},
-      {type: 'lcov', subdir: '.'},
-      {type: 'text', subdir: '.', file: 'text.txt'},
-      {type: 'text-summary', subdir: '.', file: 'text-summary.txt'}
+      { type: 'html', subdir: 'html' },
+      { type: 'lcov', subdir: '.' },
+      { type: 'text', subdir: '.', file: 'text.txt' },
+      { type: 'text-summary', subdir: '.', file: 'text-summary.txt' }
     ]
   }
 };
