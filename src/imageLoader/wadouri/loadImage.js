@@ -1,5 +1,4 @@
-import $ from '../jquery.js';
-import * as cornerstone from '../cornerstone-core.js';
+import { $, cornerstone } from '../../externalModules.js';
 import createImage from '../createImage.js';
 import parseImageId from './parseImageId.js';
 import dataSetCacheManager from './dataSetCacheManager.js';
@@ -25,14 +24,7 @@ function getPixelData (dataSet, frameIndex) {
     return getEncapsulatedImageFrame(dataSet, frameIndex);
   }
 
-<<<<<<< HEAD
-  function getPixelData(dataSet, frameIndex) {
-    var pixelDataElement = dataSet.elements.x7fe00010;
-    if (!pixelDataElement || pixelDataElement.length===0) return;
-
-=======
   return getUncompressedImageFrame(dataSet, frameIndex);
->>>>>>> 513d868f9e5b0698b63bc72b930962884a9c9276
 
 }
 
@@ -91,13 +83,4 @@ cornerstone.registerImageLoader('dicomweb', loadImage);
 cornerstone.registerImageLoader('wadouri', loadImage);
 cornerstone.registerImageLoader('dicomfile', loadImage);
 
-<<<<<<< HEAD
-  // register dicomweb and wadouri image loader prefixes
-  cornerstone.registerImageLoader('dicomweb', loadImage);
-  cornerstone.registerImageLoader('wadouri', loadImage);
-  cornerstone.registerImageLoader('dicomfile', loadImage);
-}($, cornerstone, cornerstoneWADOImageLoader));
-=======
-export { loadImageFromPromise, getLoaderForScheme };
-export default loadImage;
->>>>>>> 513d868f9e5b0698b63bc72b930962884a9c9276
+export { loadImageFromPromise, getLoaderForScheme, loadImage };
