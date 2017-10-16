@@ -1,11 +1,11 @@
-import getNumberValues from './getNumberValues';
-import parseImageId from '../parseImageId';
-import dataSetCacheManager from '../dataSetCacheManager';
-import getImagePixelModule from './getImagePixelModule';
-import getLUTs from './getLUTs';
-import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixelRepresentation';
-import * as dicomParser from 'dicom-parser';
-import * as cornerstone from 'cornerstone-core';
+import { cornerstone, dicomParser } from '../../../externalModules.js';
+import getNumberValues from './getNumberValues.js';
+import parseImageId from '../parseImageId.js';
+import dataSetCacheManager from '../dataSetCacheManager.js';
+import getImagePixelModule from './getImagePixelModule.js';
+import getLUTs from './getLUTs.js';
+import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixelRepresentation.js';
+
 
 function metaDataProvider (type, imageId) {
   const parsedImageId = parseImageId(imageId);

@@ -4,7 +4,8 @@ let options = {
   },
   // callback allowing modification of newly created image objects
   imageCreated (/* image */) {
-  }
+  },
+  strict: false
 };
 
 export function setOptions (newOptions) {

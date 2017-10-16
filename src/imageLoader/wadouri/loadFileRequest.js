@@ -1,25 +1,26 @@
-import $ from 'jquery';
-import parseImageId from './parseImageId';
-import fileManager from './fileManager';
+import parseImageId from './parseImageId.js';
+import fileManager from './fileManager.js';
 
 function loadFileRequest (uri) {
   const parsedImageId = parseImageId(uri);
   const fileIndex = parseInt(parsedImageId.url, 10);
   const file = fileManager.get(fileIndex);
 
-  // create a deferred object
-  const deferred = $.Deferred();
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
 
-  const fileReader = new FileReader();
+    fileReader.onload = (e) => {
+      const dicomPart10AsArrayBuffer = e.target.result;
 
-  fileReader.onload = function (e) {
-    const dicomPart10AsArrayBuffer = e.target.result;
+      resolve(dicomPart10AsArrayBuffer);
+    };
 
-    deferred.resolve(dicomPart10AsArrayBuffer);
-  };
-  fileReader.readAsArrayBuffer(file);
+    fileReader.onerror = (e) => {
+      reject(e);
+    };
 
-  return deferred.promise();
+    fileReader.readAsArrayBuffer(file);
+  });
 }
 
 export default loadFileRequest;
