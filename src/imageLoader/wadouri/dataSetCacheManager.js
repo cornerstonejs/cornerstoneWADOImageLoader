@@ -1,4 +1,4 @@
-import { $, dicomParser } from '../../externalModules.js';
+import { dicomParser } from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
 import storeVoiPresetTab from '../storeVoiPresetTab.js';
 
