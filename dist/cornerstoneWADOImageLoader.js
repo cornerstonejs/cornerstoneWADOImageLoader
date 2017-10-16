@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - 0.14.6 - 2017-09-09 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - 0.14.7 - 2017-10-13 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("cornerstone-core"), require("dicom-parser"), require("jquery"));
@@ -8,7 +8,7 @@
 		exports["cornerstoneWADOImageLoader"] = factory(require("cornerstone-core"), require("dicom-parser"), require("jquery"));
 	else
 		root["cornerstoneWADOImageLoader"] = factory(root["cornerstone"], root["dicomParser"], root["$"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_62__, __WEBPACK_EXTERNAL_MODULE_63__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_60__, __WEBPACK_EXTERNAL_MODULE_61__, __WEBPACK_EXTERNAL_MODULE_62__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -74,7 +74,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 45);
+/******/ 	return __webpack_require__(__webpack_require__.s = 43);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -87,26 +87,30 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.dicomParser = exports.cornerstone = exports.$ = undefined;
 
-var _jquery = __webpack_require__(63);
+var _jquery = __webpack_require__(62);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
+var _cornerstoneCore = __webpack_require__(60);
+
+var cornerstone = _interopRequireWildcard(_cornerstoneCore);
+
+var _dicomParser = __webpack_require__(61);
+
+var dicomParser = _interopRequireWildcard(_dicomParser);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = _jquery2.default; /*
-                                     * When loading sources directly with <script type="module"> remove the line below
-                                     * (keep only the export line)
-                                     */
+exports.$ = _jquery2.default;
+exports.cornerstone = cornerstone;
+exports.dicomParser = dicomParser;
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -117,11 +121,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.internal = exports.xhrRequest = exports.getOptions = exports.setOptions = undefined;
 
-var _xhrRequest = __webpack_require__(46);
+var _xhrRequest = __webpack_require__(44);
 
 var _xhrRequest2 = _interopRequireDefault(_xhrRequest);
 
-var _options = __webpack_require__(9);
+var _options = __webpack_require__(7);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -137,42 +141,19 @@ exports.xhrRequest = _xhrRequest2.default;
 exports.internal = internal;
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = '0.14.7';
+
+/***/ }),
 /* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = '0.14.6';
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _dicomParser = __webpack_require__(62);
-
-Object.keys(_dicomParser).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _dicomParser[key];
-    }
-  });
-});
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -211,7 +192,7 @@ function getValue(element, index, defaultValue) {
 exports.default = getValue;
 
 /***/ }),
-/* 6 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -246,7 +227,7 @@ function parseImageId(imageId) {
 exports.default = parseImageId;
 
 /***/ }),
-/* 7 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -256,39 +237,31 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jquery = __webpack_require__(0);
+var _externalModules = __webpack_require__(0);
 
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _getImageFrame = __webpack_require__(16);
+var _getImageFrame = __webpack_require__(14);
 
 var _getImageFrame2 = _interopRequireDefault(_getImageFrame);
 
-var _decodeImageFrame = __webpack_require__(14);
+var _decodeImageFrame = __webpack_require__(12);
 
 var _decodeImageFrame2 = _interopRequireDefault(_decodeImageFrame);
 
-var _isColorImage = __webpack_require__(17);
+var _isColorImage = __webpack_require__(15);
 
 var _isColorImage2 = _interopRequireDefault(_isColorImage);
 
-var _convertColorSpace = __webpack_require__(13);
+var _convertColorSpace = __webpack_require__(11);
 
 var _convertColorSpace2 = _interopRequireDefault(_convertColorSpace);
 
-var _getMinMax = __webpack_require__(8);
+var _getMinMax = __webpack_require__(6);
 
 var _getMinMax2 = _interopRequireDefault(_getMinMax);
 
-var _isJPEGBaseline8BitColor = __webpack_require__(18);
+var _isJPEGBaseline8BitColor = __webpack_require__(16);
 
 var _isJPEGBaseline8BitColor2 = _interopRequireDefault(_isJPEGBaseline8BitColor);
-
-var _cornerstoneCore = __webpack_require__(1);
-
-var cornerstone = _interopRequireWildcard(_cornerstoneCore);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -320,124 +293,124 @@ function setPixelDataType(imageFrame) {
 
 function createImage(imageId, pixelData, transferSyntax, options) {
   var canvas = document.createElement('canvas');
-  var deferred = _jquery2.default.Deferred();
   var imageFrame = (0, _getImageFrame2.default)(imageId);
   var decodePromise = (0, _decodeImageFrame2.default)(imageFrame, transferSyntax, pixelData, canvas, options);
 
-  decodePromise.then(function (imageFrame) {
-    // var imagePixelModule = metaDataProvider('imagePixelModule', imageId);
-    var imagePlaneModule = cornerstone.metaData.get('imagePlaneModule', imageId) || {};
-    var voiLutModule = cornerstone.metaData.get('voiLutModule', imageId) || {};
-    var modalityLutModule = cornerstone.metaData.get('modalityLutModule', imageId) || {};
-    var sopCommonModule = cornerstone.metaData.get('sopCommonModule', imageId) || {};
-    var isColorImage = (0, _isColorImage2.default)(imageFrame.photometricInterpretation);
+  return new Promise(function (resolve, reject) {
+    decodePromise.then(function (imageFrame) {
+      var imagePlaneModule = _externalModules.cornerstone.metaData.get('imagePlaneModule', imageId) || {};
+      var voiLutModule = _externalModules.cornerstone.metaData.get('voiLutModule', imageId) || {};
+      var modalityLutModule = _externalModules.cornerstone.metaData.get('modalityLutModule', imageId) || {};
+      var sopCommonModule = _externalModules.cornerstone.metaData.get('sopCommonModule', imageId) || {};
+      var isColorImage = (0, _isColorImage2.default)(imageFrame.photometricInterpretation);
 
-    // JPEGBaseline (8 bits) is already returning the pixel data in the right format (rgba)
-    // because it's using a canvas to load and decode images.
-    if (!(0, _isJPEGBaseline8BitColor2.default)(imageFrame, transferSyntax)) {
-      setPixelDataType(imageFrame);
+      // JPEGBaseline (8 bits) is already returning the pixel data in the right format (rgba)
+      // because it's using a canvas to load and decode images.
+      if (!(0, _isJPEGBaseline8BitColor2.default)(imageFrame, transferSyntax)) {
+        setPixelDataType(imageFrame);
 
-      // convert color space
-      if (isColorImage) {
-        // setup the canvas context
-        canvas.height = imageFrame.rows;
-        canvas.width = imageFrame.columns;
+        // convert color space
+        if (isColorImage) {
+          // setup the canvas context
+          canvas.height = imageFrame.rows;
+          canvas.width = imageFrame.columns;
 
-        var context = canvas.getContext('2d');
-        var imageData = context.createImageData(imageFrame.columns, imageFrame.rows);
+          var context = canvas.getContext('2d');
+          var imageData = context.createImageData(imageFrame.columns, imageFrame.rows);
 
-        (0, _convertColorSpace2.default)(imageFrame, imageData);
-        imageFrame.imageData = imageData;
-        imageFrame.pixelData = imageData.data;
+          (0, _convertColorSpace2.default)(imageFrame, imageData);
+          imageFrame.imageData = imageData;
+          imageFrame.pixelData = imageData.data;
 
-        // calculate smallest and largest PixelValue of the converted pixelData
-        var minMax = (0, _getMinMax2.default)(imageFrame.pixelData);
+          // calculate smallest and largest PixelValue of the converted pixelData
+          var minMax = (0, _getMinMax2.default)(imageFrame.pixelData);
 
-        imageFrame.smallestPixelValue = minMax.min;
-        imageFrame.largestPixelValue = minMax.max;
-      }
-    }
-
-    var image = {
-      imageId: imageId,
-      color: isColorImage,
-      columnPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[1] : undefined,
-      columns: imageFrame.columns,
-      height: imageFrame.rows,
-      intercept: modalityLutModule.rescaleIntercept ? modalityLutModule.rescaleIntercept : 0,
-      invert: imageFrame.photometricInterpretation === 'MONOCHROME1',
-      minPixelValue: imageFrame.smallestPixelValue,
-      maxPixelValue: imageFrame.largestPixelValue,
-      render: undefined, // set below
-      rowPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[0] : undefined,
-      rows: imageFrame.rows,
-      sizeInBytes: imageFrame.pixelData.length,
-      slope: modalityLutModule.rescaleSlope ? modalityLutModule.rescaleSlope : 1,
-      width: imageFrame.columns,
-      windowCenter: voiLutModule.windowCenter ? voiLutModule.windowCenter[0] : undefined,
-      windowWidth: voiLutModule.windowWidth ? voiLutModule.windowWidth[0] : undefined,
-      decodeTimeInMS: imageFrame.decodeTimeInMS
-    };
-
-    // add function to return pixel data
-    image.getPixelData = function () {
-      return imageFrame.pixelData;
-    };
-
-    // Setup the renderer
-    if (image.color) {
-      image.render = cornerstone.renderColorImage;
-      image.getCanvas = function () {
-        if (lastImageIdDrawn === imageId) {
-          return canvas;
+          imageFrame.smallestPixelValue = minMax.min;
+          imageFrame.largestPixelValue = minMax.max;
         }
-
-        canvas.height = image.rows;
-        canvas.width = image.columns;
-        var context = canvas.getContext('2d');
-
-        context.putImageData(imageFrame.imageData, 0, 0);
-        lastImageIdDrawn = imageId;
-
-        return canvas;
-      };
-    } else {
-      image.render = cornerstone.renderGrayscaleImage;
-    }
-
-    // Modality LUT
-    if (modalityLutModule.modalityLUTSequence && modalityLutModule.modalityLUTSequence.length > 0 && isModalityLUTForDisplay(sopCommonModule.sopClassUID)) {
-      image.modalityLUT = modalityLutModule.modalityLUTSequence[0];
-    }
-
-    // VOI LUT
-    if (voiLutModule.voiLUTSequence && voiLutModule.voiLUTSequence.length > 0) {
-      image.voiLUT = voiLutModule.voiLUTSequence[0];
-    }
-
-    // set the ww/wc to cover the dynamic range of the image if no values are supplied
-    if (image.windowCenter === undefined || image.windowWidth === undefined) {
-      if (image.color) {
-        image.windowWidth = 255;
-        image.windowCenter = 128;
-      } else {
-        var maxVoi = image.maxPixelValue * image.slope + image.intercept;
-        var minVoi = image.minPixelValue * image.slope + image.intercept;
-
-        image.windowWidth = maxVoi - minVoi;
-        image.windowCenter = (maxVoi + minVoi) / 2;
       }
-    }
-    deferred.resolve(image);
-  });
 
-  return deferred.promise();
+      var image = {
+        imageId: imageId,
+        color: isColorImage,
+        columnPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[1] : undefined,
+        columns: imageFrame.columns,
+        height: imageFrame.rows,
+        intercept: modalityLutModule.rescaleIntercept ? modalityLutModule.rescaleIntercept : 0,
+        invert: imageFrame.photometricInterpretation === 'MONOCHROME1',
+        minPixelValue: imageFrame.smallestPixelValue,
+        maxPixelValue: imageFrame.largestPixelValue,
+        render: undefined, // set below
+        rowPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[0] : undefined,
+        rows: imageFrame.rows,
+        sizeInBytes: imageFrame.pixelData.length,
+        slope: modalityLutModule.rescaleSlope ? modalityLutModule.rescaleSlope : 1,
+        width: imageFrame.columns,
+        windowCenter: voiLutModule.windowCenter ? voiLutModule.windowCenter[0] : undefined,
+        windowWidth: voiLutModule.windowWidth ? voiLutModule.windowWidth[0] : undefined,
+        decodeTimeInMS: imageFrame.decodeTimeInMS
+      };
+
+      // add function to return pixel data
+      image.getPixelData = function () {
+        return imageFrame.pixelData;
+      };
+
+      // Setup the renderer
+      if (image.color) {
+        image.render = _externalModules.cornerstone.renderColorImage;
+        image.getCanvas = function () {
+          if (lastImageIdDrawn === imageId) {
+            return canvas;
+          }
+
+          canvas.height = image.rows;
+          canvas.width = image.columns;
+          var context = canvas.getContext('2d');
+
+          context.putImageData(imageFrame.imageData, 0, 0);
+          lastImageIdDrawn = imageId;
+
+          return canvas;
+        };
+      } else {
+        image.render = _externalModules.cornerstone.renderGrayscaleImage;
+      }
+
+      // Modality LUT
+      if (modalityLutModule.modalityLUTSequence && modalityLutModule.modalityLUTSequence.length > 0 && isModalityLUTForDisplay(sopCommonModule.sopClassUID)) {
+        image.modalityLUT = modalityLutModule.modalityLUTSequence[0];
+      }
+
+      // VOI LUT
+      if (voiLutModule.voiLUTSequence && voiLutModule.voiLUTSequence.length > 0) {
+        image.voiLUT = voiLutModule.voiLUTSequence[0];
+      }
+
+      // set the ww/wc to cover the dynamic range of the image if no values are supplied
+      if (image.windowCenter === undefined || image.windowWidth === undefined) {
+        if (image.color) {
+          image.windowWidth = 255;
+          image.windowCenter = 128;
+        } else {
+          var maxVoi = image.maxPixelValue * image.slope + image.intercept;
+          var minVoi = image.minPixelValue * image.slope + image.intercept;
+
+          image.windowWidth = maxVoi - minVoi;
+          image.windowCenter = (maxVoi + minVoi) / 2;
+        }
+      }
+      resolve(image);
+    }, function (error) {
+      reject(error);
+    });
+  });
 }
 
 exports.default = createImage;
 
 /***/ }),
-/* 8 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -469,7 +442,7 @@ function getMinMax(storedPixelData) {
 }
 
 /***/ }),
-/* 9 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -499,7 +472,7 @@ function getOptions() {
 }
 
 /***/ }),
-/* 10 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -536,7 +509,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 11 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -546,19 +519,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jquery = __webpack_require__(0);
+var _externalModules = __webpack_require__(0);
 
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _dicomParser = __webpack_require__(4);
-
-var dicomParser = _interopRequireWildcard(_dicomParser);
-
-var _index = __webpack_require__(2);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _index = __webpack_require__(1);
 
 /**
  * This object supports loading of DICOM P10 dataset from a uri and caching it so it can be accessed
@@ -584,18 +547,17 @@ function get(uri) {
 }
 
 // loads the dicom dataset from the wadouri sp
-function load(uri, loadRequest, imageId) {
-  loadRequest = loadRequest || _index.xhrRequest;
+function load(uri) {
+  var loadRequest = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _index.xhrRequest;
+  var imageId = arguments[2];
 
   // if already loaded return it right away
   if (loadedDataSets[uri]) {
     // console.log('using loaded dataset ' + uri);
-    var alreadyLoadedpromise = _jquery2.default.Deferred();
-
-    loadedDataSets[uri].cacheCount++;
-    alreadyLoadedpromise.resolve(loadedDataSets[uri].dataSet);
-
-    return alreadyLoadedpromise;
+    return new Promise(function (resolve) {
+      loadedDataSets[uri].cacheCount++;
+      resolve(loadedDataSets[uri].dataSet);
+    });
   }
 
   // if we are currently loading this uri, return its promise
@@ -604,45 +566,40 @@ function load(uri, loadRequest, imageId) {
     return promises[uri];
   }
 
-  // console.log('loading ' + uri);
-
   // This uri is not loaded or being loaded, load it via an xhrRequest
-  var promise = loadRequest(uri, imageId);
+  var loadDICOMPromise = loadRequest(uri, imageId);
 
   // handle success and failure of the XHR request load
-  var loadDeferred = _jquery2.default.Deferred();
+  var promise = new Promise(function (resolve, reject) {
+    loadDICOMPromise.then(function (dicomPart10AsArrayBuffer /* , xhr*/) {
+      var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
 
-  promise.then(function (dicomPart10AsArrayBuffer /* , xhr*/) {
-    var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
+      // Reject the promise if parsing the dicom file fails
+      var dataSet = void 0;
 
-    // Reject the promise if parsing the dicom file fails
-    var dataSet = void 0;
+      try {
+        dataSet = _externalModules.dicomParser.parseDicom(byteArray);
+      } catch (error) {
+        return reject(error);
+      }
 
-    try {
-      dataSet = dicomParser.parseDicom(byteArray);
-    } catch (error) {
-      loadDeferred.reject(error);
+      loadedDataSets[uri] = {
+        dataSet: dataSet,
+        cacheCount: 1
+      };
 
-      return;
-    }
-
-    loadedDataSets[uri] = {
-      dataSet: dataSet,
-      cacheCount: 1
-    };
-    loadDeferred.resolve(dataSet);
-    // done loading, remove the promise
-    delete promises[uri];
-  }, function (error) {
-    loadDeferred.reject(error);
-  }).always(function () {
-    // error thrown, remove the promise
-    delete promises[uri];
+      resolve(dataSet);
+    }, function (error) {
+      reject(error);
+    }).then(function () {
+      // Remove the promise regardless of success or failure
+      delete promises[uri];
+    });
   });
 
-  promises[uri] = loadDeferred;
+  promises[uri] = promise;
 
-  return loadDeferred;
+  return promise;
 }
 
 // remove the cached/loaded dicom dataset for the specified wadouri to free up memory
@@ -672,7 +629,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 12 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -682,7 +639,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _convertRGBColorByPixel = __webpack_require__(41);
+var _convertRGBColorByPixel = __webpack_require__(39);
 
 Object.defineProperty(exports, 'convertRGBColorByPixel', {
   enumerable: true,
@@ -691,7 +648,7 @@ Object.defineProperty(exports, 'convertRGBColorByPixel', {
   }
 });
 
-var _convertRGBColorByPlane = __webpack_require__(42);
+var _convertRGBColorByPlane = __webpack_require__(40);
 
 Object.defineProperty(exports, 'convertRGBColorByPlane', {
   enumerable: true,
@@ -700,7 +657,7 @@ Object.defineProperty(exports, 'convertRGBColorByPlane', {
   }
 });
 
-var _convertYBRFullByPixel = __webpack_require__(43);
+var _convertYBRFullByPixel = __webpack_require__(41);
 
 Object.defineProperty(exports, 'convertYBRFullByPixel', {
   enumerable: true,
@@ -709,7 +666,7 @@ Object.defineProperty(exports, 'convertYBRFullByPixel', {
   }
 });
 
-var _convertYBRFullByPlane = __webpack_require__(44);
+var _convertYBRFullByPlane = __webpack_require__(42);
 
 Object.defineProperty(exports, 'convertYBRFullByPlane', {
   enumerable: true,
@@ -718,7 +675,7 @@ Object.defineProperty(exports, 'convertYBRFullByPlane', {
   }
 });
 
-var _convertPALETTECOLOR = __webpack_require__(40);
+var _convertPALETTECOLOR = __webpack_require__(38);
 
 Object.defineProperty(exports, 'convertPALETTECOLOR', {
   enumerable: true,
@@ -730,7 +687,7 @@ Object.defineProperty(exports, 'convertPALETTECOLOR', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -741,7 +698,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = convertColorSpace;
 
-var _index = __webpack_require__(12);
+var _index = __webpack_require__(10);
 
 function convertRGB(imageFrame, rgbaBuffer) {
   if (imageFrame.planarConfiguration === 0) {
@@ -781,7 +738,7 @@ function convertColorSpace(imageFrame, imageData) {
 }
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -791,11 +748,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _webWorkerManager = __webpack_require__(19);
+var _webWorkerManager = __webpack_require__(17);
 
 var _webWorkerManager2 = _interopRequireDefault(_webWorkerManager);
 
-var _decodeJPEGBaseline8BitColor = __webpack_require__(15);
+var _decodeJPEGBaseline8BitColor = __webpack_require__(13);
 
 var _decodeJPEGBaseline8BitColor2 = _interopRequireDefault(_decodeJPEGBaseline8BitColor);
 
@@ -884,7 +841,7 @@ function decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options
 exports.default = decodeImageFrame;
 
 /***/ }),
-/* 15 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -894,11 +851,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _getMinMax = __webpack_require__(8);
+var _getMinMax = __webpack_require__(6);
 
 var _getMinMax2 = _interopRequireDefault(_getMinMax);
 
@@ -928,61 +881,65 @@ function binaryToString(binary) {
 
 function decodeJPEGBaseline8BitColor(imageFrame, pixelData, canvas) {
   var start = new Date().getTime();
-  var deferred = _jquery2.default.Deferred();
-
   var imgBlob = new Blob([pixelData], { type: 'image/jpeg' });
 
-  var r = new FileReader();
+  return new Promise(function (resolve, reject) {
+    var fileReader = new FileReader();
 
-  if (r.readAsBinaryString === undefined) {
-    r.readAsArrayBuffer(imgBlob);
-  } else {
-    r.readAsBinaryString(imgBlob); // doesn't work on IE11
-  }
-
-  r.onload = function () {
-    var img = new Image();
-
-    img.onload = function () {
-      canvas.height = img.height;
-      canvas.width = img.width;
-      imageFrame.rows = img.height;
-      imageFrame.columns = img.width;
-      var context = canvas.getContext('2d');
-
-      context.drawImage(this, 0, 0);
-      var imageData = context.getImageData(0, 0, img.width, img.height);
-      var end = new Date().getTime();
-
-      imageFrame.pixelData = imageData.data;
-      imageFrame.imageData = imageData;
-      imageFrame.decodeTimeInMS = end - start;
-
-      // calculate smallest and largest PixelValue
-      var minMax = (0, _getMinMax2.default)(imageFrame.pixelData);
-
-      imageFrame.smallestPixelValue = minMax.min;
-      imageFrame.largestPixelValue = minMax.max;
-
-      deferred.resolve(imageFrame);
-    };
-    img.onerror = function (error) {
-      deferred.reject(error);
-    };
-    if (r.readAsBinaryString === undefined) {
-      img.src = 'data:image/jpeg;base64,' + window.btoa(arrayBufferToString(r.result));
+    if (fileReader.readAsBinaryString === undefined) {
+      fileReader.readAsArrayBuffer(imgBlob);
     } else {
-      img.src = 'data:image/jpeg;base64,' + window.btoa(r.result); // doesn't work on IE11
+      fileReader.readAsBinaryString(imgBlob); // doesn't work on IE11
     }
-  };
 
-  return deferred.promise();
+    fileReader.onload = function () {
+      var img = new Image();
+
+      img.onload = function () {
+        canvas.height = img.height;
+        canvas.width = img.width;
+        imageFrame.rows = img.height;
+        imageFrame.columns = img.width;
+        var context = canvas.getContext('2d');
+
+        context.drawImage(this, 0, 0);
+        var imageData = context.getImageData(0, 0, img.width, img.height);
+        var end = new Date().getTime();
+
+        imageFrame.pixelData = imageData.data;
+        imageFrame.imageData = imageData;
+        imageFrame.decodeTimeInMS = end - start;
+
+        // calculate smallest and largest PixelValue
+        var minMax = (0, _getMinMax2.default)(imageFrame.pixelData);
+
+        imageFrame.smallestPixelValue = minMax.min;
+        imageFrame.largestPixelValue = minMax.max;
+
+        resolve(imageFrame);
+      };
+
+      img.onerror = function (error) {
+        reject(error);
+      };
+
+      if (fileReader.readAsBinaryString === undefined) {
+        img.src = 'data:image/jpeg;base64,' + window.btoa(arrayBufferToString(fileReader.result));
+      } else {
+        img.src = 'data:image/jpeg;base64,' + window.btoa(fileReader.result); // doesn't work on IE11
+      }
+    };
+
+    fileReader.onerror = function (e) {
+      reject(e);
+    };
+  });
 }
 
 exports.default = decodeJPEGBaseline8BitColor;
 
 /***/ }),
-/* 16 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -992,14 +949,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _cornerstoneCore = __webpack_require__(1);
-
-var cornerstone = _interopRequireWildcard(_cornerstoneCore);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _externalModules = __webpack_require__(0);
 
 function getImageFrame(imageId) {
-  var imagePixelModule = cornerstone.metaData.get('imagePixelModule', imageId);
+  var imagePixelModule = _externalModules.cornerstone.metaData.get('imagePixelModule', imageId);
 
   return {
     samplesPerPixel: imagePixelModule.samplesPerPixel,
@@ -1024,7 +977,7 @@ function getImageFrame(imageId) {
 exports.default = getImageFrame;
 
 /***/ }),
-/* 17 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1039,7 +992,7 @@ exports.default = function (photoMetricInterpretation) {
 };
 
 /***/ }),
-/* 18 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1059,7 +1012,7 @@ function isJPEGBaseline8BitColor(imageFrame, transferSyntax) {
 exports.default = isJPEGBaseline8BitColor;
 
 /***/ }),
-/* 19 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1069,13 +1022,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _options = __webpack_require__(9);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _options = __webpack_require__(7);
 
 // the taskId to assign to the next task added via addTask()
 var nextTaskId = 0;
@@ -1280,13 +1227,19 @@ function addTask(taskType, data) {
     initialize();
   }
 
-  var deferred = _jquery2.default.Deferred();
+  var deferred = {};
+  var promise = new Promise(function (resolve, reject) {
+    deferred = {
+      resolve: resolve,
+      reject: reject
+    };
+  });
 
   // find the right spot to insert this decode task (based on priority)
   var i = void 0;
 
   for (i = 0; i < tasks.length; i++) {
-    if (tasks[i].priority <= priority) {
+    if (tasks[i].priority < priority) {
       break;
     }
   }
@@ -1310,7 +1263,7 @@ function addTask(taskType, data) {
 
   return {
     taskId: taskId,
-    promise: deferred.promise()
+    promise: promise
   };
 }
 
@@ -1334,7 +1287,7 @@ function setTaskPriority(taskId) {
 
       // find the right spot to insert this decode task (based on priority)
       for (i = 0; i < tasks.length; i++) {
-        if (tasks[i].priority <= priority) {
+        if (tasks[i].priority < priority) {
           break;
         }
       }
@@ -1362,7 +1315,7 @@ function cancelTask(taskId, reason) {
       // taskId found, remove it
       var task = tasks.splice(i, 1);
 
-      task.promise.reject(reason);
+      task.deferred.reject(reason);
 
       return true;
     }
@@ -1393,7 +1346,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 20 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1449,7 +1402,7 @@ function findIndexOfString(data, str, offset) {
 exports.default = findIndexOfString;
 
 /***/ }),
-/* 21 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1459,13 +1412,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jquery = __webpack_require__(0);
+var _index = __webpack_require__(1);
 
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _index = __webpack_require__(2);
-
-var _findIndexOfString = __webpack_require__(20);
+var _findIndexOfString = __webpack_require__(18);
 
 var _findIndexOfString2 = _interopRequireDefault(_findIndexOfString);
 
@@ -1477,8 +1426,6 @@ function findBoundary(header) {
       return header[i];
     }
   }
-
-  return undefined;
 }
 
 function findContentType(header) {
@@ -1487,8 +1434,6 @@ function findContentType(header) {
       return header[i].substr(13).trim();
     }
   }
-
-  return undefined;
 }
 
 function uint8ArrayToString(data, offset, length) {
@@ -1503,63 +1448,62 @@ function uint8ArrayToString(data, offset, length) {
   return str;
 }
 
-function getPixelData(uri, imageId, mediaType) {
-  mediaType = mediaType || 'application/octet-stream';
+function getPixelData(uri, imageId) {
+  var mediaType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'application/octet-stream';
+
   var headers = {
     accept: mediaType
   };
 
-  var deferred = _jquery2.default.Deferred();
+  return new Promise(function (resolve, reject) {
+    var loadPromise = (0, _index.xhrRequest)(uri, imageId, headers);
 
-  var loadPromise = (0, _index.xhrRequest)(uri, imageId, headers);
+    loadPromise.then(function (imageFrameAsArrayBuffer /* , xhr*/) {
 
-  loadPromise.then(function (imageFrameAsArrayBuffer /* , xhr*/) {
+      // request succeeded, Parse the multi-part mime response
+      var response = new Uint8Array(imageFrameAsArrayBuffer);
 
-    // request succeeded, Parse the multi-part mime response
-    var response = new Uint8Array(imageFrameAsArrayBuffer);
+      // First look for the multipart mime header
+      var tokenIndex = (0, _findIndexOfString2.default)(response, '\r\n\r\n');
 
-    // First look for the multipart mime header
-    var tokenIndex = (0, _findIndexOfString2.default)(response, '\r\n\r\n');
-
-    if (tokenIndex === -1) {
-      deferred.reject('invalid response - no multipart mime header');
-    }
-    var header = uint8ArrayToString(response, 0, tokenIndex);
-    // Now find the boundary  marker
-    var split = header.split('\r\n');
-    var boundary = findBoundary(split);
-
-    if (!boundary) {
-      deferred.reject('invalid response - no boundary marker');
-    }
-    var offset = tokenIndex + 4; // skip over the \r\n\r\n
-
-    // find the terminal boundary marker
-    var endIndex = (0, _findIndexOfString2.default)(response, boundary, offset);
-
-    if (endIndex === -1) {
-      deferred.reject('invalid response - terminating boundary not found');
-    }
-
-    // Remove \r\n from the length
-    var length = endIndex - offset - 2;
-
-    // return the info for this pixel data
-    deferred.resolve({
-      contentType: findContentType(split),
-      imageFrame: {
-        pixelData: new Uint8Array(imageFrameAsArrayBuffer, offset, length)
+      if (tokenIndex === -1) {
+        reject(new Error('invalid response - no multipart mime header'));
       }
+      var header = uint8ArrayToString(response, 0, tokenIndex);
+      // Now find the boundary  marker
+      var split = header.split('\r\n');
+      var boundary = findBoundary(split);
+
+      if (!boundary) {
+        reject(new Error('invalid response - no boundary marker'));
+      }
+      var offset = tokenIndex + 4; // skip over the \r\n\r\n
+
+      // find the terminal boundary marker
+      var endIndex = (0, _findIndexOfString2.default)(response, boundary, offset);
+
+      if (endIndex === -1) {
+        reject(new Error('invalid response - terminating boundary not found'));
+      }
+
+      // Remove \r\n from the length
+      var length = endIndex - offset - 2;
+
+      // return the info for this pixel data
+      resolve({
+        contentType: findContentType(split),
+        imageFrame: {
+          pixelData: new Uint8Array(imageFrameAsArrayBuffer, offset, length)
+        }
+      });
     });
   });
-
-  return deferred.promise();
 }
 
 exports.default = getPixelData;
 
 /***/ }),
-/* 22 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1569,7 +1513,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _getValue = __webpack_require__(5);
+var _getValue = __webpack_require__(3);
 
 var _getValue2 = _interopRequireDefault(_getValue);
 
@@ -1588,7 +1532,7 @@ function getNumberValue(element, index) {
 exports.default = getNumberValue;
 
 /***/ }),
-/* 23 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1631,7 +1575,7 @@ function getNumberValues(element, minimumLength) {
 exports.default = getNumberValues;
 
 /***/ }),
-/* 24 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1668,7 +1612,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 25 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1679,11 +1623,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = getEncapsulatedImageFrame;
 
-var _dicomParser = __webpack_require__(4);
-
-var dicomParser = _interopRequireWildcard(_dicomParser);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _externalModules = __webpack_require__(0);
 
 /**
  * Function to deal with extracting an image frame from an encapsulated data set.
@@ -1699,22 +1639,22 @@ function framesAreFragmented(dataSet) {
 function getEncapsulatedImageFrame(dataSet, frameIndex) {
   if (dataSet.elements.x7fe00010.basicOffsetTable.length) {
     // Basic Offset Table is not empty
-    return dicomParser.readEncapsulatedImageFrame(dataSet, dataSet.elements.x7fe00010, frameIndex);
+    return _externalModules.dicomParser.readEncapsulatedImageFrame(dataSet, dataSet.elements.x7fe00010, frameIndex);
   }
 
   // Empty basic offset table
 
   if (framesAreFragmented(dataSet)) {
-    var basicOffsetTable = dicomParser.createJPEGBasicOffsetTable(dataSet, dataSet.elements.x7fe00010);
+    var basicOffsetTable = _externalModules.dicomParser.createJPEGBasicOffsetTable(dataSet, dataSet.elements.x7fe00010);
 
-    return dicomParser.readEncapsulatedImageFrame(dataSet, dataSet.elements.x7fe00010, frameIndex, basicOffsetTable);
+    return _externalModules.dicomParser.readEncapsulatedImageFrame(dataSet, dataSet.elements.x7fe00010, frameIndex, basicOffsetTable);
   }
 
-  return dicomParser.readEncapsulatedPixelDataFromFragments(dataSet, dataSet.elements.x7fe00010, frameIndex);
+  return _externalModules.dicomParser.readEncapsulatedPixelDataFromFragments(dataSet, dataSet.elements.x7fe00010, frameIndex);
 }
 
 /***/ }),
-/* 26 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1724,7 +1664,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _unpackBinaryFrame = __webpack_require__(32);
+var _unpackBinaryFrame = __webpack_require__(30);
 
 var _unpackBinaryFrame2 = _interopRequireDefault(_unpackBinaryFrame);
 
@@ -1775,7 +1715,7 @@ function getUncompressedImageFrame(dataSet, frameIndex) {
 exports.default = getUncompressedImageFrame;
 
 /***/ }),
-/* 27 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1785,15 +1725,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _parseImageId = __webpack_require__(6);
+var _parseImageId = __webpack_require__(4);
 
 var _parseImageId2 = _interopRequireDefault(_parseImageId);
 
-var _fileManager = __webpack_require__(24);
+var _fileManager = __webpack_require__(22);
 
 var _fileManager2 = _interopRequireDefault(_fileManager);
 
@@ -1804,25 +1740,27 @@ function loadFileRequest(uri) {
   var fileIndex = parseInt(parsedImageId.url, 10);
   var file = _fileManager2.default.get(fileIndex);
 
-  // create a deferred object
-  var deferred = _jquery2.default.Deferred();
+  return new Promise(function (resolve, reject) {
+    var fileReader = new FileReader();
 
-  var fileReader = new FileReader();
+    fileReader.onload = function (e) {
+      var dicomPart10AsArrayBuffer = e.target.result;
 
-  fileReader.onload = function (e) {
-    var dicomPart10AsArrayBuffer = e.target.result;
+      resolve(dicomPart10AsArrayBuffer);
+    };
 
-    deferred.resolve(dicomPart10AsArrayBuffer);
-  };
-  fileReader.readAsArrayBuffer(file);
+    fileReader.onerror = function (e) {
+      reject(e);
+    };
 
-  return deferred.promise();
+    fileReader.readAsArrayBuffer(file);
+  });
 }
 
 exports.default = loadFileRequest;
 
 /***/ }),
-/* 28 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1908,7 +1846,7 @@ function getImagePixelModule(dataSet) {
 exports.default = getImagePixelModule;
 
 /***/ }),
-/* 29 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1974,7 +1912,7 @@ function getLUTs(pixelRepresentation, lutSequence) {
 exports.default = getLUTs;
 
 /***/ }),
-/* 30 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2034,7 +1972,7 @@ function getModalityLUTOutputPixelRepresentation(dataSet) {
 exports.default = getModalityLUTOutputPixelRepresentation;
 
 /***/ }),
-/* 31 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2065,7 +2003,7 @@ function getNumberValues(dataSet, tag, minimumLength) {
 exports.default = getNumberValues;
 
 /***/ }),
-/* 32 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2107,9 +2045,9 @@ function unpackBinaryFrame(byteArray, frameOffset, pixelsPerFrame) {
 exports.default = unpackBinaryFrame;
 
 /***/ }),
-/* 33 */,
-/* 34 */,
-/* 35 */
+/* 31 */,
+/* 32 */,
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2119,7 +2057,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(2);
+var _index = __webpack_require__(1);
 
 function configure(options) {
   (0, _index.setOptions)(options);
@@ -2128,7 +2066,7 @@ function configure(options) {
 exports.default = configure;
 
 /***/ }),
-/* 36 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2138,21 +2076,21 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(49);
+var _index = __webpack_require__(47);
 
-var _findIndexOfString = __webpack_require__(20);
+var _findIndexOfString = __webpack_require__(18);
 
 var _findIndexOfString2 = _interopRequireDefault(_findIndexOfString);
 
-var _getPixelData = __webpack_require__(21);
+var _getPixelData = __webpack_require__(19);
 
 var _getPixelData2 = _interopRequireDefault(_getPixelData);
 
-var _metaDataManager = __webpack_require__(10);
+var _metaDataManager = __webpack_require__(8);
 
 var _metaDataManager2 = _interopRequireDefault(_metaDataManager);
 
-var _loadImage = __webpack_require__(47);
+var _loadImage = __webpack_require__(45);
 
 var _loadImage2 = _interopRequireDefault(_loadImage);
 
@@ -2175,7 +2113,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 37 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2185,35 +2123,35 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(52);
+var _index = __webpack_require__(50);
 
-var _dataSetCacheManager = __webpack_require__(11);
+var _dataSetCacheManager = __webpack_require__(9);
 
 var _dataSetCacheManager2 = _interopRequireDefault(_dataSetCacheManager);
 
-var _fileManager = __webpack_require__(24);
+var _fileManager = __webpack_require__(22);
 
 var _fileManager2 = _interopRequireDefault(_fileManager);
 
-var _getEncapsulatedImageFrame = __webpack_require__(25);
+var _getEncapsulatedImageFrame = __webpack_require__(23);
 
 var _getEncapsulatedImageFrame2 = _interopRequireDefault(_getEncapsulatedImageFrame);
 
-var _getUncompressedImageFrame = __webpack_require__(26);
+var _getUncompressedImageFrame = __webpack_require__(24);
 
 var _getUncompressedImageFrame2 = _interopRequireDefault(_getUncompressedImageFrame);
 
-var _loadFileRequest = __webpack_require__(27);
+var _loadFileRequest = __webpack_require__(25);
 
 var _loadFileRequest2 = _interopRequireDefault(_loadFileRequest);
 
-var _loadImage = __webpack_require__(51);
+var _loadImage = __webpack_require__(49);
 
-var _parseImageId = __webpack_require__(6);
+var _parseImageId = __webpack_require__(4);
 
 var _parseImageId2 = _interopRequireDefault(_parseImageId);
 
-var _unpackBinaryFrame = __webpack_require__(32);
+var _unpackBinaryFrame = __webpack_require__(30);
 
 var _unpackBinaryFrame2 = _interopRequireDefault(_unpackBinaryFrame);
 
@@ -2242,9 +2180,9 @@ exports.default = {
 };
 
 /***/ }),
-/* 38 */,
-/* 39 */,
-/* 40 */
+/* 36 */,
+/* 37 */,
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2289,7 +2227,7 @@ exports.default = function (imageFrame, rgbaBuffer) {
 };
 
 /***/ }),
-/* 41 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2320,7 +2258,7 @@ exports.default = function (imageFrame, rgbaBuffer) {
 };
 
 /***/ }),
-/* 42 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2353,7 +2291,7 @@ exports.default = function (imageFrame, rgbaBuffer) {
 };
 
 /***/ }),
-/* 43 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2388,7 +2326,7 @@ exports.default = function (imageFrame, rgbaBuffer) {
 };
 
 /***/ }),
-/* 44 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2425,7 +2363,7 @@ exports.default = function (imageFrame, rgbaBuffer) {
 };
 
 /***/ }),
-/* 45 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2435,7 +2373,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(12);
+var _index = __webpack_require__(10);
 
 Object.keys(_index).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -2447,7 +2385,7 @@ Object.keys(_index).forEach(function (key) {
   });
 });
 
-var _index2 = __webpack_require__(37);
+var _index2 = __webpack_require__(35);
 
 Object.defineProperty(exports, 'wadouri', {
   enumerable: true,
@@ -2456,7 +2394,7 @@ Object.defineProperty(exports, 'wadouri', {
   }
 });
 
-var _index3 = __webpack_require__(36);
+var _index3 = __webpack_require__(34);
 
 Object.defineProperty(exports, 'wadors', {
   enumerable: true,
@@ -2465,7 +2403,7 @@ Object.defineProperty(exports, 'wadors', {
   }
 });
 
-var _configure = __webpack_require__(35);
+var _configure = __webpack_require__(33);
 
 Object.defineProperty(exports, 'configure', {
   enumerable: true,
@@ -2474,7 +2412,7 @@ Object.defineProperty(exports, 'configure', {
   }
 });
 
-var _convertColorSpace = __webpack_require__(13);
+var _convertColorSpace = __webpack_require__(11);
 
 Object.defineProperty(exports, 'convertColorSpace', {
   enumerable: true,
@@ -2483,7 +2421,7 @@ Object.defineProperty(exports, 'convertColorSpace', {
   }
 });
 
-var _createImage = __webpack_require__(7);
+var _createImage = __webpack_require__(5);
 
 Object.defineProperty(exports, 'createImage', {
   enumerable: true,
@@ -2492,7 +2430,7 @@ Object.defineProperty(exports, 'createImage', {
   }
 });
 
-var _decodeImageFrame = __webpack_require__(14);
+var _decodeImageFrame = __webpack_require__(12);
 
 Object.defineProperty(exports, 'decodeImageFrame', {
   enumerable: true,
@@ -2501,7 +2439,7 @@ Object.defineProperty(exports, 'decodeImageFrame', {
   }
 });
 
-var _decodeJPEGBaseline8BitColor = __webpack_require__(15);
+var _decodeJPEGBaseline8BitColor = __webpack_require__(13);
 
 Object.defineProperty(exports, 'decodeJPEGBaseline8BitColor', {
   enumerable: true,
@@ -2510,7 +2448,7 @@ Object.defineProperty(exports, 'decodeJPEGBaseline8BitColor', {
   }
 });
 
-var _getImageFrame = __webpack_require__(16);
+var _getImageFrame = __webpack_require__(14);
 
 Object.defineProperty(exports, 'getImageFrame', {
   enumerable: true,
@@ -2519,7 +2457,7 @@ Object.defineProperty(exports, 'getImageFrame', {
   }
 });
 
-var _getMinMax = __webpack_require__(8);
+var _getMinMax = __webpack_require__(6);
 
 Object.defineProperty(exports, 'getMinMax', {
   enumerable: true,
@@ -2528,7 +2466,7 @@ Object.defineProperty(exports, 'getMinMax', {
   }
 });
 
-var _isColorImage = __webpack_require__(17);
+var _isColorImage = __webpack_require__(15);
 
 Object.defineProperty(exports, 'isColorImage', {
   enumerable: true,
@@ -2537,7 +2475,7 @@ Object.defineProperty(exports, 'isColorImage', {
   }
 });
 
-var _isJPEGBaseline8BitColor = __webpack_require__(18);
+var _isJPEGBaseline8BitColor = __webpack_require__(16);
 
 Object.defineProperty(exports, 'isJPEGBaseline8BitColor', {
   enumerable: true,
@@ -2546,7 +2484,7 @@ Object.defineProperty(exports, 'isJPEGBaseline8BitColor', {
   }
 });
 
-var _webWorkerManager = __webpack_require__(19);
+var _webWorkerManager = __webpack_require__(17);
 
 Object.defineProperty(exports, 'webWorkerManager', {
   enumerable: true,
@@ -2555,7 +2493,7 @@ Object.defineProperty(exports, 'webWorkerManager', {
   }
 });
 
-var _version = __webpack_require__(3);
+var _version = __webpack_require__(2);
 
 Object.defineProperty(exports, 'version', {
   enumerable: true,
@@ -2564,7 +2502,7 @@ Object.defineProperty(exports, 'version', {
   }
 });
 
-var _index4 = __webpack_require__(2);
+var _index4 = __webpack_require__(1);
 
 Object.defineProperty(exports, 'internal', {
   enumerable: true,
@@ -2576,7 +2514,7 @@ Object.defineProperty(exports, 'internal', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 46 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2586,126 +2524,114 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jquery = __webpack_require__(0);
+var _externalModules = __webpack_require__(0);
 
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _options = __webpack_require__(9);
-
-var _cornerstoneCore = __webpack_require__(1);
-
-var cornerstone = _interopRequireWildcard(_cornerstoneCore);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _options = __webpack_require__(7);
 
 function xhrRequest(url, imageId) {
   var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   var params = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var deferred = _jquery2.default.Deferred();
   var options = (0, _options.getOptions)();
 
   // Make the request for the DICOM P10 SOP Instance
-  var xhr = new XMLHttpRequest();
+  return new Promise(function (resolve, reject) {
+    var xhr = new XMLHttpRequest();
 
-  xhr.open('get', url, true);
-  xhr.responseType = 'arraybuffer';
-  options.beforeSend(xhr);
-  Object.keys(headers).forEach(function (key) {
-    xhr.setRequestHeader(key, headers[key]);
-  });
-
-  params.deferred = deferred;
-  params.url = url;
-  params.imageId = imageId;
-
-  // Event triggered when downloading an image starts
-  xhr.onloadstart = function (event) {
-    // Action
-    if (options.onloadstart) {
-      options.onloadstart(event, params);
-    }
-
-    // Event
-    (0, _jquery2.default)(cornerstone.events).trigger('CornerstoneImageLoadStart', {
-      url: url,
-      imageId: imageId
+    xhr.open('get', url, true);
+    xhr.responseType = 'arraybuffer';
+    options.beforeSend(xhr);
+    Object.keys(headers).forEach(function (key) {
+      xhr.setRequestHeader(key, headers[key]);
     });
-  };
 
-  // Event triggered when downloading an image ends
-  xhr.onloadend = function (event) {
-    // Action
-    if (options.onloadend) {
-      options.onloadend(event, params);
-    }
+    params.url = url;
+    params.imageId = imageId;
 
-    // Event
-    (0, _jquery2.default)(cornerstone.events).trigger('CornerstoneImageLoadEnd', {
-      url: url,
-      imageId: imageId
-    });
-  };
-
-  // handle response data
-  xhr.onreadystatechange = function (event) {
-    // Action
-    if (options.onreadystatechange) {
-      options.onreadystatechange(event, params);
-
-      return;
-    }
-
-    // Default action
-    // TODO: consider sending out progress messages here as we receive the pixel data
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        deferred.resolve(xhr.response, xhr);
-      } else {
-        // request failed, reject the deferred
-        deferred.reject(xhr);
+    // Event triggered when downloading an image starts
+    xhr.onloadstart = function (event) {
+      // Action
+      if (options.onloadstart) {
+        options.onloadstart(event, params);
       }
-    }
-  };
 
-  // Event triggered when downloading an image progresses
-  xhr.onprogress = function (oProgress) {
-    // console.log('progress:',oProgress)
-    var loaded = oProgress.loaded; // evt.loaded the bytes browser receive
-    var total = void 0;
-    var percentComplete = void 0;
+      // Event
+      (0, _externalModules.$)(_externalModules.cornerstone.events).trigger('CornerstoneImageLoadStart', {
+        url: url,
+        imageId: imageId
+      });
+    };
 
-    if (oProgress.lengthComputable) {
-      total = oProgress.total; // evt.total the total bytes seted by the header
-      percentComplete = Math.round(loaded / total * 100);
-    }
+    // Event triggered when downloading an image ends
+    xhr.onloadend = function (event) {
+      // Action
+      if (options.onloadend) {
+        options.onloadend(event, params);
+      }
 
-    // Action
-    if (options.onprogress) {
-      options.onprogress(oProgress, params);
-    }
+      // Event
+      (0, _externalModules.$)(_externalModules.cornerstone.events).trigger('CornerstoneImageLoadEnd', {
+        url: url,
+        imageId: imageId
+      });
+    };
 
-    // Event
-    (0, _jquery2.default)(cornerstone.events).trigger('CornerstoneImageLoadProgress', {
-      url: url,
-      imageId: imageId,
-      loaded: loaded,
-      total: total,
-      percentComplete: percentComplete
-    });
-  };
+    // handle response data
+    xhr.onreadystatechange = function (event) {
+      // Action
+      if (options.onreadystatechange) {
+        options.onreadystatechange(event, params);
 
-  xhr.send();
+        return;
+      }
 
-  return deferred.promise();
+      // Default action
+      // TODO: consider sending out progress messages here as we receive the pixel data
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          resolve(xhr.response, xhr);
+        } else {
+          // request failed, reject the Promise
+          reject(xhr);
+        }
+      }
+    };
+
+    // Event triggered when downloading an image progresses
+    xhr.onprogress = function (oProgress) {
+      // console.log('progress:',oProgress)
+      var loaded = oProgress.loaded; // evt.loaded the bytes browser receive
+      var total = void 0;
+      var percentComplete = void 0;
+
+      if (oProgress.lengthComputable) {
+        total = oProgress.total; // evt.total the total bytes seted by the header
+        percentComplete = Math.round(loaded / total * 100);
+      }
+
+      // Action
+      if (options.onprogress) {
+        options.onprogress(oProgress, params);
+      }
+
+      // Event
+      (0, _externalModules.$)(_externalModules.cornerstone.events).trigger('CornerstoneImageLoadProgress', {
+        url: url,
+        imageId: imageId,
+        loaded: loaded,
+        total: total,
+        percentComplete: percentComplete
+      });
+    };
+
+    xhr.send();
+  });
 }
 
 exports.default = xhrRequest;
 
 /***/ }),
-/* 47 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2715,27 +2641,19 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jquery = __webpack_require__(0);
+var _externalModules = __webpack_require__(0);
 
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _cornerstoneCore = __webpack_require__(1);
-
-var cornerstone = _interopRequireWildcard(_cornerstoneCore);
-
-var _metaDataManager = __webpack_require__(10);
+var _metaDataManager = __webpack_require__(8);
 
 var _metaDataManager2 = _interopRequireDefault(_metaDataManager);
 
-var _getPixelData = __webpack_require__(21);
+var _getPixelData = __webpack_require__(19);
 
 var _getPixelData2 = _interopRequireDefault(_getPixelData);
 
-var _createImage = __webpack_require__(7);
+var _createImage = __webpack_require__(5);
 
 var _createImage2 = _interopRequireDefault(_createImage);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2745,10 +2663,9 @@ function getTransferSyntaxForContentType() /* contentType */{
 
 function loadImage(imageId, options) {
   var start = new Date().getTime();
-
-  var deferred = _jquery2.default.Deferred();
-
   var uri = imageId.substring(7);
+
+  var deferred = _externalModules.$.Deferred();
 
   // check to make sure we have metadata for this imageId
   var metaData = _metaDataManager2.default.get(imageId);
@@ -2760,7 +2677,6 @@ function loadImage(imageId, options) {
   }
 
   // TODO: load bulk data items that we might need
-
   var mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
 
   // get the pixel data from the server
@@ -2776,8 +2692,10 @@ function loadImage(imageId, options) {
 
       image.loadTimeInMS = end - start;
       deferred.resolve(image);
+    }, function (reason) {
+      deferred.reject(reason);
     });
-  }).fail(function (reason) {
+  }, function (reason) {
     deferred.reject(reason);
   });
 
@@ -2785,12 +2703,12 @@ function loadImage(imageId, options) {
 }
 
 // register wadors scheme
-cornerstone.registerImageLoader('wadors', loadImage);
+_externalModules.cornerstone.registerImageLoader('wadors', loadImage);
 
 exports.default = loadImage;
 
 /***/ }),
-/* 48 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2800,7 +2718,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _getValue = __webpack_require__(5);
+var _getValue = __webpack_require__(3);
 
 var _getValue2 = _interopRequireDefault(_getValue);
 
@@ -2827,7 +2745,7 @@ function getNumberString(element, index, defaultValue) {
 exports.default = getNumberString;
 
 /***/ }),
-/* 49 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2837,7 +2755,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _getNumberString = __webpack_require__(48);
+var _getNumberString = __webpack_require__(46);
 
 Object.defineProperty(exports, 'getNumberString', {
   enumerable: true,
@@ -2846,7 +2764,7 @@ Object.defineProperty(exports, 'getNumberString', {
   }
 });
 
-var _getNumberValue = __webpack_require__(22);
+var _getNumberValue = __webpack_require__(20);
 
 Object.defineProperty(exports, 'getNumberValue', {
   enumerable: true,
@@ -2855,7 +2773,7 @@ Object.defineProperty(exports, 'getNumberValue', {
   }
 });
 
-var _getNumberValues = __webpack_require__(23);
+var _getNumberValues = __webpack_require__(21);
 
 Object.defineProperty(exports, 'getNumberValues', {
   enumerable: true,
@@ -2864,7 +2782,7 @@ Object.defineProperty(exports, 'getNumberValues', {
   }
 });
 
-var _getValue = __webpack_require__(5);
+var _getValue = __webpack_require__(3);
 
 Object.defineProperty(exports, 'getValue', {
   enumerable: true,
@@ -2873,7 +2791,7 @@ Object.defineProperty(exports, 'getValue', {
   }
 });
 
-var _metaDataProvider = __webpack_require__(50);
+var _metaDataProvider = __webpack_require__(48);
 
 Object.defineProperty(exports, 'metaDataProvider', {
   enumerable: true,
@@ -2885,7 +2803,7 @@ Object.defineProperty(exports, 'metaDataProvider', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 50 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2895,31 +2813,23 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _getNumberValues = __webpack_require__(23);
+var _externalModules = __webpack_require__(0);
+
+var _getNumberValues = __webpack_require__(21);
 
 var _getNumberValues2 = _interopRequireDefault(_getNumberValues);
 
-var _getValue = __webpack_require__(5);
+var _getValue = __webpack_require__(3);
 
 var _getValue2 = _interopRequireDefault(_getValue);
 
-var _getNumberValue = __webpack_require__(22);
+var _getNumberValue = __webpack_require__(20);
 
 var _getNumberValue2 = _interopRequireDefault(_getNumberValue);
 
-var _metaDataManager = __webpack_require__(10);
+var _metaDataManager = __webpack_require__(8);
 
 var _metaDataManager2 = _interopRequireDefault(_metaDataManager);
-
-var _dicomParser = __webpack_require__(4);
-
-var dicomParser = _interopRequireWildcard(_dicomParser);
-
-var _cornerstoneCore = __webpack_require__(1);
-
-var cornerstone = _interopRequireWildcard(_cornerstoneCore);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2936,8 +2846,8 @@ function metaDataProvider(type, imageId) {
       seriesInstanceUID: (0, _getValue2.default)(metaData['0020000e']),
       seriesNumber: (0, _getNumberValue2.default)(metaData['00200011']),
       studyInstanceUID: (0, _getValue2.default)(metaData['0020000d']),
-      seriesDate: dicomParser.parseDA((0, _getValue2.default)(metaData['00080021'])),
-      seriesTime: dicomParser.parseTM((0, _getValue2.default)(metaData['00080031'], 0, ''))
+      seriesDate: _externalModules.dicomParser.parseDA((0, _getValue2.default)(metaData['00080021'])),
+      seriesTime: _externalModules.dicomParser.parseTM((0, _getValue2.default)(metaData['00080031'], 0, ''))
     };
   }
 
@@ -3015,7 +2925,7 @@ function metaDataProvider(type, imageId) {
 
     return {
       radiopharmaceuticalInfo: {
-        radiopharmaceuticalStartTime: dicomParser.parseTM((0, _getValue2.default)(radiopharmaceuticalInfo['00181072'], 0, '')),
+        radiopharmaceuticalStartTime: _externalModules.dicomParser.parseTM((0, _getValue2.default)(radiopharmaceuticalInfo['00181072'], 0, '')),
         radionuclideTotalDose: (0, _getNumberValue2.default)(radiopharmaceuticalInfo['00181074']),
         radionuclideHalfLife: (0, _getNumberValue2.default)(radiopharmaceuticalInfo['00181075'])
       }
@@ -3023,12 +2933,12 @@ function metaDataProvider(type, imageId) {
   }
 }
 
-cornerstone.metaData.addProvider(metaDataProvider);
+_externalModules.cornerstone.metaData.addProvider(metaDataProvider);
 
 exports.default = metaDataProvider;
 
 /***/ }),
-/* 51 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3037,43 +2947,35 @@ exports.default = metaDataProvider;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getLoaderForScheme = exports.loadImageFromPromise = undefined;
+exports.loadImage = exports.getLoaderForScheme = exports.loadImageFromPromise = undefined;
 
-var _jquery = __webpack_require__(0);
+var _externalModules = __webpack_require__(0);
 
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _cornerstoneCore = __webpack_require__(1);
-
-var cornerstone = _interopRequireWildcard(_cornerstoneCore);
-
-var _createImage = __webpack_require__(7);
+var _createImage = __webpack_require__(5);
 
 var _createImage2 = _interopRequireDefault(_createImage);
 
-var _parseImageId = __webpack_require__(6);
+var _parseImageId = __webpack_require__(4);
 
 var _parseImageId2 = _interopRequireDefault(_parseImageId);
 
-var _dataSetCacheManager = __webpack_require__(11);
+var _dataSetCacheManager = __webpack_require__(9);
 
 var _dataSetCacheManager2 = _interopRequireDefault(_dataSetCacheManager);
 
-var _getEncapsulatedImageFrame = __webpack_require__(25);
+var _getEncapsulatedImageFrame = __webpack_require__(23);
 
 var _getEncapsulatedImageFrame2 = _interopRequireDefault(_getEncapsulatedImageFrame);
 
-var _getUncompressedImageFrame = __webpack_require__(26);
+var _getUncompressedImageFrame = __webpack_require__(24);
 
 var _getUncompressedImageFrame2 = _interopRequireDefault(_getUncompressedImageFrame);
 
-var _loadFileRequest = __webpack_require__(27);
+var _loadFileRequest = __webpack_require__(25);
 
 var _loadFileRequest2 = _interopRequireDefault(_loadFileRequest);
 
-var _index = __webpack_require__(2);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _index = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3097,12 +2999,13 @@ function getPixelData(dataSet, frameIndex) {
   return (0, _getUncompressedImageFrame2.default)(dataSet, frameIndex);
 }
 
-function loadImageFromPromise(dataSetPromise, imageId, frame, sharedCacheKey, options) {
+function loadImageFromPromise(dataSetPromise, imageId) {
+  var frame = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var sharedCacheKey = arguments[3];
+  var options = arguments[4];
 
   var start = new Date().getTime();
-
-  frame = frame || 0;
-  var deferred = _jquery2.default.Deferred();
+  var deferred = _externalModules.$.Deferred();
 
   dataSetPromise.then(function (dataSet /* , xhr*/) {
     var pixelData = getPixelData(dataSet, frame);
@@ -3112,13 +3015,45 @@ function loadImageFromPromise(dataSetPromise, imageId, frame, sharedCacheKey, op
 
     imagePromise.then(function (image) {
       image.data = dataSet;
+      image.sharedCacheKey = sharedCacheKey;
       var end = new Date().getTime();
 
       image.loadTimeInMS = loadEnd - start;
       image.totalTimeInMS = end - start;
       addDecache(image);
       deferred.resolve(image);
+    }, function (error) {
+      deferred.reject(error);
     });
+  }, function (error) {
+    deferred.reject(error);
+  });
+
+  return deferred;
+}
+
+function loadImageFromDataSet(dataSet, imageId) {
+  var frame = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var sharedCacheKey = arguments[3];
+  var options = arguments[4];
+
+  var start = new Date().getTime();
+  var deferred = _externalModules.$.Deferred();
+
+  var pixelData = getPixelData(dataSet, frame);
+  var transferSyntax = dataSet.string('x00020010');
+  var loadEnd = new Date().getTime();
+  var imagePromise = (0, _createImage2.default)(imageId, pixelData, transferSyntax, options);
+
+  imagePromise.then(function (image) {
+    image.data = dataSet;
+    image.sharedCacheKey = sharedCacheKey;
+    var end = new Date().getTime();
+
+    image.loadTimeInMS = loadEnd - start;
+    image.totalTimeInMS = end - start;
+    addDecache(image);
+    deferred.resolve(image);
   }, function (error) {
     deferred.reject(error);
   });
@@ -3140,24 +3075,28 @@ function loadImage(imageId, options) {
 
   // if the dataset for this url is already loaded, use it
   if (_dataSetCacheManager2.default.isLoaded(parsedImageId.url)) {
-    return loadImageFromPromise(_dataSetCacheManager2.default.load(parsedImageId.url, loader, imageId), imageId, parsedImageId.frame, parsedImageId.url, options);
+    var dataSet = _dataSetCacheManager2.default.get(parsedImageId.url, loader, imageId);
+
+    return loadImageFromDataSet(dataSet, imageId, parsedImageId.frame, parsedImageId.url, options);
   }
 
   // load the dataSet via the dataSetCacheManager
-  return loadImageFromPromise(_dataSetCacheManager2.default.load(parsedImageId.url, loader, imageId), imageId, parsedImageId.frame, parsedImageId.url, options);
+  var dataSetPromise = _dataSetCacheManager2.default.load(parsedImageId.url, loader, imageId);
+
+  return loadImageFromPromise(dataSetPromise, imageId, parsedImageId.frame, parsedImageId.url, options);
 }
 
 // register dicomweb and wadouri image loader prefixes
-cornerstone.registerImageLoader('dicomweb', loadImage);
-cornerstone.registerImageLoader('wadouri', loadImage);
-cornerstone.registerImageLoader('dicomfile', loadImage);
+_externalModules.cornerstone.registerImageLoader('dicomweb', loadImage);
+_externalModules.cornerstone.registerImageLoader('wadouri', loadImage);
+_externalModules.cornerstone.registerImageLoader('dicomfile', loadImage);
 
 exports.loadImageFromPromise = loadImageFromPromise;
 exports.getLoaderForScheme = getLoaderForScheme;
-exports.default = loadImage;
+exports.loadImage = loadImage;
 
 /***/ }),
-/* 52 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3167,7 +3106,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _getImagePixelModule = __webpack_require__(28);
+var _getImagePixelModule = __webpack_require__(26);
 
 Object.defineProperty(exports, 'getImagePixelModule', {
   enumerable: true,
@@ -3176,7 +3115,7 @@ Object.defineProperty(exports, 'getImagePixelModule', {
   }
 });
 
-var _getLUTs = __webpack_require__(29);
+var _getLUTs = __webpack_require__(27);
 
 Object.defineProperty(exports, 'getLUTs', {
   enumerable: true,
@@ -3185,7 +3124,7 @@ Object.defineProperty(exports, 'getLUTs', {
   }
 });
 
-var _getModalityLUTOutputPixelRepresentation = __webpack_require__(30);
+var _getModalityLUTOutputPixelRepresentation = __webpack_require__(28);
 
 Object.defineProperty(exports, 'getModalityLUTOutputPixelRepresentation', {
   enumerable: true,
@@ -3194,7 +3133,7 @@ Object.defineProperty(exports, 'getModalityLUTOutputPixelRepresentation', {
   }
 });
 
-var _getNumberValues = __webpack_require__(31);
+var _getNumberValues = __webpack_require__(29);
 
 Object.defineProperty(exports, 'getNumberValues', {
   enumerable: true,
@@ -3203,7 +3142,7 @@ Object.defineProperty(exports, 'getNumberValues', {
   }
 });
 
-var _metaDataProvider = __webpack_require__(53);
+var _metaDataProvider = __webpack_require__(51);
 
 Object.defineProperty(exports, 'metaDataProvider', {
   enumerable: true,
@@ -3215,7 +3154,7 @@ Object.defineProperty(exports, 'metaDataProvider', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 53 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3225,39 +3164,31 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _getNumberValues = __webpack_require__(31);
+var _externalModules = __webpack_require__(0);
+
+var _getNumberValues = __webpack_require__(29);
 
 var _getNumberValues2 = _interopRequireDefault(_getNumberValues);
 
-var _parseImageId = __webpack_require__(6);
+var _parseImageId = __webpack_require__(4);
 
 var _parseImageId2 = _interopRequireDefault(_parseImageId);
 
-var _dataSetCacheManager = __webpack_require__(11);
+var _dataSetCacheManager = __webpack_require__(9);
 
 var _dataSetCacheManager2 = _interopRequireDefault(_dataSetCacheManager);
 
-var _getImagePixelModule = __webpack_require__(28);
+var _getImagePixelModule = __webpack_require__(26);
 
 var _getImagePixelModule2 = _interopRequireDefault(_getImagePixelModule);
 
-var _getLUTs = __webpack_require__(29);
+var _getLUTs = __webpack_require__(27);
 
 var _getLUTs2 = _interopRequireDefault(_getLUTs);
 
-var _getModalityLUTOutputPixelRepresentation = __webpack_require__(30);
+var _getModalityLUTOutputPixelRepresentation = __webpack_require__(28);
 
 var _getModalityLUTOutputPixelRepresentation2 = _interopRequireDefault(_getModalityLUTOutputPixelRepresentation);
-
-var _dicomParser = __webpack_require__(4);
-
-var dicomParser = _interopRequireWildcard(_dicomParser);
-
-var _cornerstoneCore = __webpack_require__(1);
-
-var cornerstone = _interopRequireWildcard(_cornerstoneCore);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3276,8 +3207,8 @@ function metaDataProvider(type, imageId) {
       seriesInstanceUID: dataSet.string('x0020000e'),
       seriesNumber: dataSet.intString('x00200011'),
       studyInstanceUID: dataSet.string('x0020000d'),
-      seriesDate: dicomParser.parseDA(dataSet.string('x00080021')),
-      seriesTime: dicomParser.parseTM(dataSet.string('x00080031') || '')
+      seriesDate: _externalModules.dicomParser.parseDA(dataSet.string('x00080021')),
+      seriesTime: _externalModules.dicomParser.parseTM(dataSet.string('x00080031') || '')
     };
   }
 
@@ -3341,7 +3272,7 @@ function metaDataProvider(type, imageId) {
 
     return {
       radiopharmaceuticalInfo: {
-        radiopharmaceuticalStartTime: dicomParser.parseTM(firstRadiopharmaceuticalInfoDataSet.string('x00181072') || ''),
+        radiopharmaceuticalStartTime: _externalModules.dicomParser.parseTM(firstRadiopharmaceuticalInfoDataSet.string('x00181072') || ''),
         radionuclideTotalDose: firstRadiopharmaceuticalInfoDataSet.floatString('x00181074'),
         radionuclideHalfLife: firstRadiopharmaceuticalInfoDataSet.floatString('x00181075')
       }
@@ -3350,29 +3281,35 @@ function metaDataProvider(type, imageId) {
 }
 
 // register our metadata provider
-cornerstone.metaData.addProvider(metaDataProvider);
+_externalModules.cornerstone.metaData.addProvider(metaDataProvider);
 
 exports.default = metaDataProvider;
 
 /***/ }),
+/* 52 */,
+/* 53 */,
 /* 54 */,
 /* 55 */,
 /* 56 */,
 /* 57 */,
 /* 58 */,
 /* 59 */,
-/* 60 */,
-/* 61 */,
+/* 60 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_60__;
+
+/***/ }),
+/* 61 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_61__;
+
+/***/ }),
 /* 62 */
 /***/ (function(module, exports) {
 
 module.exports = __WEBPACK_EXTERNAL_MODULE_62__;
-
-/***/ }),
-/* 63 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_63__;
 
 /***/ })
 /******/ ]);
