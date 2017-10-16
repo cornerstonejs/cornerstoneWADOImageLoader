@@ -1,4 +1,3 @@
-import $ from './jquery.js';
 import { getOptions } from './internal/options.js';
 
 // the taskId to assign to the next task added via addTask()
@@ -201,13 +200,19 @@ function addTask (taskType, data, priority = 0, transferList) {
     initialize();
   }
 
-  const deferred = $.Deferred();
+  let deferred = {};
+  const promise = new Promise((resolve, reject) => {
+    deferred = {
+      resolve,
+      reject
+    };
+  });
 
   // find the right spot to insert this decode task (based on priority)
   let i;
 
   for (i = 0; i < tasks.length; i++) {
-    if (tasks[i].priority <= priority) {
+    if (tasks[i].priority < priority) {
       break;
     }
   }
@@ -231,7 +236,7 @@ function addTask (taskType, data, priority = 0, transferList) {
 
   return {
     taskId,
-    promise: deferred.promise()
+    promise
   };
 }
 
@@ -253,7 +258,7 @@ function setTaskPriority (taskId, priority = 0) {
 
       // find the right spot to insert this decode task (based on priority)
       for (i = 0; i < tasks.length; i++) {
-        if (tasks[i].priority <= priority) {
+        if (tasks[i].priority < priority) {
           break;
         }
       }
@@ -281,7 +286,7 @@ function cancelTask (taskId, reason) {
       // taskId found, remove it
       const task = tasks.splice(i, 1);
 
-      task.promise.reject(reason);
+      task.deferred.reject(reason);
 
       return true;
     }
