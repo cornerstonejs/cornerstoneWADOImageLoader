@@ -1,9 +1,8 @@
-import getNumberValues from './getNumberValues';
-import getValue from './getValue';
-import getNumberValue from './getNumberValue';
-import metaDataManager from '../metaDataManager';
-import * as dicomParser from 'dicom-parser';
-import * as cornerstone from 'cornerstone-core';
+import { cornerstone, dicomParser } from '../../../externalModules.js';
+import getNumberValues from './getNumberValues.js';
+import getValue from './getValue.js';
+import getNumberValue from './getNumberValue.js';
+import metaDataManager from '../metaDataManager.js';
 
 function metaDataProvider (type, imageId) {
   const metaData = metaDataManager.get(imageId);

@@ -1,8 +1,7 @@
-import $ from 'jquery';
-import * as cornerstone from 'cornerstone-core';
-import metaDataManager from './metaDataManager';
-import getPixelData from './getPixelData';
-import createImage from '../createImage';
+import { $, cornerstone } from '../../externalModules.js';
+import metaDataManager from './metaDataManager.js';
+import getPixelData from './getPixelData.js';
+import createImage from '../createImage.js';
 
 function getTransferSyntaxForContentType (/* contentType */) {
   return '1.2.840.10008.1.2'; // hard code to ILE for now
@@ -10,10 +9,9 @@ function getTransferSyntaxForContentType (/* contentType */) {
 
 function loadImage (imageId, options) {
   const start = new Date().getTime();
+  const uri = imageId.substring(7);
 
   const deferred = $.Deferred();
-
-  const uri = imageId.substring(7);
 
   // check to make sure we have metadata for this imageId
   const metaData = metaDataManager.get(imageId);
@@ -25,7 +23,6 @@ function loadImage (imageId, options) {
   }
 
   // TODO: load bulk data items that we might need
-
   const mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
 
   // get the pixel data from the server
@@ -41,8 +38,10 @@ function loadImage (imageId, options) {
 
       image.loadTimeInMS = end - start;
       deferred.resolve(image);
+    }, function (reason) {
+      deferred.reject(reason);
     });
-  }).fail(function (reason) {
+  }, function (reason) {
     deferred.reject(reason);
   });
 
