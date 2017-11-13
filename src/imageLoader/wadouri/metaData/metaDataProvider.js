@@ -1,4 +1,4 @@
-import { dicomParser } from '../../../externalModules.js';
+import { cornerstoneMath, dicomParser } from '../../../externalModules.js';
 import getNumberValues from './getNumberValues.js';
 import parseImageId from '../parseImageId.js';
 import dataSetCacheManager from '../dataSetCacheManager.js';
@@ -35,13 +35,48 @@ function metaDataProvider (type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
+
+    const imageOrientationPatient = getNumberValues(dataSet, 'x00200037', 6);
+    const imageOrientation = imageOrientationPatient ? imageOrientationPatient.split('\\') : null;
+    const imagePositionPatient = getNumberValues(dataSet, 'x00200032', 3);
+    const imagePosition = imagePositionPatient ? imagePositionPatient.split('\\') : null;
+    const pixelSpacing = getNumberValues(dataSet, 'x00280030', 2);
+
+    let columnPixelSpacing = 1.0;
+    let rowPixelSpacing = 1.0;
+
+    if (pixelSpacing) {
+      rowPixelSpacing = pixelSpacing[0];
+      columnPixelSpacing = pixelSpacing[1];
+    }
+
+    let rowCosines = null;
+    let columnCosines = null;
+
+    if (imageOrientation) {
+      rowCosines = new cornerstoneMath.Vector3(parseFloat(imageOrientation[0]), parseFloat(imageOrientation[1]), parseFloat(imageOrientation[2]));
+      columnCosines = new cornerstoneMath.Vector3(parseFloat(imageOrientation[3]), parseFloat(imageOrientation[4]), parseFloat(imageOrientation[5]));
+    }
+
+    let imagePositionPatientVector = null;
+
+    if (imagePosition) {
+      imagePositionPatientVector = new cornerstoneMath.Vector3(parseFloat(imagePosition[0]), parseFloat(imagePosition[1]), parseFloat(imagePosition[2]));
+    }
+
     return {
-      pixelSpacing: getNumberValues(dataSet, 'x00280030', 2),
-      imageOrientationPatient: getNumberValues(dataSet, 'x00200037', 6),
-      imagePositionPatient: getNumberValues(dataSet, 'x00200032', 3),
+      frameOfReferenceUID: dataSet.string('x00200052'),
+      rows: getNumberValues(dataSet, 'x00280010', 1),
+      columns: getNumberValues(dataSet, 'x00280011', 1),
+      imageOrientationPatient,
+      rowCosines,
+      columnCosines,
+      imagePositionPatient: imagePositionPatientVector,
       sliceThickness: dataSet.floatString('x00180050'),
       sliceLocation: dataSet.floatString('x00201041'),
-      frameOfReferenceUID: dataSet.string('x00200052')
+      pixelSpacing,
+      rowPixelSpacing,
+      columnPixelSpacing
     };
   }
 

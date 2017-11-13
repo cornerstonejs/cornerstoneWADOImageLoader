@@ -1,4 +1,4 @@
-import { dicomParser } from '../../../externalModules.js';
+import { cornerstoneMath, dicomParser } from '../../../externalModules.js';
 import getNumberValues from './getNumberValues.js';
 import getValue from './getValue.js';
 import getNumberValue from './getNumberValue.js';
@@ -31,12 +31,47 @@ function metaDataProvider (type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
+
+    const imageOrientationPatient = getNumberValues(metaData['00200037'], 6);
+    const imageOrientation = imageOrientationPatient ? imageOrientationPatient.split('\\') : null;
+    const imagePositionPatient = getNumberValues(metaData['00200032'], 3);
+    const imagePosition = imagePositionPatient ? imagePositionPatient.split('\\') : null;
+    const pixelSpacing = getNumberValues(metaData['00280030'], 2);
+
+    let columnPixelSpacing = 1.0;
+    let rowPixelSpacing = 1.0;
+    if (pixelSpacing) {
+      rowPixelSpacing = pixelSpacing[0];
+      columnPixelSpacing = pixelSpacing[1];
+    }
+
+    let rowCosines = null;
+    let columnCosines = null;
+
+    if (imageOrientation) {
+      rowCosines = new cornerstoneMath.Vector3(parseFloat(imageOrientation[0]), parseFloat(imageOrientation[1]), parseFloat(imageOrientation[2]));
+      columnCosines = new cornerstoneMath.Vector3(parseFloat(imageOrientation[3]), parseFloat(imageOrientation[4]), parseFloat(imageOrientation[5]));
+    }
+
+    let imagePositionPatientVector = null;
+
+    if (imagePosition) {
+      imagePositionPatientVector = new cornerstoneMath.Vector3(parseFloat(imagePosition[0]), parseFloat(imagePosition[1]), parseFloat(imagePosition[2]));
+    }
+
     return {
-      pixelSpacing: getNumberValues(metaData['00280030'], 2),
-      imageOrientationPatient: getNumberValues(metaData['00200037'], 6),
-      imagePositionPatient: getNumberValues(metaData['00200032'], 3),
+      frameOfReferenceUID: getValue(metaData['00200052']),
+      rows: getNumberValue(metaData['00280010']),
+      columns: getNumberValue(metaData['00280011']),
+      imageOrientationPatient,
+      rowCosines,
+      columnCosines,
+      imagePositionPatient: imagePositionPatientVector,
       sliceThickness: getNumberValue(metaData['00180050']),
-      sliceLocation: getNumberValue(metaData['00201041'])
+      sliceLocation: getNumberValue(metaData['00201041']),
+      pixelSpacing,
+      rowPixelSpacing,
+      columnPixelSpacing
     };
   }
 
