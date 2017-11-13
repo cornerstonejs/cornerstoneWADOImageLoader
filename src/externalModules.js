@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import * as dicomParser from 'dicom-parser';
+import * as cornerstoneMath from 'cornerstone-math';
 import registerLoaders from './imageLoader/registerLoaders.js';
 
 let cornerstone;
@@ -15,4 +16,4 @@ const external = {
   }
 };
 
-export { $, dicomParser, external };
+export { $, dicomParser, cornerstoneMath, external };
