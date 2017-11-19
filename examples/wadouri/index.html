@@ -144,7 +144,6 @@
             <span>Total Time: </span><span id="totalTime"></span><br>
             <span>Load Time: </span><span id="loadTime"></span><br>
             <span>Decode Time: </span><span id="decodeTime"></span><br>
-            <span>WebWorker Time: </span><span id="webWorkerTime"></span><br>
         </div>
     </div>
 </div>
@@ -195,6 +194,7 @@
 
 
 <script>
+    cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 
     cornerstoneWADOImageLoader.configure({
         beforeSend: function(xhr) {
@@ -278,7 +278,6 @@
                 $('#totalTime').text(time + "ms");
                 $('#loadTime').text(image.loadTimeInMS + "ms");
                 $('#decodeTime').text(image.decodeTimeInMS + "ms");
-                $('#webWorkerTime').text(image.webWorkerTimeInMS + "ms");
 
             }, function(err) {
                 alert(err);
@@ -301,7 +300,8 @@
         loadAndViewImage(url);
     }
 
-    $(cornerstone).bind('CornerstoneImageLoadProgress', function(event, eventData) {
+    cornerstone.events.addEventListener('cornerstoneimageloadprogress', function(event) {
+        var eventData = event.detail;
         $('#loadProgress').text('Image Load Progress: ' + eventData.percentComplete + "%");
     });
 

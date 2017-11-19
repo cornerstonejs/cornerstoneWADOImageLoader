@@ -1,26 +1,20 @@
-/**
- */
-(function (cornerstoneWADOImageLoader) {
+function getNumberValues (dataSet, tag, minimumLength) {
+  const values = [];
+  const valueAsString = dataSet.string(tag);
 
-  "use strict";
+  if (!valueAsString) {
+    return;
+  }
+  const split = valueAsString.split('\\');
 
-  function getNumberValues(dataSet, tag, minimumLength) {
-    var values = [];
-    var valueAsString = dataSet.string(tag);
-    if(!valueAsString) {
-      return;
-    }
-    var split = valueAsString.split('\\');
-    if(minimumLength && split.length < minimumLength) {
-      return;
-    }
-    for(var i=0;i < split.length; i++) {
-      values.push(parseFloat(split[i]));
-    }
-    return values;
+  if (minimumLength && split.length < minimumLength) {
+    return;
+  }
+  for (let i = 0; i < split.length; i++) {
+    values.push(parseFloat(split[i]));
   }
 
-  // module exports
-  cornerstoneWADOImageLoader.wadouri.getNumberValues = getNumberValues
+  return values;
+}
 
-}(cornerstoneWADOImageLoader));
+export default getNumberValues;

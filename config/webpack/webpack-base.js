@@ -1,42 +1,50 @@
 const path = require('path');
-const webpack = require('webpack');
-const rootPath = process.env.PWD;
-const context = path.resolve(rootPath, "src");
-const outputPath = path.resolve(rootPath, 'dist');
+const rootPath = process.cwd();
+const context = path.join(rootPath, "src");
+const outputPath = path.join(rootPath, 'dist');
 const bannerPlugin = require('./plugins/banner');
 
 module.exports = {
-  context: context,
+  context,
   entry: {
-    cornerstoneWADOImageLoader: './imageLoader/index.js'
-    // cornerstoneWADOImageLoaderWebWorker: './webWorker/index.js',
-    // cornerstoneWADOImageLoaderCodecs: './codecs/index.js'
+    cornerstoneWADOImageLoader: './imageLoader/index.js',
+    cornerstoneWADOImageLoaderWebWorker: './webWorker/index.js'
   },
   target: 'web',
   output: {
     filename: '[name].js',
     library: '[name]',
-    libraryTarget: 'var',
-    path: outputPath
+    libraryTarget: 'umd',
+    path: outputPath,
+    umdNamedDefine: true
   },
   devtool: 'source-map',
   externals: {
     jquery: {
+      commonjs: "jquery",
+      commonjs2: "jquery",
+      amd: "jquery",
       root: '$'
-    }
+    },
+    'dicom-parser': {
+      commonjs: "dicom-parser",
+      commonjs2: "dicom-parser",
+      amd: "dicom-parser",
+      root: 'dicomParser'
+    },
   },
   module: {
     rules: [{
       enforce: 'pre',
       test: /\.js$/,
-      exclude: /(node_modules|bower_components)/,
+      exclude: /(node_modules)/,
       loader: 'eslint-loader',
       options: {
         failOnError: true
       }
     }, {
       test: /\.js$/,
-      exclude: /(node_modules|bower_components)/,
+      exclude: /(node_modules)/,
       use: [{
         loader: 'babel-loader'
       }]

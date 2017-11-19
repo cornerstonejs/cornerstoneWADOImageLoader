@@ -123,6 +123,7 @@
 
 
 <script>
+    cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 
     cornerstoneWADOImageLoader.configure({
         beforeSend: function(xhr) {
@@ -151,7 +152,7 @@
             var imageIds = [];
             var imageIdRoot = 'wadouri:' + url;
 
-            for(var i=1; i < numFrames; i++) {
+            for(var i=0; i < numFrames; i++) {
                 var imageId = imageIdRoot + "?frame="+i;
                 imageIds.push(imageId);
             }
@@ -203,7 +204,8 @@
         return false;
     }
 
-    $(cornerstone).bind('CornerstoneImageLoadProgress', function(event, eventData) {
+    cornerstone.events.addEventListener('cornerstoneimageloadprogress', function(event) {
+        var eventData = event.detail;
         $('#loadProgress').text('Image Load Progress: ' + eventData.percentComplete + "%");
     });
 

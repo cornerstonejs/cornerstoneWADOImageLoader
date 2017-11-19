@@ -1,3 +1,6 @@
+[![NPM version][npm-version-image]][npm-url] [![NPM downloads][npm-downloads-image]][npm-url] [![MIT License][license-image]][license-url] [![Build Status][travis-image]][travis-url]
+[![Coverage Status][coverage-image]][coverage-url]
+
 cornerstone WADO Image Loader
 =============================
 
@@ -38,15 +41,21 @@ or the distributed minimized files:
 Usage
 -------
 
-The cornerstoneWADOImageLoader depends on the following external libraries which should be loaded before cornerstoneWADOImageLoad.js:
+The cornerstoneWADOImageLoader depends on the following external libraries which should be loaded before cornerstoneWADOImageLoader.js:
 
 1. [jQuery](https://github.com/jquery/jquery)
 2. [dicomParser](https://github.com/chafey/dicomParser) 
-3. [cornerstone](https://github.com/chafey/cornerStone)
+3. [cornerstone](https://github.com/chafey/cornerstone)
+
+*New in 1.0.0*: Specify the cornerstone instance you want to register the loader with.
+
+````javascript
+cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
+````
 
 Have your code configure the web worker framework with the paths to the web worker and the codecs:
 
-``` javascript
+```javascript
    var config = {
         webWorkerPath : '../../dist/cornerstoneWADOImageLoaderWebWorker.js',
         taskConfiguration: {
@@ -112,3 +121,16 @@ See the documentation [here](docs/ImageIds.md)
 Copyright
 ============
 Copyright 2016 Chris Hafey [chafey@gmail.com](mailto:chafey@gmail.com)
+
+[license-image]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
+[license-url]: LICENSE
+
+[npm-url]: https://npmjs.org/package/cornerstone-wado-image-loader
+[npm-version-image]: http://img.shields.io/npm/v/cornerstone-wado-image-loader.svg?style=flat
+[npm-downloads-image]: http://img.shields.io/npm/dm/cornerstone-wado-image-loader.svg?style=flat
+
+[travis-url]: http://travis-ci.org/chafey/cornerstoneWADOImageLoader
+[travis-image]: https://travis-ci.org/chafey/cornerstoneWADOImageLoader.svg?branch=master
+
+[coverage-url]: https://coveralls.io/github/chafey/cornerstoneWADOImageLoader?branch=master
+[coverage-image]: https://coveralls.io/repos/github/chafey/cornerstoneWADOImageLoader/badge.svg?branch=master
