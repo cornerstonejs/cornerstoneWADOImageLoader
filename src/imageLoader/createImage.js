@@ -1,4 +1,4 @@
-import { external } from '../externalModules.js';
+import external from '../externalModules.js';
 import getImageFrame from './getImageFrame.js';
 import decodeImageFrame from './decodeImageFrame.js';
 import isColorImageFn from './isColorImage.js';

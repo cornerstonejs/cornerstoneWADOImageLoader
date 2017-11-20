@@ -14,7 +14,6 @@ import { loadImageFromPromise,
   loadImage } from './loadImage.js';
 import parseImageId from './parseImageId.js';
 import unpackBinaryFrame from './unpackBinaryFrame.js';
-import register from './register.js';
 
 const metaData = {
   getImagePixelModule,
@@ -35,6 +34,5 @@ export default {
   getLoaderForScheme,
   loadImage,
   parseImageId,
-  unpackBinaryFrame,
-  register
+  unpackBinaryFrame
 };

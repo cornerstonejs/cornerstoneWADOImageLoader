@@ -1,4 +1,4 @@
-import { $, external } from '../../externalModules.js';
+import external from '../../externalModules.js';
 import { getOptions } from './options.js';
 
 function xhrRequest (url, imageId, headers = {}, params = {}) {
@@ -24,6 +24,8 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
 
     // Event triggered when downloading an image starts
     xhr.onloadstart = function (event) {
+      const { cornerstone, $ } = external;
+
       // Action
       if (options.onloadstart) {
         options.onloadstart(event, params);
@@ -35,15 +37,17 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
         imageId
       };
 
-      $(external.cornerstone.events).trigger('CornerstoneImageLoadStart', eventData);
+      $(cornerstone.events).trigger('CornerstoneImageLoadStart', eventData);
 
       const customEvent = new CustomEvent('cornerstoneimageloadstart', { detail: eventData });
 
-      external.cornerstone.events.dispatchEvent(customEvent);
+      cornerstone.events.dispatchEvent(customEvent);
     };
 
     // Event triggered when downloading an image ends
     xhr.onloadend = function (event) {
+      const { cornerstone, $ } = external;
+
       // Action
       if (options.onloadend) {
         options.onloadend(event, params);
@@ -55,11 +59,11 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
       };
 
       // Event
-      $(external.cornerstone.events).trigger('CornerstoneImageLoadEnd', eventData);
+      $(cornerstone.events).trigger('CornerstoneImageLoadEnd', eventData);
 
       const customEvent = new CustomEvent('cornerstoneimageloadend', { detail: eventData });
 
-      external.cornerstone.events.dispatchEvent(customEvent);
+      cornerstone.events.dispatchEvent(customEvent);
     };
 
     // handle response data
@@ -85,6 +89,7 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
 
     // Event triggered when downloading an image progresses
     xhr.onprogress = function (oProgress) {
+      const { cornerstone, $ } = external;
       // console.log('progress:',oProgress)
       const loaded = oProgress.loaded; // evt.loaded the bytes browser receive
       let total;
@@ -109,11 +114,11 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
         percentComplete
       };
 
-      $(external.cornerstone.events).trigger('CornerstoneImageLoadProgress', eventData);
+      $(cornerstone.events).trigger('CornerstoneImageLoadProgress', eventData);
 
       const customEvent = new CustomEvent('cornerstoneimageloadprogress', { detail: eventData });
 
-      external.cornerstone.events.dispatchEvent(customEvent);
+      cornerstone.events.dispatchEvent(customEvent);
     };
 
     xhr.send();

@@ -1,4 +1,4 @@
-import { dicomParser } from '../../externalModules.js';
+import external from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
 
 /**
@@ -53,7 +53,7 @@ function load (uri, loadRequest = xhrRequest, imageId) {
       let dataSet;
 
       try {
-        dataSet = dicomParser.parseDicom(byteArray);
+        dataSet = external.dicomParser.parseDicom(byteArray);
       } catch (error) {
         return reject(error);
       }
