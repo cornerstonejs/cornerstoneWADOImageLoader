@@ -1,10 +1,9 @@
-import { $, cornerstone } from '../../externalModules.js';
+import { $ } from '../../externalModules.js';
 import createImage from '../createImage.js';
 import parseImageId from './parseImageId.js';
 import dataSetCacheManager from './dataSetCacheManager.js';
-import getEncapsulatedImageFrame from './getEncapsulatedImageFrame.js';
-import getUncompressedImageFrame from './getUncompressedImageFrame.js';
 import loadFileRequest from './loadFileRequest.js';
+import getPixelData from './getPixelData.js';
 import { xhrRequest } from '../internal/index.js';
 
 // add a decache callback function to clear out our dataSetCacheManager
@@ -15,16 +14,6 @@ function addDecache (image) {
 
     dataSetCacheManager.unload(parsedImageId.url);
   };
-}
-
-function getPixelData (dataSet, frameIndex) {
-  const pixelDataElement = dataSet.elements.x7fe00010;
-
-  if (pixelDataElement.encapsulatedPixelData) {
-    return getEncapsulatedImageFrame(dataSet, frameIndex);
-  }
-
-  return getUncompressedImageFrame(dataSet, frameIndex);
 }
 
 function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKey, options) {
@@ -105,10 +94,5 @@ function loadImage (imageId, options) {
 
   return loadImageFromPromise(dataSetPromise, imageId, parsedImageId.frame, parsedImageId.url, options);
 }
-
-// register dicomweb and wadouri image loader prefixes
-cornerstone.registerImageLoader('dicomweb', loadImage);
-cornerstone.registerImageLoader('wadouri', loadImage);
-cornerstone.registerImageLoader('dicomfile', loadImage);
 
 export { loadImageFromPromise, getLoaderForScheme, loadImage };
