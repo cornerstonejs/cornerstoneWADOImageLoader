@@ -1,9 +1,6 @@
-
-
 let charLS;
 
 function jpegLSDecode (data, isSigned) {
-
   // prepare input parameters
   const dataPtr = charLS._malloc(data.length);
 
@@ -73,7 +70,7 @@ function jpegLSDecode (data, isSigned) {
 function initializeJPEGLS () {
   // check to make sure codec is loaded
   if (typeof CharLS === 'undefined') {
-    throw 'No JPEG-LS decoder loaded';
+    throw new Error('No JPEG-LS decoder loaded');
   }
 
   // Try to initialize CharLS
@@ -81,7 +78,7 @@ function initializeJPEGLS () {
   if (!charLS) {
     charLS = CharLS();
     if (!charLS || !charLS._jpegls_decode) {
-      throw 'JPEG-LS failed to initialize';
+      throw new Error('JPEG-LS failed to initialize');
     }
   }
 
@@ -91,11 +88,10 @@ function decodeJPEGLS (imageFrame, pixelData) {
   initializeJPEGLS();
 
   const image = jpegLSDecode(pixelData, imageFrame.pixelRepresentation === 1);
-  // console.log(image);
 
   // throw error if not success or too much data
   if (image.result !== 0 && image.result !== 6) {
-    throw `JPEG-LS decoder failed to decode frame (error code ${image.result})`;
+    throw new Error(`JPEG-LS decoder failed to decode frame (error code ${image.result})`);
   }
 
   imageFrame.columns = image.width;

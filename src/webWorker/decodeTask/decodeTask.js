@@ -1,6 +1,6 @@
 import { initializeJPEG2000 } from './decoders/decodeJPEG2000.js';
 import { initializeJPEGLS } from './decoders/decodeJPEGLS.js';
-import getMinMax from './getMinMax.js';
+import getMinMax from '../../shared/getMinMax.js';
 import decodeImageFrame from './decodeImageFrame.js';
 
 // flag to ensure codecs are loaded only once
@@ -37,7 +37,7 @@ function loadCodecs (config) {
 /**
  * Task initialization function
  */
-function decodeTaskInitialize (config) {
+function initialize (config) {
   decodeConfig = config;
   if (config.decodeTask.loadCodecsOnStartup) {
     loadCodecs(config);
@@ -64,7 +64,7 @@ function calculateMinMax (imageFrame) {
 /**
  * Task handler function
  */
-function decodeTaskHandler (data, doneCallback) {
+function handler (data, doneCallback) {
   // Load the codecs if they aren't already loaded
   loadCodecs(decodeConfig);
 
@@ -81,6 +81,10 @@ function decodeTaskHandler (data, doneCallback) {
     decodeConfig.decodeTask,
     data.data.options);
 
+  if (!imageFrame.pixelData) {
+    throw new Error('decodeTask: imageFrame.pixelData is undefined after decoding');
+  }
+
   calculateMinMax(imageFrame);
 
   // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
@@ -94,6 +98,6 @@ function decodeTaskHandler (data, doneCallback) {
 
 export default {
   taskType: 'decodeTask',
-  handler: decodeTaskHandler,
-  initialize: decodeTaskInitialize
+  handler,
+  initialize
 };
