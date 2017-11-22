@@ -5,7 +5,7 @@ function decodeJPEGLossless (imageFrame, pixelData) {
   if (typeof jpeg === 'undefined' ||
     typeof jpeg.lossless === 'undefined' ||
     typeof jpeg.lossless.Decoder === 'undefined') {
-    throw 'No JPEG Lossless decoder loaded';
+    throw new Error('No JPEG Lossless decoder loaded');
   }
 
   const byteOutput = imageFrame.bitsAllocated <= 8 ? 1 : 2;
@@ -21,7 +21,7 @@ function decodeJPEGLossless (imageFrame, pixelData) {
 
       return imageFrame;
     }
-      // untested!
+    // untested!
     imageFrame.pixelData = new Uint8Array(decompressedData.buffer);
 
     return imageFrame;

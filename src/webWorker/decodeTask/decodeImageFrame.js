@@ -49,14 +49,10 @@ function decodeImageFrame (imageFrame, transferSyntax, pixelData, decodeConfig, 
     // JPEG 2000 Lossy
     imageFrame = decodeJPEG2000(imageFrame, pixelData, decodeConfig, options);
   } else {
-    if (console && console.log) {
-      console.log(`Image cannot be decoded due to Unsupported transfer syntax ${transferSyntax}`);
-    }
-
-    throw `no decoder for transfer syntax ${transferSyntax}`;
+    throw new Error(`no decoder for transfer syntax ${transferSyntax}`);
   }
 
-    /* Don't know if these work...
+  /* Don't know if these work...
    // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
    else if(transferSyntax === "1.2.840.10008.1.2.4.92")
    {

@@ -1,11 +1,10 @@
-import { cornerstone, dicomParser } from '../../../externalModules.js';
+import { dicomParser } from '../../../externalModules.js';
 import getNumberValues from './getNumberValues.js';
 import parseImageId from '../parseImageId.js';
 import dataSetCacheManager from '../dataSetCacheManager.js';
 import getImagePixelModule from './getImagePixelModule.js';
 import getLUTs from './getLUTs.js';
 import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixelRepresentation.js';
-
 
 function metaDataProvider (type, imageId) {
   const parsedImageId = parseImageId(imageId);
@@ -36,13 +35,40 @@ function metaDataProvider (type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
+
+    const imageOrientationPatient = getNumberValues(dataSet, 'x00200037', 6);
+    const imagePositionPatient = getNumberValues(dataSet, 'x00200032', 3);
+    const pixelSpacing = getNumberValues(dataSet, 'x00280030', 2);
+
+    let columnPixelSpacing = 1.0;
+    let rowPixelSpacing = 1.0;
+
+    if (pixelSpacing) {
+      rowPixelSpacing = pixelSpacing[0];
+      columnPixelSpacing = pixelSpacing[1];
+    }
+
+    let rowCosines = null;
+    let columnCosines = null;
+
+    if (imageOrientationPatient) {
+      rowCosines = [parseFloat(imageOrientationPatient[0]), parseFloat(imageOrientationPatient[1]), parseFloat(imageOrientationPatient[2])];
+      columnCosines = [parseFloat(imageOrientationPatient[3]), parseFloat(imageOrientationPatient[4]), parseFloat(imageOrientationPatient[5])];
+    }
+
     return {
-      pixelSpacing: getNumberValues(dataSet, 'x00280030', 2),
-      imageOrientationPatient: getNumberValues(dataSet, 'x00200037', 6),
-      imagePositionPatient: getNumberValues(dataSet, 'x00200032', 3),
+      frameOfReferenceUID: dataSet.string('x00200052'),
+      rows: dataSet.uint16('x00280010'),
+      columns: dataSet.uint16('x00280011'),
+      imageOrientationPatient,
+      rowCosines,
+      columnCosines,
+      imagePositionPatient,
       sliceThickness: dataSet.floatString('x00180050'),
       sliceLocation: dataSet.floatString('x00201041'),
-      frameOfReferenceUID: dataSet.string('x00200052')
+      pixelSpacing,
+      rowPixelSpacing,
+      columnPixelSpacing
     };
   }
 
@@ -95,10 +121,6 @@ function metaDataProvider (type, imageId) {
       }
     };
   }
-
 }
-
-// register our metadata provider
-cornerstone.metaData.addProvider(metaDataProvider);
 
 export default metaDataProvider;
