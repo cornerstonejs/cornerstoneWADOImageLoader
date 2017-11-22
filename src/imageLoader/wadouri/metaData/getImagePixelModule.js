@@ -1,5 +1,3 @@
-
-
 function getLutDescriptor (dataSet, tag) {
   if (!dataSet.elements[tag] || dataSet.elements[tag].length !== 6) {
     return;
@@ -11,7 +9,11 @@ function getLutDescriptor (dataSet, tag) {
 function getLutData (lutDataSet, tag, lutDescriptor) {
   const lut = [];
   const lutData = lutDataSet.elements[tag];
-  const numLutEntries = lutDescriptor[0];
+
+  // The first Palette Color Lookup Table Descriptor value is the number of entries in the lookup table.
+  // When the number of table entries is equal to 2ˆ16 then this value shall be 0.
+  // See http://dicom.nema.org/MEDICAL/DICOM/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.5
+  const numLutEntries = lutDescriptor[0] || 65536;
 
   for (let i = 0; i < numLutEntries; i++) {
     // Output range is always unsigned
@@ -52,7 +54,6 @@ function populateSmallestLargestPixelValues (dataSet, imagePixelModule) {
 }
 
 function getImagePixelModule (dataSet) {
-
   const imagePixelModule = {
     samplesPerPixel: dataSet.uint16('x00280002'),
     photometricInterpretation: dataSet.string('x00280004'),
@@ -70,7 +71,6 @@ function getImagePixelModule (dataSet) {
   populatePaletteColorLut(dataSet, imagePixelModule);
 
   return imagePixelModule;
-
 }
 
 export default getImagePixelModule;
