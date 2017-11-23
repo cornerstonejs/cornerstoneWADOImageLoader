@@ -1,4 +1,4 @@
-import { external } from '../../src/externalModules.js';
+import external from '../../src/externalModules.js';
 import webWorkerManager from '../../src/imageLoader/webWorkerManager.js';
 
 external.cornerstone = window.cornerstone;

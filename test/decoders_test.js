@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { external } from '../src/externalModules.js';
+import external from '../src/externalModules.js';
 import { initializeJPEGLS } from '../src/webWorker/decodeTask/decoders/decodeJPEGLS.js';
 import { initializeJPEG2000 } from '../src/webWorker/decodeTask/decoders/decodeJPEG2000.js';
 import decodeImageFrame from '../src/webWorker/decodeTask/decodeImageFrame.js';
@@ -39,7 +39,7 @@ const transferSyntaxes = {
 const base = 'CTImage.dcm';
 const url = 'dicomweb://localhost:9876/base/testImages/';
 
-describe('loadImage', function () {
+describe('decodeImageFrame', function () {
   this.timeout(0);
 
   before(function () {
@@ -65,16 +65,22 @@ describe('loadImage', function () {
       const dataSetPromise = dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId);
 
       dataSetPromise.then((dataSet) => {
-        const canvas = document.createElement('canvas');
-        const imageFrame = getImageFrame(imageId);
-        const pixelData = getPixelData(dataSet);
-        const transferSyntax = dataSet.string('x00020010');
+        try {
+          const canvas = document.createElement('canvas');
+        
 
-        decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas);
+          const imageFrame = getImageFrame(imageId);
+          const pixelData = getPixelData(dataSet);
+          const transferSyntax = dataSet.string('x00020010');
 
-        // TODO: Compare against known correct pixel data
-        expect(imageFrame).to.be.an('object');
-        done();
+          decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas);
+
+          // TODO: Compare against known correct pixel data
+          expect(imageFrame).to.be.an('object');
+          done();
+        } catch (error) {
+          done(error);
+        }
       }, done);
     });
   });

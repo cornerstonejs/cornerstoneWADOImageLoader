@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { external } from '../src/externalModules.js';
+import external from '../src/externalModules.js';
 import { loadImage } from '../src/imageLoader/wadouri/loadImage.js';
 import webWorkerManager from '../src/imageLoader/webWorkerManager.js';
 
@@ -35,7 +35,7 @@ const base = 'CTImage.dcm';
 const url = 'dicomweb://localhost:9876/base/testImages/';
 
 describe('loadImage', function () {
-  // this.timeout(0);
+  this.timeout(0);
 
   before(function () {
     // Initialize the web worker manager
@@ -64,7 +64,16 @@ describe('loadImage', function () {
       const imageId = `${url}${filename}`;
 
       console.time(name);
-      loadImage(imageId).then((image) => {
+
+      let promise;
+
+      try {
+        promise = loadImage(imageId);  
+      } catch (error) {
+        done(error);
+      }
+
+      promise.then((image) => {
         console.timeEnd(name);
         // TODO: Compare against known correct pixel data
         expect(image).to.be.an('object');
