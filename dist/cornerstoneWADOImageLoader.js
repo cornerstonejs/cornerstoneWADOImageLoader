@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - 1.0.3 - 2017-11-22 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - 1.0.4 - 2017-11-26 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("jquery"), require("dicom-parser"));
@@ -371,13 +371,43 @@ function isModalityLUTForDisplay(sopClassUid) {
   sopClassUid !== '1.2.840.10008.5.1.4.1.1.12.2.1'; // XRF
 }
 
+function convertToIntPixelData(floatPixelData) {
+  var floatMinMax = (0, _getMinMax2.default)(floatPixelData);
+  var floatRange = Math.abs(floatMinMax.max - floatMinMax.min);
+  var intRange = 65535;
+  var slope = floatRange / intRange;
+  var intercept = floatMinMax.min;
+  var numPixels = floatPixelData.length;
+  var intPixelData = new Uint16Array(numPixels);
+  var min = 65535;
+  var max = 0;
+
+  for (var i = 0; i < numPixels; i++) {
+    var rescaledPixel = Math.floor((floatPixelData[i] - intercept) / slope);
+
+    intPixelData[i] = rescaledPixel;
+    min = Math.min(min, rescaledPixel);
+    max = Math.max(max, rescaledPixel);
+  }
+
+  return {
+    min: min,
+    max: max,
+    intPixelData: intPixelData,
+    slope: slope,
+    intercept: intercept
+  };
+}
+
 /**
  * Helper function to set pixel data to the right typed array.  This is needed because web workers
  * can transfer array buffers but not typed arrays
  * @param imageFrame
  */
 function setPixelDataType(imageFrame) {
-  if (imageFrame.bitsAllocated === 16) {
+  if (imageFrame.bitsAllocated === 32) {
+    imageFrame.pixelData = new Float32Array(imageFrame.pixelData);
+  } else if (imageFrame.bitsAllocated === 16) {
     if (imageFrame.pixelRepresentation === 0) {
       imageFrame.pixelData = new Uint16Array(imageFrame.pixelData);
     } else {
@@ -446,13 +476,28 @@ function createImage(imageId, pixelData, transferSyntax, options) {
         width: imageFrame.columns,
         windowCenter: voiLutModule.windowCenter ? voiLutModule.windowCenter[0] : undefined,
         windowWidth: voiLutModule.windowWidth ? voiLutModule.windowWidth[0] : undefined,
-        decodeTimeInMS: imageFrame.decodeTimeInMS
+        decodeTimeInMS: imageFrame.decodeTimeInMS,
+        floatPixelData: undefined
       };
 
       // add function to return pixel data
-      image.getPixelData = function () {
-        return imageFrame.pixelData;
-      };
+      if (imageFrame.pixelData instanceof Float32Array) {
+        var floatPixelData = imageFrame.pixelData;
+        var results = convertToIntPixelData(floatPixelData);
+
+        image.minPixelValue = results.min;
+        image.maxPixelValue = results.max;
+        image.slope = results.slope;
+        image.intercept = results.intercept;
+        image.floatPixelData = floatPixelData;
+        image.getPixelData = function () {
+          return results.intPixelData;
+        };
+      } else {
+        image.getPixelData = function () {
+          return imageFrame.pixelData;
+        };
+      }
 
       // Setup the renderer
       if (image.color) {
@@ -632,7 +677,7 @@ exports.default = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = '1.0.3';
+exports.default = '1.0.4';
 
 /***/ }),
 /* 10 */
@@ -844,12 +889,7 @@ function getLutData(lutDataSet, tag, lutDescriptor) {
   var lut = [];
   var lutData = lutDataSet.elements[tag];
 
-  // The first Palette Color Lookup Table Descriptor value is the number of entries in the lookup table.
-  // When the number of table entries is equal to 2ˆ16 then this value shall be 0.
-  // See http://dicom.nema.org/MEDICAL/DICOM/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.5
-  var numLutEntries = lutDescriptor[0] || 65536;
-
-  for (var i = 0; i < numLutEntries; i++) {
+  for (var i = 0; i < lutDescriptor[0]; i++) {
     // Output range is always unsigned
     if (lutDescriptor[2] === 16) {
       lut[i] = lutDataSet.uint16(tag, i);
@@ -862,13 +902,37 @@ function getLutData(lutDataSet, tag, lutDescriptor) {
 }
 
 function populatePaletteColorLut(dataSet, imagePixelModule) {
-  // return immediately if photometric interpretation is not PALETTE COLOR or no palette lut elements
-  if (imagePixelModule.photometricInterpretation !== 'PALETTE COLOR' || !dataSet.elements.x00281101) {
-    return;
-  }
   imagePixelModule.redPaletteColorLookupTableDescriptor = getLutDescriptor(dataSet, 'x00281101');
   imagePixelModule.greenPaletteColorLookupTableDescriptor = getLutDescriptor(dataSet, 'x00281102');
   imagePixelModule.bluePaletteColorLookupTableDescriptor = getLutDescriptor(dataSet, 'x00281103');
+
+  // The first Palette Color Lookup Table Descriptor value is the number of entries in the lookup table.
+  // When the number of table entries is equal to 2ˆ16 then this value shall be 0.
+  // See http://dicom.nema.org/MEDICAL/DICOM/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.5
+  if (imagePixelModule.redPaletteColorLookupTableDescriptor[0] === 0) {
+    imagePixelModule.redPaletteColorLookupTableDescriptor[0] = 65536;
+    imagePixelModule.greenPaletteColorLookupTableDescriptor[0] = 65536;
+    imagePixelModule.bluePaletteColorLookupTableDescriptor[0] = 65536;
+  }
+
+  // The third Palette Color Lookup Table Descriptor value specifies the number of bits for each entry in the Lookup Table Data.
+  // It shall take the value of 8 or 16.
+  // The LUT Data shall be stored in a format equivalent to 8 bits allocated when the number of bits for each entry is 8, and 16 bits allocated when the number of bits for each entry is 16, where in both cases the high bit is equal to bits allocated-1.
+  // The third value shall be identical for each of the Red, Green and Blue Palette Color Lookup Table Descriptors.
+  //
+  // Note: Some implementations have encoded 8 bit entries with 16 bits allocated, padding the high bits;
+  // this can be detected by comparing the number of entries specified in the LUT Descriptor with the actual value length of the LUT Data entry.
+  // The value length in bytes should equal the number of entries if bits allocated is 8, and be twice as long if bits allocated is 16.
+  var numLutEntries = imagePixelModule.redPaletteColorLookupTableDescriptor[0];
+  var lutData = dataSet.elements.x00281201;
+  var lutBitsAllocated = lutData.length === numLutEntries ? 8 : 16;
+
+  // If the descriptors do not appear to have the correct values, correct them
+  if (imagePixelModule.redPaletteColorLookupTableDescriptor[2] !== lutBitsAllocated) {
+    imagePixelModule.redPaletteColorLookupTableDescriptor[2] = lutBitsAllocated;
+    imagePixelModule.greenPaletteColorLookupTableDescriptor[2] = lutBitsAllocated;
+    imagePixelModule.bluePaletteColorLookupTableDescriptor[2] = lutBitsAllocated;
+  }
 
   imagePixelModule.redPaletteColorLookupTableData = getLutData(dataSet, 'x00281201', imagePixelModule.redPaletteColorLookupTableDescriptor);
   imagePixelModule.greenPaletteColorLookupTableData = getLutData(dataSet, 'x00281202', imagePixelModule.greenPaletteColorLookupTableDescriptor);
@@ -902,7 +966,10 @@ function getImagePixelModule(dataSet) {
   };
 
   populateSmallestLargestPixelValues(dataSet, imagePixelModule);
-  populatePaletteColorLut(dataSet, imagePixelModule);
+
+  if (imagePixelModule.photometricInterpretation === 'PALETTE COLOR' && dataSet.elements.x00281101) {
+    populatePaletteColorLut(dataSet, imagePixelModule);
+  }
 
   return imagePixelModule;
 }
@@ -2199,7 +2266,7 @@ function framesAreFragmented(dataSet) {
 }
 
 function getEncapsulatedImageFrame(dataSet, frameIndex) {
-  if (dataSet.elements.x7fe00010.basicOffsetTable.length) {
+  if (dataSet.elements.x7fe00010 && dataSet.elements.x7fe00010.basicOffsetTable.length) {
     // Basic Offset Table is not empty
     return _externalModules.dicomParser.readEncapsulatedImageFrame(dataSet, dataSet.elements.x7fe00010, frameIndex);
   }
@@ -2237,7 +2304,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 function getUncompressedImageFrame(dataSet, frameIndex) {
-  var pixelDataElement = dataSet.elements.x7fe00010;
+  var pixelDataElement = dataSet.elements.x7fe00010 || dataSet.elements.x7fe00008;
   var bitsAllocated = dataSet.uint16('x00280100');
   var rows = dataSet.uint16('x00280010');
   var columns = dataSet.uint16('x00280011');
@@ -2269,6 +2336,13 @@ function getUncompressedImageFrame(dataSet, frameIndex) {
     }
 
     return (0, _unpackBinaryFrame2.default)(dataSet.byteArray, frameOffset, pixelsPerFrame);
+  } else if (bitsAllocated === 32) {
+    frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame * 4;
+    if (frameOffset >= dataSet.byteArray.length) {
+      throw new Error('frame exceeds size of pixelData');
+    }
+
+    return new Uint8Array(dataSet.byteArray.buffer, frameOffset, pixelsPerFrame * 4);
   }
 
   throw new Error('unsupported pixel format');
@@ -2811,19 +2885,20 @@ Object.defineProperty(exports, "__esModule", {
 
 exports.default = function (imageFrame, rgbaBuffer) {
   var numPixels = imageFrame.columns * imageFrame.rows;
-  var palIndex = 0;
-  var rgbaIndex = 0;
   var pixelData = imageFrame.pixelData;
-  var start = imageFrame.redPaletteColorLookupTableDescriptor[1];
   var rData = imageFrame.redPaletteColorLookupTableData;
   var gData = imageFrame.greenPaletteColorLookupTableData;
   var bData = imageFrame.bluePaletteColorLookupTableData;
-  var shift = imageFrame.redPaletteColorLookupTableDescriptor[2] === 8 ? 0 : 8;
   var len = imageFrame.redPaletteColorLookupTableData.length;
+  var palIndex = 0;
+  var rgbaIndex = 0;
 
-  if (len === 0) {
-    len = 65535;
-  }
+  var start = imageFrame.redPaletteColorLookupTableDescriptor[1];
+  var shift = imageFrame.redPaletteColorLookupTableDescriptor[2] === 8 ? 0 : 8;
+
+  var rDataCleaned = convertLUTto8Bit(rData, shift);
+  var gDataCleaned = convertLUTto8Bit(gData, shift);
+  var bDataCleaned = convertLUTto8Bit(bData, shift);
 
   for (var i = 0; i < numPixels; ++i) {
     var value = pixelData[palIndex++];
@@ -2836,12 +2911,33 @@ exports.default = function (imageFrame, rgbaBuffer) {
       value -= start;
     }
 
-    rgbaBuffer[rgbaIndex++] = rData[value] >> shift;
-    rgbaBuffer[rgbaIndex++] = gData[value] >> shift;
-    rgbaBuffer[rgbaIndex++] = bData[value] >> shift;
+    rgbaBuffer[rgbaIndex++] = rDataCleaned[value];
+    rgbaBuffer[rgbaIndex++] = gDataCleaned[value];
+    rgbaBuffer[rgbaIndex++] = bDataCleaned[value];
     rgbaBuffer[rgbaIndex++] = 255;
   }
 };
+
+/* eslint no-bitwise: 0 */
+
+function convertLUTto8Bit(lut, shift) {
+  var numEntries = lut.length;
+  var cleanedLUT = new Uint8ClampedArray(numEntries);
+
+  for (var i = 0; i < numEntries; ++i) {
+    cleanedLUT[i] = lut[i] >> shift;
+  }
+
+  return cleanedLUT;
+}
+
+/**
+ * Convert pixel data with PALETTE COLOR Photometric Interpretation to RGBA
+ *
+ * @param {ImageFrame} imageFrame
+ * @param {Uint8ClampedArray} rgbaBuffer
+ * @returns {void}
+ */
 
 /***/ }),
 /* 45 */
@@ -3429,7 +3525,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function getPixelData(dataSet) {
   var frameIndex = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
-  var pixelDataElement = dataSet.elements.x7fe00010;
+  var pixelDataElement = dataSet.elements.x7fe00010 || dataSet.elements.x7fe00008;
 
   if (pixelDataElement.encapsulatedPixelData) {
     return (0, _getEncapsulatedImageFrame2.default)(dataSet, frameIndex);
