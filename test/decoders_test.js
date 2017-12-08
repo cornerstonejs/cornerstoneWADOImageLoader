@@ -1,6 +1,6 @@
 /* eslint import/extensions: 0 */
 import { expect } from 'chai';
-import { external } from '../src/externalModules.js';
+import external from '../src/externalModules.js';
 import { initializeJPEGLS } from '../src/webWorker/decodeTask/decoders/decodeJPEGLS.js';
 import { initializeJPEG2000 } from '../src/webWorker/decodeTask/decoders/decodeJPEG2000.js';
 import decodeImageFrame from '../src/webWorker/decodeTask/decodeImageFrame.js';
