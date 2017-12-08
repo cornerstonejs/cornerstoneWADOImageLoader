@@ -15,7 +15,7 @@ function framesAreFragmented (dataSet) {
 export default function getEncapsulatedImageFrame (dataSet, frameIndex) {
   const { dicomParser } = external;
 
-  if (dataSet.elements.x7fe00010.basicOffsetTable.length) {
+  if (dataSet.elements.x7fe00010 && dataSet.elements.x7fe00010.basicOffsetTable.length) {
     // Basic Offset Table is not empty
     return dicomParser.readEncapsulatedImageFrame(dataSet, dataSet.elements.x7fe00010, frameIndex);
   }
