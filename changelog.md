@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2017-12-08
+### Changed
+
+- *Breaking Change!!!* Switches image loader return values to support the breaking change in Cornerstone Master (https://github.com/cornerstonejs/cornerstone/commit/9448755397da10a6de6f694d83123274cbd4b38e) which requires image loaders to return an object of the form { promise, cancelFn }.
+- *Breaking Change!!!* Removed jQuery events from triggerEvent, lower-cased all the event names.
+- *Breaking Change!!!* Switched all Deferred usage to use Promises
+- *Breaking Change!!!* Updated to depend on Cornerstone 2.0.0 or higher
+
+## [1.0.5] - 2017-12-08
+### Added
+- beforeSend option now passes imageId as its second parameter. This is useful for writing beforeSend functions which have different actions depending on the image type.
+
+### Changed
+- Moved the repository from Chris Hafey's (@chafey) personal page to a new Organization (@cornerstonejs). Renamed all the relevant links. Join us at @cornerstonejs to start contributing!
+
 ## [1.0.4] - 2017-11-26
 ### Added
 - Added support for DICOM Parametric Maps
@@ -73,8 +88,8 @@ e.g. CornerstoneImageLoadStart has a native CustomEvent name 'cornerstoneimagelo
 
 ## Version 0.14.5
 
-- Rename loadDataSetFromPromise to loadImageFromPromise (https://github.com/chafey/cornerstoneWADOImageLoader/pull/94)
-- Set web worker status ready after task is read (https://github.com/chafey/cornerstoneWADOImageLoader/pull/95)
+- Rename loadDataSetFromPromise to loadImageFromPromise (https://github.com/cornerstonejs/cornerstoneWADOImageLoader/pull/94)
+- Set web worker status ready after task is read (https://github.com/cornerstonejs/cornerstoneWADOImageLoader/pull/95)
 - Fixes for dependencies after migration to Webpack (@lscoder)
 
 ## Version 0.14.4
@@ -83,4 +98,4 @@ e.g. CornerstoneImageLoadStart has a native CustomEvent name 'cornerstoneimagelo
 - Fixes for examples after inital migration steps (@kofifus, @lscoder)
 - Typo in package.json (@JMiha)
 - Bug fix for the inital draw of color images with WW/WC 255/128
-- Bug fixes for JPEG Baseline 8 Bit decoding (https://github.com/chafey/cornerstoneWADOImageLoader/issues/46)
+- Bug fixes for JPEG Baseline 8 Bit decoding (https://github.com/cornerstonejs/cornerstoneWADOImageLoader/issues/46)
