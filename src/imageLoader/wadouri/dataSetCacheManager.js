@@ -64,7 +64,7 @@ function load (uri, loadRequest = xhrRequest, imageId) {
       };
 
       resolve(dataSet);
-    }, reject).then(() => {
+    }, reject).always(() => {
       // Remove the promise regardless of success or failure
       delete promises[uri];
     });
