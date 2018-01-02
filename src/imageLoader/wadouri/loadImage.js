@@ -35,17 +35,16 @@ function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKe
         addDecache(image);
         resolve(image);
       }, function (error) {
-        // Return the error, and the dataSet
-        deferred.reject({
+        // Reject the error, and the dataSet
+        reject({
           error,
           dataSet
         });
       });
     }, function (error) {
-      // Return the error, and the dataSet
-      deferred.reject({
-        error,
-        dataSet
+      // Reject the error
+      reject({
+        error
       });
     });
   });
@@ -60,23 +59,22 @@ function loadImageFromDataSet (dataSet, imageId, frame = 0, sharedCacheKey, opti
   const start = new Date().getTime();
 
   const promise = new Promise((resolve, reject) => {
-    const pixelData = getPixelData(dataSet, frame);
-    const transferSyntax = dataSet.string('x00020010');
     const loadEnd = new Date().getTime();
     let imagePromise;
 
     try {
       const pixelData = getPixelData(dataSet, frame);
+      const transferSyntax = dataSet.string('x00020010');
 
       imagePromise = createImage(imageId, pixelData, transferSyntax, options);
     } catch (error) {
-      // Return the error, and the dataSet
-      deferred.reject({
+      // Reject the error, and the dataSet
+      reject({
         error,
         dataSet
       });
 
-      return deferred;
+      return;
     }
 
     imagePromise.then((image) => {
