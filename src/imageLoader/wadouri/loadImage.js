@@ -34,8 +34,20 @@ function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKe
         image.totalTimeInMS = end - start;
         addDecache(image);
         resolve(image);
-      }, reject);
-    }, reject);
+      }, function (error) {
+        // Return the error, and the dataSet
+        deferred.reject({
+          error,
+          dataSet
+        });
+      });
+    }, function (error) {
+      // Return the error, and the dataSet
+      deferred.reject({
+        error,
+        dataSet
+      });
+    });
   });
 
   return {
@@ -51,7 +63,21 @@ function loadImageFromDataSet (dataSet, imageId, frame = 0, sharedCacheKey, opti
     const pixelData = getPixelData(dataSet, frame);
     const transferSyntax = dataSet.string('x00020010');
     const loadEnd = new Date().getTime();
-    const imagePromise = createImage(imageId, pixelData, transferSyntax, options);
+    let imagePromise;
+
+    try {
+      const pixelData = getPixelData(dataSet, frame);
+
+      imagePromise = createImage(imageId, pixelData, transferSyntax, options);
+    } catch (error) {
+      // Return the error, and the dataSet
+      deferred.reject({
+        error,
+        dataSet
+      });
+
+      return deferred;
+    }
 
     imagePromise.then((image) => {
       image.data = dataSet;
