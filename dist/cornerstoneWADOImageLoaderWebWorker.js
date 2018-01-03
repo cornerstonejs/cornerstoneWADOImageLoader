@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - 1.0.3 - 2017-11-21 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - 2.0.0 - 2017-12-15 | (c) 2016 Chris Hafey | https://github.com/cornerstonejs/cornerstoneWADOImageLoader */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -71,7 +71,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 56);
+/******/ 	return __webpack_require__(__webpack_require__.s = 55);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -358,7 +358,7 @@ function initializeJPEGLS() {
   }
 
   // Try to initialize CharLS
-  // CharLS https://github.com/chafey/charls
+  // CharLS https://github.com/cornerstonejs/charls
   if (!charLS) {
     charLS = CharLS();
     if (!charLS || !charLS._jpegls_decode) {
@@ -389,7 +389,7 @@ exports.initializeJPEGLS = initializeJPEGLS;
 
 /***/ }),
 
-/***/ 56:
+/***/ 55:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -409,9 +409,9 @@ Object.defineProperty(exports, 'version', {
   }
 });
 
-var _webWorker = __webpack_require__(57);
+var _webWorker = __webpack_require__(56);
 
-var _decodeTask = __webpack_require__(58);
+var _decodeTask = __webpack_require__(57);
 
 var _decodeTask2 = _interopRequireDefault(_decodeTask);
 
@@ -424,7 +424,7 @@ exports.registerTaskHandler = _webWorker.registerTaskHandler;
 
 /***/ }),
 
-/***/ 57:
+/***/ 56:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -552,7 +552,7 @@ self.onmessage = function (msg) {
 
 /***/ }),
 
-/***/ 58:
+/***/ 57:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -570,7 +570,7 @@ var _getMinMax = __webpack_require__(2);
 
 var _getMinMax2 = _interopRequireDefault(_getMinMax);
 
-var _decodeImageFrame = __webpack_require__(59);
+var _decodeImageFrame = __webpack_require__(58);
 
 var _decodeImageFrame2 = _interopRequireDefault(_decodeImageFrame);
 
@@ -672,7 +672,7 @@ exports.default = {
 
 /***/ }),
 
-/***/ 59:
+/***/ 58:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -682,23 +682,23 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _decodeLittleEndian = __webpack_require__(60);
+var _decodeLittleEndian = __webpack_require__(59);
 
 var _decodeLittleEndian2 = _interopRequireDefault(_decodeLittleEndian);
 
-var _decodeBigEndian = __webpack_require__(61);
+var _decodeBigEndian = __webpack_require__(60);
 
 var _decodeBigEndian2 = _interopRequireDefault(_decodeBigEndian);
 
-var _decodeRLE = __webpack_require__(62);
+var _decodeRLE = __webpack_require__(61);
 
 var _decodeRLE2 = _interopRequireDefault(_decodeRLE);
 
-var _decodeJPEGBaseline = __webpack_require__(63);
+var _decodeJPEGBaseline = __webpack_require__(62);
 
 var _decodeJPEGBaseline2 = _interopRequireDefault(_decodeJPEGBaseline);
 
-var _decodeJPEGLossless = __webpack_require__(64);
+var _decodeJPEGLossless = __webpack_require__(63);
 
 var _decodeJPEGLossless2 = _interopRequireDefault(_decodeJPEGLossless);
 
@@ -782,7 +782,7 @@ exports.default = decodeImageFrame;
 
 /***/ }),
 
-/***/ 60:
+/***/ 59:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -792,13 +792,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 function decodeLittleEndian(imageFrame, pixelData) {
+  var arrayBuffer = pixelData.buffer;
+  var offset = pixelData.byteOffset;
+  var length = pixelData.length;
+
   if (imageFrame.bitsAllocated === 16) {
-    var arrayBuffer = pixelData.buffer;
-    var offset = pixelData.byteOffset;
-    var length = pixelData.length;
     // if pixel data is not aligned on even boundary, shift it so we can create the 16 bit array
     // buffers on it
-
     if (offset % 2) {
       arrayBuffer = arrayBuffer.slice(offset);
       offset = 0;
@@ -811,6 +811,14 @@ function decodeLittleEndian(imageFrame, pixelData) {
     }
   } else if (imageFrame.bitsAllocated === 8 || imageFrame.bitsAllocated === 1) {
     imageFrame.pixelData = pixelData;
+  } else if (imageFrame.bitsAllocated === 32) {
+    // if pixel data is not aligned on even boundary, shift it
+    if (offset % 2) {
+      arrayBuffer = arrayBuffer.slice(offset);
+      offset = 0;
+    }
+
+    imageFrame.pixelData = new Float32Array(arrayBuffer, offset, length / 4);
   }
 
   return imageFrame;
@@ -820,7 +828,7 @@ exports.default = decodeLittleEndian;
 
 /***/ }),
 
-/***/ 61:
+/***/ 60:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -867,7 +875,7 @@ exports.default = decodeBigEndian;
 
 /***/ }),
 
-/***/ 62:
+/***/ 61:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1042,7 +1050,7 @@ exports.default = decodeRLE;
 
 /***/ }),
 
-/***/ 63:
+/***/ 62:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1081,7 +1089,7 @@ exports.default = decodeJPEGBaseline;
 
 /***/ }),
 
-/***/ 64:
+/***/ 63:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1134,7 +1142,7 @@ exports.default = decodeJPEGLossless;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = '1.0.3';
+exports.default = '2.0.0';
 
 /***/ })
 
