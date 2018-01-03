@@ -1,4 +1,4 @@
-import { $, dicomParser } from '../../externalModules.js';
+import { dicomParser, external } from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
 import events from '../events.js';
 
@@ -29,6 +29,8 @@ function get (uri) {
 
 // loads the dicom dataset from the wadouri sp
 function load (uri, loadRequest = xhrRequest, imageId) {
+  const cornerstone = external.cornerstone;
+
   // if already loaded return it right away
   if (loadedDataSets[uri]) {
     // console.log('using loaded dataset ' + uri);
@@ -68,7 +70,7 @@ function load (uri, loadRequest = xhrRequest, imageId) {
       cacheSizeInBytes += dataSet.byteArray.length;
       resolve(dataSet);
 
-      $(events).trigger('DataSetsCacheChanged', {
+      cornerstone.triggerEvent(events, 'DataSetsCacheChanged', {
         uri,
         action: 'loaded',
         cacheInfo: getCacheInfo()
@@ -86,6 +88,8 @@ function load (uri, loadRequest = xhrRequest, imageId) {
 
 // remove the cached/loaded dicom dataset for the specified wadouri to free up memory
 function unload (uri) {
+  const cornerstone = external.cornerstone;
+
   // console.log('unload for ' + uri);
   if (loadedDataSets[uri]) {
     loadedDataSets[uri].cacheCount--;
@@ -94,7 +98,7 @@ function unload (uri) {
       cacheSizeInBytes -= loadedDataSets[uri].dataSet.byteArray.length;
       delete loadedDataSets[uri];
 
-      $(events).trigger('DataSetsCacheChanged', {
+      cornerstone.triggerEvent(events, 'DataSetsCacheChanged', {
         uri,
         action: 'unloaded',
         cacheInfo: getCacheInfo()
