@@ -15,7 +15,7 @@ function addDecache (image) {
   };
 }
 
-function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKey, options) {
+function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKey, options, callbacks) {
   const start = new Date().getTime();
 
   const promise = new Promise((resolve, reject) => {
@@ -32,6 +32,9 @@ function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKe
 
         image.loadTimeInMS = loadEnd - start;
         image.totalTimeInMS = end - start;
+        if (callbacks !== undefined && callbacks.imageDoneCallback !== undefined) {
+          callbacks.imageDoneCallback(image);
+        }
         addDecache(image);
         resolve(image);
       }, reject);
