@@ -1,14 +1,14 @@
-/*! cornerstone-wado-image-loader - 1.0.3 - 2017-11-21 | (c) 2016 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - 2.0.0 - 2017-12-15 | (c) 2016 Chris Hafey | https://github.com/cornerstonejs/cornerstoneWADOImageLoader */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("jquery"), require("dicom-parser"));
+		module.exports = factory(require("dicom-parser"));
 	else if(typeof define === 'function' && define.amd)
-		define("cornerstoneWADOImageLoader", ["jquery", "dicom-parser"], factory);
+		define("cornerstoneWADOImageLoader", ["dicom-parser"], factory);
 	else if(typeof exports === 'object')
-		exports["cornerstoneWADOImageLoader"] = factory(require("jquery"), require("dicom-parser"));
+		exports["cornerstoneWADOImageLoader"] = factory(require("dicom-parser"));
 	else
-		root["cornerstoneWADOImageLoader"] = factory(root["$"], root["dicomParser"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_46__, __WEBPACK_EXTERNAL_MODULE_47__) {
+		root["cornerstoneWADOImageLoader"] = factory(root["dicomParser"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_46__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -84,24 +84,21 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.external = exports.dicomParser = exports.$ = undefined;
+exports.external = exports.dicomParser = undefined;
 
-var _jquery = __webpack_require__(46);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _dicomParser = __webpack_require__(47);
+var _dicomParser = __webpack_require__(46);
 
 var dicomParser = _interopRequireWildcard(_dicomParser);
 
-var _registerLoaders = __webpack_require__(48);
+var _registerLoaders = __webpack_require__(47);
 
 var _registerLoaders2 = _interopRequireDefault(_registerLoaders);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/* eslint import/extensions:0 */
 var cornerstone = void 0;
 
 var external = {
@@ -115,7 +112,6 @@ var external = {
   }
 };
 
-exports.$ = _jquery2.default;
 exports.dicomParser = dicomParser;
 exports.external = external;
 
@@ -131,7 +127,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.internal = exports.xhrRequest = exports.getOptions = exports.setOptions = undefined;
 
-var _xhrRequest = __webpack_require__(51);
+var _xhrRequest = __webpack_require__(50);
 
 var _xhrRequest2 = _interopRequireDefault(_xhrRequest);
 
@@ -306,7 +302,7 @@ exports.setOptions = setOptions;
 exports.getOptions = getOptions;
 var options = {
   // callback allowing customization of the xhr (e.g. adding custom auth headers, cors, etc)
-  beforeSend: function beforeSend() /* xhr */{},
+  beforeSend: function beforeSend() /* xhr, imageId */{},
 
   // callback allowing modification of newly created image objects
   imageCreated: function imageCreated() /* image */{},
@@ -370,13 +366,43 @@ function isModalityLUTForDisplay(sopClassUid) {
   sopClassUid !== '1.2.840.10008.5.1.4.1.1.12.2.1'; // XRF
 }
 
+function convertToIntPixelData(floatPixelData) {
+  var floatMinMax = (0, _getMinMax2.default)(floatPixelData);
+  var floatRange = Math.abs(floatMinMax.max - floatMinMax.min);
+  var intRange = 65535;
+  var slope = floatRange / intRange;
+  var intercept = floatMinMax.min;
+  var numPixels = floatPixelData.length;
+  var intPixelData = new Uint16Array(numPixels);
+  var min = 65535;
+  var max = 0;
+
+  for (var i = 0; i < numPixels; i++) {
+    var rescaledPixel = Math.floor((floatPixelData[i] - intercept) / slope);
+
+    intPixelData[i] = rescaledPixel;
+    min = Math.min(min, rescaledPixel);
+    max = Math.max(max, rescaledPixel);
+  }
+
+  return {
+    min: min,
+    max: max,
+    intPixelData: intPixelData,
+    slope: slope,
+    intercept: intercept
+  };
+}
+
 /**
  * Helper function to set pixel data to the right typed array.  This is needed because web workers
  * can transfer array buffers but not typed arrays
  * @param imageFrame
  */
 function setPixelDataType(imageFrame) {
-  if (imageFrame.bitsAllocated === 16) {
+  if (imageFrame.bitsAllocated === 32) {
+    imageFrame.pixelData = new Float32Array(imageFrame.pixelData);
+  } else if (imageFrame.bitsAllocated === 16) {
     if (imageFrame.pixelRepresentation === 0) {
       imageFrame.pixelData = new Uint16Array(imageFrame.pixelData);
     } else {
@@ -445,13 +471,28 @@ function createImage(imageId, pixelData, transferSyntax, options) {
         width: imageFrame.columns,
         windowCenter: voiLutModule.windowCenter ? voiLutModule.windowCenter[0] : undefined,
         windowWidth: voiLutModule.windowWidth ? voiLutModule.windowWidth[0] : undefined,
-        decodeTimeInMS: imageFrame.decodeTimeInMS
+        decodeTimeInMS: imageFrame.decodeTimeInMS,
+        floatPixelData: undefined
       };
 
       // add function to return pixel data
-      image.getPixelData = function () {
-        return imageFrame.pixelData;
-      };
+      if (imageFrame.pixelData instanceof Float32Array) {
+        var floatPixelData = imageFrame.pixelData;
+        var results = convertToIntPixelData(floatPixelData);
+
+        image.minPixelValue = results.min;
+        image.maxPixelValue = results.max;
+        image.slope = results.slope;
+        image.intercept = results.intercept;
+        image.floatPixelData = floatPixelData;
+        image.getPixelData = function () {
+          return results.intPixelData;
+        };
+      } else {
+        image.getPixelData = function () {
+          return imageFrame.pixelData;
+        };
+      }
 
       // Setup the renderer
       if (image.color) {
@@ -484,18 +525,18 @@ function createImage(imageId, pixelData, transferSyntax, options) {
         image.voiLUT = voiLutModule.voiLUTSequence[0];
       }
 
+      if (image.color) {
+        image.windowWidth = 255;
+        image.windowCenter = 127;
+      }
+
       // set the ww/wc to cover the dynamic range of the image if no values are supplied
       if (image.windowCenter === undefined || image.windowWidth === undefined) {
-        if (image.color) {
-          image.windowWidth = 255;
-          image.windowCenter = 128;
-        } else {
-          var maxVoi = image.maxPixelValue * image.slope + image.intercept;
-          var minVoi = image.minPixelValue * image.slope + image.intercept;
+        var maxVoi = image.maxPixelValue * image.slope + image.intercept;
+        var minVoi = image.minPixelValue * image.slope + image.intercept;
 
-          image.windowWidth = maxVoi - minVoi;
-          image.windowCenter = (maxVoi + minVoi) / 2;
-        }
+        image.windowWidth = maxVoi - minVoi;
+        image.windowCenter = (maxVoi + minVoi) / 2;
       }
       resolve(image);
     }, reject);
@@ -631,7 +672,7 @@ exports.default = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = '1.0.3';
+exports.default = '2.0.0';
 
 /***/ }),
 /* 10 */
@@ -734,7 +775,7 @@ var _unpackBinaryFrame = __webpack_require__(34);
 
 var _unpackBinaryFrame2 = _interopRequireDefault(_unpackBinaryFrame);
 
-var _register = __webpack_require__(54);
+var _register = __webpack_require__(53);
 
 var _register2 = _interopRequireDefault(_register);
 
@@ -843,12 +884,7 @@ function getLutData(lutDataSet, tag, lutDescriptor) {
   var lut = [];
   var lutData = lutDataSet.elements[tag];
 
-  // The first Palette Color Lookup Table Descriptor value is the number of entries in the lookup table.
-  // When the number of table entries is equal to 2ˆ16 then this value shall be 0.
-  // See http://dicom.nema.org/MEDICAL/DICOM/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.5
-  var numLutEntries = lutDescriptor[0] || 65536;
-
-  for (var i = 0; i < numLutEntries; i++) {
+  for (var i = 0; i < lutDescriptor[0]; i++) {
     // Output range is always unsigned
     if (lutDescriptor[2] === 16) {
       lut[i] = lutDataSet.uint16(tag, i);
@@ -861,13 +897,37 @@ function getLutData(lutDataSet, tag, lutDescriptor) {
 }
 
 function populatePaletteColorLut(dataSet, imagePixelModule) {
-  // return immediately if photometric interpretation is not PALETTE COLOR or no palette lut elements
-  if (imagePixelModule.photometricInterpretation !== 'PALETTE COLOR' || !dataSet.elements.x00281101) {
-    return;
-  }
   imagePixelModule.redPaletteColorLookupTableDescriptor = getLutDescriptor(dataSet, 'x00281101');
   imagePixelModule.greenPaletteColorLookupTableDescriptor = getLutDescriptor(dataSet, 'x00281102');
   imagePixelModule.bluePaletteColorLookupTableDescriptor = getLutDescriptor(dataSet, 'x00281103');
+
+  // The first Palette Color Lookup Table Descriptor value is the number of entries in the lookup table.
+  // When the number of table entries is equal to 2ˆ16 then this value shall be 0.
+  // See http://dicom.nema.org/MEDICAL/DICOM/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.5
+  if (imagePixelModule.redPaletteColorLookupTableDescriptor[0] === 0) {
+    imagePixelModule.redPaletteColorLookupTableDescriptor[0] = 65536;
+    imagePixelModule.greenPaletteColorLookupTableDescriptor[0] = 65536;
+    imagePixelModule.bluePaletteColorLookupTableDescriptor[0] = 65536;
+  }
+
+  // The third Palette Color Lookup Table Descriptor value specifies the number of bits for each entry in the Lookup Table Data.
+  // It shall take the value of 8 or 16.
+  // The LUT Data shall be stored in a format equivalent to 8 bits allocated when the number of bits for each entry is 8, and 16 bits allocated when the number of bits for each entry is 16, where in both cases the high bit is equal to bits allocated-1.
+  // The third value shall be identical for each of the Red, Green and Blue Palette Color Lookup Table Descriptors.
+  //
+  // Note: Some implementations have encoded 8 bit entries with 16 bits allocated, padding the high bits;
+  // this can be detected by comparing the number of entries specified in the LUT Descriptor with the actual value length of the LUT Data entry.
+  // The value length in bytes should equal the number of entries if bits allocated is 8, and be twice as long if bits allocated is 16.
+  var numLutEntries = imagePixelModule.redPaletteColorLookupTableDescriptor[0];
+  var lutData = dataSet.elements.x00281201;
+  var lutBitsAllocated = lutData.length === numLutEntries ? 8 : 16;
+
+  // If the descriptors do not appear to have the correct values, correct them
+  if (imagePixelModule.redPaletteColorLookupTableDescriptor[2] !== lutBitsAllocated) {
+    imagePixelModule.redPaletteColorLookupTableDescriptor[2] = lutBitsAllocated;
+    imagePixelModule.greenPaletteColorLookupTableDescriptor[2] = lutBitsAllocated;
+    imagePixelModule.bluePaletteColorLookupTableDescriptor[2] = lutBitsAllocated;
+  }
 
   imagePixelModule.redPaletteColorLookupTableData = getLutData(dataSet, 'x00281201', imagePixelModule.redPaletteColorLookupTableDescriptor);
   imagePixelModule.greenPaletteColorLookupTableData = getLutData(dataSet, 'x00281202', imagePixelModule.greenPaletteColorLookupTableDescriptor);
@@ -901,7 +961,10 @@ function getImagePixelModule(dataSet) {
   };
 
   populateSmallestLargestPixelValues(dataSet, imagePixelModule);
-  populatePaletteColorLut(dataSet, imagePixelModule);
+
+  if (imagePixelModule.photometricInterpretation === 'PALETTE COLOR' && dataSet.elements.x00281101) {
+    populatePaletteColorLut(dataSet, imagePixelModule);
+  }
 
   return imagePixelModule;
 }
@@ -1092,7 +1155,7 @@ var _loadImage = __webpack_require__(23);
 
 var _loadImage2 = _interopRequireDefault(_loadImage);
 
-var _register = __webpack_require__(52);
+var _register = __webpack_require__(51);
 
 var _register2 = _interopRequireDefault(_register);
 
@@ -1126,7 +1189,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _getNumberString = __webpack_require__(49);
+var _getNumberString = __webpack_require__(48);
 
 Object.defineProperty(exports, 'getNumberString', {
   enumerable: true,
@@ -1162,7 +1225,7 @@ Object.defineProperty(exports, 'getValue', {
   }
 });
 
-var _metaDataProvider = __webpack_require__(50);
+var _metaDataProvider = __webpack_require__(49);
 
 Object.defineProperty(exports, 'metaDataProvider', {
   enumerable: true,
@@ -1413,8 +1476,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _externalModules = __webpack_require__(0);
-
 var _metaDataManager = __webpack_require__(5);
 
 var _metaDataManager2 = _interopRequireDefault(_metaDataManager);
@@ -1437,41 +1498,39 @@ function loadImage(imageId, options) {
   var start = new Date().getTime();
   var uri = imageId.substring(7);
 
-  var deferred = _externalModules.$.Deferred();
+  var promise = new Promise(function (resolve, reject) {
+    // check to make sure we have metadata for this imageId
+    var metaData = _metaDataManager2.default.get(imageId);
 
-  // check to make sure we have metadata for this imageId
-  var metaData = _metaDataManager2.default.get(imageId);
+    if (metaData === undefined) {
+      var error = new Error('no metadata for imageId ' + imageId);
 
-  if (metaData === undefined) {
-    deferred.reject('no metadata for imageId ' + imageId);
+      return reject(error);
+    }
 
-    return deferred.promise();
-  }
+    // TODO: load bulk data items that we might need
+    var mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
 
-  // TODO: load bulk data items that we might need
-  var mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
+    // get the pixel data from the server
+    (0, _getPixelData2.default)(uri, imageId, mediaType).then(function (result) {
+      var transferSyntax = getTransferSyntaxForContentType(result.contentType);
+      var pixelData = result.imageFrame.pixelData;
+      var imagePromise = (0, _createImage2.default)(imageId, pixelData, transferSyntax, options);
 
-  // get the pixel data from the server
-  (0, _getPixelData2.default)(uri, imageId, mediaType).then(function (result) {
+      imagePromise.then(function (image) {
+        // add the loadTimeInMS property
+        var end = new Date().getTime();
 
-    var transferSyntax = getTransferSyntaxForContentType(result.contentType);
-    var pixelData = result.imageFrame.pixelData;
-    var imagePromise = (0, _createImage2.default)(imageId, pixelData, transferSyntax, options);
-
-    imagePromise.then(function (image) {
-      // add the loadTimeInMS property
-      var end = new Date().getTime();
-
-      image.loadTimeInMS = end - start;
-      deferred.resolve(image);
-    }, function (reason) {
-      deferred.reject(reason);
-    });
-  }, function (reason) {
-    deferred.reject(reason);
+        image.loadTimeInMS = end - start;
+        resolve(image);
+      }, reject);
+    }, reject);
   });
 
-  return deferred;
+  return {
+    promise: promise,
+    cancelFn: undefined
+  };
 }
 
 exports.default = loadImage;
@@ -2198,7 +2257,7 @@ function framesAreFragmented(dataSet) {
 }
 
 function getEncapsulatedImageFrame(dataSet, frameIndex) {
-  if (dataSet.elements.x7fe00010.basicOffsetTable.length) {
+  if (dataSet.elements.x7fe00010 && dataSet.elements.x7fe00010.basicOffsetTable.length) {
     // Basic Offset Table is not empty
     return _externalModules.dicomParser.readEncapsulatedImageFrame(dataSet, dataSet.elements.x7fe00010, frameIndex);
   }
@@ -2236,7 +2295,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 function getUncompressedImageFrame(dataSet, frameIndex) {
-  var pixelDataElement = dataSet.elements.x7fe00010;
+  var pixelDataElement = dataSet.elements.x7fe00010 || dataSet.elements.x7fe00008;
   var bitsAllocated = dataSet.uint16('x00280100');
   var rows = dataSet.uint16('x00280010');
   var columns = dataSet.uint16('x00280011');
@@ -2268,6 +2327,13 @@ function getUncompressedImageFrame(dataSet, frameIndex) {
     }
 
     return (0, _unpackBinaryFrame2.default)(dataSet.byteArray, frameOffset, pixelsPerFrame);
+  } else if (bitsAllocated === 32) {
+    frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame * 4;
+    if (frameOffset >= dataSet.byteArray.length) {
+      throw new Error('frame exceeds size of pixelData');
+    }
+
+    return new Uint8Array(dataSet.byteArray.buffer, frameOffset, pixelsPerFrame * 4);
   }
 
   throw new Error('unsupported pixel format');
@@ -2372,8 +2438,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.loadImage = exports.getLoaderForScheme = exports.loadImageFromPromise = undefined;
 
-var _externalModules = __webpack_require__(0);
-
 var _createImage = __webpack_require__(7);
 
 var _createImage2 = _interopRequireDefault(_createImage);
@@ -2390,7 +2454,7 @@ var _loadFileRequest = __webpack_require__(35);
 
 var _loadFileRequest2 = _interopRequireDefault(_loadFileRequest);
 
-var _getPixelData = __webpack_require__(53);
+var _getPixelData = __webpack_require__(52);
 
 var _getPixelData2 = _interopRequireDefault(_getPixelData);
 
@@ -2414,9 +2478,41 @@ function loadImageFromPromise(dataSetPromise, imageId) {
   var options = arguments[4];
 
   var start = new Date().getTime();
-  var deferred = _externalModules.$.Deferred();
 
-  dataSetPromise.then(function (dataSet /* , xhr*/) {
+  var promise = new Promise(function (resolve, reject) {
+    dataSetPromise.then(function (dataSet /* , xhr*/) {
+      var pixelData = (0, _getPixelData2.default)(dataSet, frame);
+      var transferSyntax = dataSet.string('x00020010');
+      var loadEnd = new Date().getTime();
+      var imagePromise = (0, _createImage2.default)(imageId, pixelData, transferSyntax, options);
+
+      imagePromise.then(function (image) {
+        image.data = dataSet;
+        image.sharedCacheKey = sharedCacheKey;
+        var end = new Date().getTime();
+
+        image.loadTimeInMS = loadEnd - start;
+        image.totalTimeInMS = end - start;
+        addDecache(image);
+        resolve(image);
+      }, reject);
+    }, reject);
+  });
+
+  return {
+    promise: promise,
+    cancelFn: undefined
+  };
+}
+
+function loadImageFromDataSet(dataSet, imageId) {
+  var frame = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var sharedCacheKey = arguments[3];
+  var options = arguments[4];
+
+  var start = new Date().getTime();
+
+  var promise = new Promise(function (resolve, reject) {
     var pixelData = (0, _getPixelData2.default)(dataSet, frame);
     var transferSyntax = dataSet.string('x00020010');
     var loadEnd = new Date().getTime();
@@ -2430,44 +2526,14 @@ function loadImageFromPromise(dataSetPromise, imageId) {
       image.loadTimeInMS = loadEnd - start;
       image.totalTimeInMS = end - start;
       addDecache(image);
-      deferred.resolve(image);
-    }, function (error) {
-      deferred.reject(error);
-    });
-  }, function (error) {
-    deferred.reject(error);
+      resolve(image);
+    }, reject);
   });
 
-  return deferred;
-}
-
-function loadImageFromDataSet(dataSet, imageId) {
-  var frame = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-  var sharedCacheKey = arguments[3];
-  var options = arguments[4];
-
-  var start = new Date().getTime();
-  var deferred = _externalModules.$.Deferred();
-
-  var pixelData = (0, _getPixelData2.default)(dataSet, frame);
-  var transferSyntax = dataSet.string('x00020010');
-  var loadEnd = new Date().getTime();
-  var imagePromise = (0, _createImage2.default)(imageId, pixelData, transferSyntax, options);
-
-  imagePromise.then(function (image) {
-    image.data = dataSet;
-    image.sharedCacheKey = sharedCacheKey;
-    var end = new Date().getTime();
-
-    image.loadTimeInMS = loadEnd - start;
-    image.totalTimeInMS = end - start;
-    addDecache(image);
-    deferred.resolve(image);
-  }, function (error) {
-    deferred.reject(error);
-  });
-
-  return deferred;
+  return {
+    promise: promise,
+    cancelFn: undefined
+  };
 }
 
 function getLoaderForScheme(scheme) {
@@ -2542,7 +2608,7 @@ Object.defineProperty(exports, 'wadors', {
   }
 });
 
-var _configure = __webpack_require__(55);
+var _configure = __webpack_require__(54);
 
 Object.defineProperty(exports, 'configure', {
   enumerable: true,
@@ -2810,19 +2876,20 @@ Object.defineProperty(exports, "__esModule", {
 
 exports.default = function (imageFrame, rgbaBuffer) {
   var numPixels = imageFrame.columns * imageFrame.rows;
-  var palIndex = 0;
-  var rgbaIndex = 0;
   var pixelData = imageFrame.pixelData;
-  var start = imageFrame.redPaletteColorLookupTableDescriptor[1];
   var rData = imageFrame.redPaletteColorLookupTableData;
   var gData = imageFrame.greenPaletteColorLookupTableData;
   var bData = imageFrame.bluePaletteColorLookupTableData;
-  var shift = imageFrame.redPaletteColorLookupTableDescriptor[2] === 8 ? 0 : 8;
   var len = imageFrame.redPaletteColorLookupTableData.length;
+  var palIndex = 0;
+  var rgbaIndex = 0;
 
-  if (len === 0) {
-    len = 65535;
-  }
+  var start = imageFrame.redPaletteColorLookupTableDescriptor[1];
+  var shift = imageFrame.redPaletteColorLookupTableDescriptor[2] === 8 ? 0 : 8;
+
+  var rDataCleaned = convertLUTto8Bit(rData, shift);
+  var gDataCleaned = convertLUTto8Bit(gData, shift);
+  var bDataCleaned = convertLUTto8Bit(bData, shift);
 
   for (var i = 0; i < numPixels; ++i) {
     var value = pixelData[palIndex++];
@@ -2835,12 +2902,33 @@ exports.default = function (imageFrame, rgbaBuffer) {
       value -= start;
     }
 
-    rgbaBuffer[rgbaIndex++] = rData[value] >> shift;
-    rgbaBuffer[rgbaIndex++] = gData[value] >> shift;
-    rgbaBuffer[rgbaIndex++] = bData[value] >> shift;
+    rgbaBuffer[rgbaIndex++] = rDataCleaned[value];
+    rgbaBuffer[rgbaIndex++] = gDataCleaned[value];
+    rgbaBuffer[rgbaIndex++] = bDataCleaned[value];
     rgbaBuffer[rgbaIndex++] = 255;
   }
 };
+
+/* eslint no-bitwise: 0 */
+
+function convertLUTto8Bit(lut, shift) {
+  var numEntries = lut.length;
+  var cleanedLUT = new Uint8ClampedArray(numEntries);
+
+  for (var i = 0; i < numEntries; ++i) {
+    cleanedLUT[i] = lut[i] >> shift;
+  }
+
+  return cleanedLUT;
+}
+
+/**
+ * Convert pixel data with PALETTE COLOR Photometric Interpretation to RGBA
+ *
+ * @param {ImageFrame} imageFrame
+ * @param {Uint8ClampedArray} rgbaBuffer
+ * @returns {void}
+ */
 
 /***/ }),
 /* 45 */
@@ -3006,12 +3094,6 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_46__;
 
 /***/ }),
 /* 47 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_47__;
-
-/***/ }),
-/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3045,7 +3127,7 @@ function registerLoaders(cornerstone) {
 exports.default = registerLoaders;
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3082,7 +3164,7 @@ function getNumberString(element, index, defaultValue) {
 exports.default = getNumberString;
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3241,7 +3323,7 @@ function metaDataProvider(type, imageId) {
 exports.default = metaDataProvider;
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3259,6 +3341,7 @@ function xhrRequest(url, imageId) {
   var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   var params = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
+  var cornerstone = _externalModules.external.cornerstone;
   var options = (0, _options.getOptions)();
 
   // Make the request for the DICOM P10 SOP Instance
@@ -3267,7 +3350,7 @@ function xhrRequest(url, imageId) {
 
     xhr.open('get', url, true);
     xhr.responseType = 'arraybuffer';
-    options.beforeSend(xhr);
+    options.beforeSend(xhr, imageId);
     Object.keys(headers).forEach(function (key) {
       xhr.setRequestHeader(key, headers[key]);
     });
@@ -3292,11 +3375,7 @@ function xhrRequest(url, imageId) {
         imageId: imageId
       };
 
-      (0, _externalModules.$)(_externalModules.external.cornerstone.events).trigger('CornerstoneImageLoadStart', eventData);
-
-      var customEvent = new CustomEvent('cornerstoneimageloadstart', { detail: eventData });
-
-      _externalModules.external.cornerstone.events.dispatchEvent(customEvent);
+      cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadstart', eventData);
     };
 
     // Event triggered when downloading an image ends
@@ -3312,11 +3391,7 @@ function xhrRequest(url, imageId) {
       };
 
       // Event
-      (0, _externalModules.$)(_externalModules.external.cornerstone.events).trigger('CornerstoneImageLoadEnd', eventData);
-
-      var customEvent = new CustomEvent('cornerstoneimageloadend', { detail: eventData });
-
-      _externalModules.external.cornerstone.events.dispatchEvent(customEvent);
+      cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadend', eventData);
     };
 
     // handle response data
@@ -3366,11 +3441,7 @@ function xhrRequest(url, imageId) {
         percentComplete: percentComplete
       };
 
-      (0, _externalModules.$)(_externalModules.external.cornerstone.events).trigger('CornerstoneImageLoadProgress', eventData);
-
-      var customEvent = new CustomEvent('cornerstoneimageloadprogress', { detail: eventData });
-
-      _externalModules.external.cornerstone.events.dispatchEvent(customEvent);
+      cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadprogress', eventData);
     };
 
     xhr.send();
@@ -3380,7 +3451,7 @@ function xhrRequest(url, imageId) {
 exports.default = xhrRequest;
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3405,7 +3476,7 @@ var _index = __webpack_require__(18);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3428,7 +3499,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function getPixelData(dataSet) {
   var frameIndex = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
-  var pixelDataElement = dataSet.elements.x7fe00010;
+  var pixelDataElement = dataSet.elements.x7fe00010 || dataSet.elements.x7fe00008;
 
   if (pixelDataElement.encapsulatedPixelData) {
     return (0, _getEncapsulatedImageFrame2.default)(dataSet, frameIndex);
@@ -3440,7 +3511,7 @@ function getPixelData(dataSet) {
 exports.default = getPixelData;
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3465,7 +3536,7 @@ var _loadImage = __webpack_require__(36);
 var _index = __webpack_require__(12);
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

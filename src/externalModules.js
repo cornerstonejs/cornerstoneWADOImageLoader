@@ -1,4 +1,4 @@
-import $ from 'jquery';
+/* eslint import/extensions:0 */
 import * as dicomParser from 'dicom-parser';
 import registerLoaders from './imageLoader/registerLoaders.js';
 
@@ -15,4 +15,4 @@ const external = {
   }
 };
 
-export { $, dicomParser, external };
+export { dicomParser, external };
