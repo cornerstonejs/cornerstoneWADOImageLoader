@@ -35,9 +35,11 @@ function load (uri, loadRequest = xhrRequest, imageId) {
     });
   }
 
-  // if we are currently loading this uri, return its promise
+  // if we are currently loading this uri, increment the cacheCount and return its promise
   if (promises[uri]) {
     // console.log('returning existing load promise for ' + uri);
+    promises[uri].cacheCount++;
+
     return promises[uri];
   }
 
@@ -60,15 +62,20 @@ function load (uri, loadRequest = xhrRequest, imageId) {
 
       loadedDataSets[uri] = {
         dataSet,
-        cacheCount: 1
+        cacheCount: promise.cacheCount
       };
 
       resolve(dataSet);
     }, reject).then(() => {
-      // Remove the promise regardless of success or failure
+      // Remove the promise if success
+      delete promises[uri];
+    }, () => {
+      // Remove the promise if failure
       delete promises[uri];
     });
   });
+
+  promise.cacheCount = 1;
 
   promises[uri] = promise;
 
