@@ -1,6 +1,5 @@
 import { dicomParser, external } from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
-import events from '../events.js';
 
 /**
  * This object supports loading of DICOM P10 dataset from a uri and caching it so it can be accessed
@@ -70,7 +69,7 @@ function load (uri, loadRequest = xhrRequest, imageId) {
       cacheSizeInBytes += dataSet.byteArray.length;
       resolve(dataSet);
 
-      cornerstone.triggerEvent(events, 'DataSetsCacheChanged', {
+      cornerstone.triggerEvent(cornerstone.events, 'datasetscachechanged', {
         uri,
         action: 'loaded',
         cacheInfo: getCacheInfo()
@@ -98,7 +97,7 @@ function unload (uri) {
       cacheSizeInBytes -= loadedDataSets[uri].dataSet.byteArray.length;
       delete loadedDataSets[uri];
 
-      cornerstone.triggerEvent(events, 'DataSetsCacheChanged', {
+      cornerstone.triggerEvent(cornerstone.events, 'datasetscachechanged', {
         uri,
         action: 'unloaded',
         cacheInfo: getCacheInfo()
