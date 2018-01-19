@@ -28,7 +28,7 @@ function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKe
       const loadEnd = new Date().getTime();
       const imagePromise = createImage(imageId, pixelData, transferSyntax, options.decodeTask);
 
-      if (options.shallAddDecache === true) {
+      if (options.decache === true) {
         addDecache(imageLoadObject, imageId);
       }
 
@@ -121,6 +121,8 @@ function loadImage (imageId, options) {
 
   // load the dataSet via the dataSetCacheManager
   const dataSetPromise = dataSetCacheManager.load(parsedImageId.url, loader, imageId);
+
+  options.decache = true;
 
   return loadImageFromPromise(dataSetPromise, imageId, parsedImageId.frame, parsedImageId.url, options);
 }
