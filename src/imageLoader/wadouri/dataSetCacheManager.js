@@ -1,4 +1,4 @@
-import { dicomParser, external } from '../../externalModules.js';
+import external from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
 
 /**
@@ -8,7 +8,6 @@ import { xhrRequest } from '../internal/index.js';
  * in a multiframe sop instance so it can create the imageId's correctly.
  */
 let cacheSizeInBytes = 0;
-
 let loadedDataSets = {};
 let promises = {};
 
@@ -28,8 +27,7 @@ function get (uri) {
 
 // loads the dicom dataset from the wadouri sp
 function load (uri, loadRequest = xhrRequest, imageId) {
-  const cornerstone = external.cornerstone;
-
+  const { cornerstone, dicomParser } = external;
   // if already loaded return it right away
   if (loadedDataSets[uri]) {
     // console.log('using loaded dataset ' + uri);
@@ -43,7 +41,6 @@ function load (uri, loadRequest = xhrRequest, imageId) {
   if (promises[uri]) {
     // console.log('returning existing load promise for ' + uri);
     promises[uri].cacheCount++;
-
     return promises[uri];
   }
 
@@ -70,7 +67,6 @@ function load (uri, loadRequest = xhrRequest, imageId) {
       };
       cacheSizeInBytes += dataSet.byteArray.length;
       resolve(dataSet);
-
       cornerstone.triggerEvent(cornerstone.events, 'datasetscachechanged', {
         uri,
         action: 'loaded',
@@ -86,7 +82,6 @@ function load (uri, loadRequest = xhrRequest, imageId) {
   });
 
   promise.cacheCount = 1;
-
   promises[uri] = promise;
 
   return promise;
@@ -94,8 +89,7 @@ function load (uri, loadRequest = xhrRequest, imageId) {
 
 // remove the cached/loaded dicom dataset for the specified wadouri to free up memory
 function unload (uri) {
-  const cornerstone = external.cornerstone;
-
+  const { cornerstone } = external;
   // console.log('unload for ' + uri);
   if (loadedDataSets[uri]) {
     loadedDataSets[uri].cacheCount--;
@@ -103,7 +97,6 @@ function unload (uri) {
       // console.log('removing loaded dataset for ' + uri);
       cacheSizeInBytes -= loadedDataSets[uri].dataSet.byteArray.length;
       delete loadedDataSets[uri];
-
       cornerstone.triggerEvent(cornerstone.events, 'datasetscachechanged', {
         uri,
         action: 'unloaded',
@@ -112,7 +105,6 @@ function unload (uri) {
     }
   }
 }
-
 export function getInfo () {
   return {
     cacheSizeInBytes,

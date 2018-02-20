@@ -12,6 +12,6 @@ export { default as getMinMax } from '../shared/getMinMax.js';
 export { default as isColorImage } from './isColorImage.js';
 export { default as isJPEGBaseline8BitColor } from './isJPEGBaseline8BitColor.js';
 export { default as webWorkerManager } from './webWorkerManager.js';
+export { default as registerLoaders } from './registerLoaders.js';
 export { default as version } from '../version.js';
-export { internal } from './internal/index.js';
-export { external } from '../externalModules.js';
+export { default as external } from '../externalModules.js';

@@ -1,4 +1,4 @@
-import { external } from '../externalModules.js';
+import external from '../externalModules.js';
 import getImageFrame from './getImageFrame.js';
 import decodeImageFrame from './decodeImageFrame.js';
 import isColorImageFn from './isColorImage.js';
@@ -25,15 +25,12 @@ function convertToIntPixelData (floatPixelData) {
   const intPixelData = new Uint16Array(numPixels);
   let min = 65535;
   let max = 0;
-
   for (let i = 0; i < numPixels; i++) {
     const rescaledPixel = Math.floor((floatPixelData[i] - intercept) / slope);
-
     intPixelData[i] = rescaledPixel;
     min = Math.min(min, rescaledPixel);
     max = Math.max(max, rescaledPixel);
   }
-
   return {
     min,
     max,
@@ -42,7 +39,6 @@ function convertToIntPixelData (floatPixelData) {
     intercept
   };
 }
-
 /**
  * Helper function to set pixel data to the right typed array.  This is needed because web workers
  * can transfer array buffers but not typed arrays
@@ -63,7 +59,7 @@ function setPixelDataType (imageFrame) {
 }
 
 function createImage (imageId, pixelData, transferSyntax, options) {
-  const cornerstone = external.cornerstone;
+  const { cornerstone } = external;
   const canvas = document.createElement('canvas');
   const imageFrame = getImageFrame(imageId);
   const decodePromise = decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options);
@@ -128,7 +124,6 @@ function createImage (imageId, pixelData, transferSyntax, options) {
       if (imageFrame.pixelData instanceof Float32Array) {
         const floatPixelData = imageFrame.pixelData;
         const results = convertToIntPixelData(floatPixelData);
-
         image.minPixelValue = results.min;
         image.maxPixelValue = results.max;
         image.slope = results.slope;
@@ -136,7 +131,7 @@ function createImage (imageId, pixelData, transferSyntax, options) {
         image.floatPixelData = floatPixelData;
         image.getPixelData = () => results.intPixelData;
       } else {
-        image.getPixelData = () => imageFrame.pixelData;
+      image.getPixelData = () => imageFrame.pixelData;
       }
 
       // Setup the renderer
@@ -174,18 +169,18 @@ function createImage (imageId, pixelData, transferSyntax, options) {
         image.voiLUT = voiLutModule.voiLUTSequence[0];
       }
 
-      if (image.color) {
-        image.windowWidth = 255;
+        if (image.color) {
+          image.windowWidth = 255;
         image.windowCenter = 127;
       }
 
       // set the ww/wc to cover the dynamic range of the image if no values are supplied
       if (image.windowCenter === undefined || image.windowWidth === undefined) {
-        const maxVoi = image.maxPixelValue * image.slope + image.intercept;
-        const minVoi = image.minPixelValue * image.slope + image.intercept;
+          const maxVoi = image.maxPixelValue * image.slope + image.intercept;
+          const minVoi = image.minPixelValue * image.slope + image.intercept;
 
-        image.windowWidth = maxVoi - minVoi;
-        image.windowCenter = (maxVoi + minVoi) / 2;
+          image.windowWidth = maxVoi - minVoi;
+          image.windowCenter = (maxVoi + minVoi) / 2;
       }
       resolve(image);
     }, reject);

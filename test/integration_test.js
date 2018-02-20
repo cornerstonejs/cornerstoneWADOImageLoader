@@ -1,10 +1,10 @@
 /* eslint import/extensions: 0 */
 import { expect } from 'chai';
-import { external } from '../src/externalModules.js';
 import { loadImage } from '../src/imageLoader/wadouri/loadImage.js';
 import webWorkerManager from '../src/imageLoader/webWorkerManager.js';
+import registerLoaders from '../src/imageLoader/registerLoaders.js';
 
-external.cornerstone = window.cornerstone;
+registerLoaders();
 
 const transferSyntaxes = {
   '1.2.840.10008.1.2': 'LittleEndianImplicitTransferSyntax',
