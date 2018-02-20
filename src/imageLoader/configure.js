@@ -1,12 +1,7 @@
-(function (cornerstoneWADOImageLoader) {
+import { setOptions } from './internal/index.js';
 
-  "use strict";
+function configure (options) {
+  setOptions(options);
+}
 
-  function configure(options) {
-    cornerstoneWADOImageLoader.internal.options = options;
-  }
-
-  // module exports
-  cornerstoneWADOImageLoader.configure = configure;
-
-}(cornerstoneWADOImageLoader));
+export default configure;

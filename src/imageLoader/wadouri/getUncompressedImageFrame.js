@@ -1,46 +1,53 @@
+import unpackBinaryFrame from './unpackBinaryFrame.js';
+
 /**
  * Function to deal with extracting an image frame from an encapsulated data set.
  */
-(function ($, cornerstone, cornerstoneWADOImageLoader) {
 
-  "use strict";
 
-  function getUncompressedImageFrame(dataSet, frameIndex) {
-    var pixelDataElement = dataSet.elements.x7fe00010;
-    if (!pixelDataElement || pixelDataElement.length===0) throw 'missing pixel data';
+function getUncompressedImageFrame (dataSet, frameIndex) {
+  const pixelDataElement = dataSet.elements.x7fe00010 || dataSet.elements.x7fe00008;
+  const bitsAllocated = dataSet.uint16('x00280100');
+  const rows = dataSet.uint16('x00280010');
+  const columns = dataSet.uint16('x00280011');
+  const samplesPerPixel = dataSet.uint16('x00280002');
 
-    var bitsAllocated = dataSet.uint16('x00280100');
-    var rows = dataSet.uint16('x00280010');
-    var columns = dataSet.uint16('x00280011');
-    var samplesPerPixel = dataSet.uint16('x00280002');
+  const pixelDataOffset = pixelDataElement.dataOffset;
+  const pixelsPerFrame = rows * columns * samplesPerPixel;
 
-    var pixelDataOffset = pixelDataElement.dataOffset;
-    var pixelsPerFrame = rows * columns * samplesPerPixel;
+  let frameOffset;
 
-    var frameOffset;
-    if(bitsAllocated === 8) {
-      frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame;
-      if(frameOffset >= dataSet.byteArray.length) {
-        throw 'frame exceeds size of pixelData';
-      }
-      return new Uint8Array(dataSet.byteArray.buffer, frameOffset, pixelsPerFrame);
-    }
-    else if(bitsAllocated === 16) {
-      frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame * 2;
-      if(frameOffset >= dataSet.byteArray.length) {
-        throw 'frame exceeds size of pixelData';
-      }
-      return new Uint8Array(dataSet.byteArray.buffer, frameOffset,pixelsPerFrame * 2);
-    } else if (bitsAllocated === 1) {
-      frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame * 0.125;
-      if(frameOffset >= dataSet.byteArray.length) {
-        throw 'frame exceeds size of pixelData';
-      }
-      return cornerstoneWADOImageLoader.wadouri.unpackBinaryFrame(dataSet.byteArray, frameOffset, pixelsPerFrame);
+  if (bitsAllocated === 8) {
+    frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame;
+    if (frameOffset >= dataSet.byteArray.length) {
+      throw new Error('frame exceeds size of pixelData');
     }
 
-    throw 'unsupported pixel format';
+    return new Uint8Array(dataSet.byteArray.buffer, frameOffset, pixelsPerFrame);
+  } else if (bitsAllocated === 16) {
+    frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame * 2;
+    if (frameOffset >= dataSet.byteArray.length) {
+      throw new Error('frame exceeds size of pixelData');
+    }
+
+    return new Uint8Array(dataSet.byteArray.buffer, frameOffset, pixelsPerFrame * 2);
+  } else if (bitsAllocated === 1) {
+    frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame * 0.125;
+    if (frameOffset >= dataSet.byteArray.length) {
+      throw new Error('frame exceeds size of pixelData');
+    }
+
+    return unpackBinaryFrame(dataSet.byteArray, frameOffset, pixelsPerFrame);
+  } else if (bitsAllocated === 32) {
+    frameOffset = pixelDataOffset + frameIndex * pixelsPerFrame * 4;
+    if (frameOffset >= dataSet.byteArray.length) {
+      throw new Error('frame exceeds size of pixelData');
+    }
+
+    return new Uint8Array(dataSet.byteArray.buffer, frameOffset, pixelsPerFrame * 4);
   }
 
-  cornerstoneWADOImageLoader.wadouri.getUncompressedImageFrame = getUncompressedImageFrame;
-}($, cornerstone, cornerstoneWADOImageLoader));
+  throw new Error('unsupported pixel format');
+}
+
+export default getUncompressedImageFrame;

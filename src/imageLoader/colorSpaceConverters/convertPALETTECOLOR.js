@@ -1,39 +1,54 @@
-(function (cornerstoneWADOImageLoader) {
+/* eslint no-bitwise: 0 */
 
-  "use strict";
+function convertLUTto8Bit (lut, shift) {
+  const numEntries = lut.length;
+  const cleanedLUT = new Uint8ClampedArray(numEntries);
 
-  function convertPALETTECOLOR( imageFrame, rgbaBuffer ) {
-    var numPixels = imageFrame.columns * imageFrame.rows;
-    var palIndex=0;
-    var rgbaIndex=0;
-    var pixelData = imageFrame.pixelData;
-    var start = imageFrame.redPaletteColorLookupTableDescriptor[1];
-    var rData = imageFrame.redPaletteColorLookupTableData;
-    var gData = imageFrame.greenPaletteColorLookupTableData;
-    var bData = imageFrame.bluePaletteColorLookupTableData;
-    var shift = imageFrame.redPaletteColorLookupTableDescriptor[2] === 8 ? 0 : 8;
-    var len = imageFrame.redPaletteColorLookupTableData.length;
-    if(len === 0) {
-      len = 65535;
-    }
-
-    for( var i=0 ; i < numPixels ; ++i ) {
-      var value=pixelData[palIndex++];
-      if( value < start )
-        value=0;
-      else if( value > start + len -1 )
-        value=len-1;
-      else
-        value=value-start;
-
-      rgbaBuffer[ rgbaIndex++ ] = rData[value] >> shift;
-      rgbaBuffer[ rgbaIndex++ ] = gData[value] >> shift;
-      rgbaBuffer[ rgbaIndex++ ] = bData[value] >> shift;
-      rgbaBuffer[ rgbaIndex++ ] = 255;
-    }
+  for (let i = 0; i < numEntries; ++i) {
+    cleanedLUT[i] = lut[i] >> shift;
   }
 
-  // module exports
-  cornerstoneWADOImageLoader.convertPALETTECOLOR = convertPALETTECOLOR;
+  return cleanedLUT;
+}
 
-}(cornerstoneWADOImageLoader));
+/**
+ * Convert pixel data with PALETTE COLOR Photometric Interpretation to RGBA
+ *
+ * @param {ImageFrame} imageFrame
+ * @param {Uint8ClampedArray} rgbaBuffer
+ * @returns {void}
+ */
+export default function (imageFrame, rgbaBuffer) {
+  const numPixels = imageFrame.columns * imageFrame.rows;
+  const pixelData = imageFrame.pixelData;
+  const rData = imageFrame.redPaletteColorLookupTableData;
+  const gData = imageFrame.greenPaletteColorLookupTableData;
+  const bData = imageFrame.bluePaletteColorLookupTableData;
+  const len = imageFrame.redPaletteColorLookupTableData.length;
+  let palIndex = 0;
+  let rgbaIndex = 0;
+
+  const start = imageFrame.redPaletteColorLookupTableDescriptor[1];
+  const shift = imageFrame.redPaletteColorLookupTableDescriptor[2] === 8 ? 0 : 8;
+
+  const rDataCleaned = convertLUTto8Bit(rData, shift);
+  const gDataCleaned = convertLUTto8Bit(gData, shift);
+  const bDataCleaned = convertLUTto8Bit(bData, shift);
+
+  for (let i = 0; i < numPixels; ++i) {
+    let value = pixelData[palIndex++];
+
+    if (value < start) {
+      value = 0;
+    } else if (value > start + len - 1) {
+      value = len - 1;
+    } else {
+      value -= start;
+    }
+
+    rgbaBuffer[rgbaIndex++] = rDataCleaned[value];
+    rgbaBuffer[rgbaIndex++] = gDataCleaned[value];
+    rgbaBuffer[rgbaIndex++] = bDataCleaned[value];
+    rgbaBuffer[rgbaIndex++] = 255;
+  }
+}
