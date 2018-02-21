@@ -65,6 +65,16 @@ function decodeImageFrame (imageFrame, transferSyntax, pixelData, decodeConfig, 
    }
    */
 
+  const shouldShift = imageFrame.pixelRepresentation !== undefined && imageFrame.pixelRepresentation === 1;
+  const shift = (shouldShift && imageFrame.bitsStored !== undefined) ? (32 - imageFrame.bitsStored) : undefined;
+
+  if (shouldShift && shift !== undefined) {
+    for (let i = 0; i < imageFrame.pixelData.length; i++) {
+      // eslint-disable-next-line no-bitwise
+      imageFrame.pixelData[i] = (imageFrame.pixelData[i] << shift >> shift);
+    }
+  }
+
   const end = new Date().getTime();
 
   imageFrame.decodeTimeInMS = end - start;
