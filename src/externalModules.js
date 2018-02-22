@@ -1,14 +1,18 @@
 /* eslint import/extensions:0 */
+import registerLoaders from './imageLoader/registerLoaders.js';
+
 let internalCornerstone;
 let internalDicomParser;
 
 export default {
   set cornerstone (cs) {
     internalCornerstone = cs;
+    registerLoaders();
   },
   get cornerstone () {
-    if (!internalCornerstone) {
-      internalCornerstone = (window ? window.cornerstone : undefined); // default to window.cornerstone
+    if (!internalCornerstone && window && window.cornerstone) {
+      internalCornerstone = window.cornerstone; // default to window.cornerstone
+      registerLoaders();
     }
     return internalCornerstone;
   },
@@ -16,8 +20,8 @@ export default {
     internalDicomParser = dp;
   },
   get dicomParser () {
-    if (!internalDicomParser) {
-      internalDicomParser = (window ? window.dicomParser : undefined); // default to window.dicomParser
+    if (!internalDicomParser && window && window.dicomParser) {
+      internalDicomParser = window.dicomParser; // default to window.dicomParser
     }
     return internalDicomParser;
   }

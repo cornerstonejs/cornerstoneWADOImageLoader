@@ -2,9 +2,6 @@
 import { expect } from 'chai';
 import { loadImage } from '../src/imageLoader/wadouri/loadImage.js';
 import webWorkerManager from '../src/imageLoader/webWorkerManager.js';
-import registerLoaders from '../src/imageLoader/registerLoaders.js';
-
-registerLoaders();
 
 const transferSyntaxes = {
   '1.2.840.10008.1.2': 'LittleEndianImplicitTransferSyntax',

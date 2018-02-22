@@ -8,9 +8,6 @@ import getPixelData from '../src/imageLoader/wadouri/getPixelData.js';
 import xhrRequest from '../src/imageLoader/internal/xhrRequest.js';
 import dataSetCacheManager from '../src/imageLoader/wadouri/dataSetCacheManager.js';
 import parseImageId from '../src/imageLoader/wadouri/parseImageId.js';
-import registerLoaders from '../src/imageLoader/registerLoaders.js';
-
-registerLoaders();
 
 const transferSyntaxes = {
   '1.2.840.10008.1.2': 'LittleEndianImplicitTransferSyntax',
