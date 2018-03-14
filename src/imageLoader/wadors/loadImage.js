@@ -9,16 +9,16 @@ function getTransferSyntaxForContentType (contentType)
   // Browse through the content type parameters
   const parameters = contentType.split(';');
   for(let parameter of parameters) {
-	// Look for a transfer-syntax=XXXX pair
-	const parameterValues = parameter.split('=');
-	if(parameterValues.length !== 2)
-	  continue;
-	
+    // Look for a transfer-syntax=XXXX pair
+    const parameterValues = parameter.split('=');
+    if(parameterValues.length !== 2)
+      continue;
+    
     if(parameterValues[0].trim() === 'transfer-syntax') {
       transferSyntax = parameterValues[1].trim();
-	}	
-  }	
-	
+    }
+  }
+  
   return transferSyntax;
 }
 
