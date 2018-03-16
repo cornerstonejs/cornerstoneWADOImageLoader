@@ -2,6 +2,11 @@ import metaDataManager from './metaDataManager.js';
 import getPixelData from './getPixelData.js';
 import createImage from '../createImage.js';
 
+/**
+ * Helper method to extract the transfer-syntax from the response of the server.
+ * @param {string} contentType The value of the content-type header as returned by the WADO-RS server.
+ * @return The transfer-syntax as announced by the server, or Implicit Little Endian by default.
+ */
 function getTransferSyntaxForContentType (contentType)
 {
   let transferSyntax = '1.2.840.10008.1.2'; // Default is Implicit Little Endian.
