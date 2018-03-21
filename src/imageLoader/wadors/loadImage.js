@@ -2,8 +2,35 @@ import metaDataManager from './metaDataManager.js';
 import getPixelData from './getPixelData.js';
 import createImage from '../createImage.js';
 
-function getTransferSyntaxForContentType (/* contentType */) {
-  return '1.2.840.10008.1.2'; // hard code to ILE for now
+/**
+ * Helper method to extract the transfer-syntax from the response of the server.
+ * @param {string} contentType The value of the content-type header as returned by the WADO-RS server.
+ * @return The transfer-syntax as announced by the server, or Implicit Little Endian by default.
+ */
+export function getTransferSyntaxForContentType (contentType) {
+  let transferSyntax = '1.2.840.10008.1.2'; // Default is Implicit Little Endian.
+
+  if (contentType) {
+    // Browse through the content type parameters
+    const parameters = contentType.split(';');
+
+    for (const parameterIndex in parameters) {
+      let parameter = parameters[parameterIndex];
+       
+      // Look for a transfer-syntax=XXXX pair
+      const parameterValues = parameter.split('=');
+
+      if (parameterValues.length !== 2) {
+        continue;
+      }
+
+      if (parameterValues[0].trim() === 'transfer-syntax') {
+        transferSyntax = parameterValues[1].trim() || transferSyntax;
+      }
+    }
+  }
+
+  return transferSyntax;
 }
 
 function loadImage (imageId, options) {
