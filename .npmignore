@@ -1,2 +1,17 @@
-test
-scripts
+## All Non-Dist Directories
+codecs/
+config/
+docs/
+examples/
+src/
+test/
+testImages/
+
+## Root Files
+.babelrc
+.eslintignore
+.gitignore
+.jsdocrc
+.travis.yml
+changelog.md
+karma.conf.js
