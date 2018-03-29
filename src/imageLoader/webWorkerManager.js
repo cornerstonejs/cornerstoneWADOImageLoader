@@ -19,6 +19,7 @@ const defaultConfig = {
   webWorkerTaskPaths: [],
   taskConfiguration: {
     decodeTask: {
+      useWebWorkers: true,
       loadCodecsOnStartup: true,
       initializeCodecsOnStartup: false,
       codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
@@ -149,13 +150,18 @@ function initialize (configObject) {
   }
 
   config = configObject;
+  options.decodeConfig = (config.taskConfiguration || defaultConfig.taskConfiguration).decodeTask;
 
-  config.maxWebWorkers = config.maxWebWorkers || (navigator.hardwareConcurrency || 1);
+  // Prevent web worker from being spawned if it's disabled by configuration
+  if (options.decodeConfig.useWebWorkers !== false) {
 
-  // Spawn new web workers
-  if (!config.startWebWorkersOnDemand) {
-    for (let i = 0; i < config.maxWebWorkers; i++) {
-      spawnWebWorker();
+    config.maxWebWorkers = config.maxWebWorkers || (navigator.hardwareConcurrency || 1);
+
+    // Spawn new web workers
+    if (!config.startWebWorkersOnDemand) {
+      for (let i = 0; i < config.maxWebWorkers; i++) {
+        spawnWebWorker();
+      }
     }
   }
 }
