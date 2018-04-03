@@ -9,6 +9,7 @@ import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixel
 function metaDataProvider (type, imageId, dataSet) {
   if (!dataSet) {
     const parsedImageId = parseImageId(imageId);
+
     dataSet = dataSetCacheManager.get(parsedImageId.url);
   }
 
