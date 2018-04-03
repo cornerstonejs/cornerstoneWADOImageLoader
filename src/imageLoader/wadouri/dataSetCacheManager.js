@@ -44,15 +44,11 @@ function load (uri, loadRequest = xhrRequest, imageId) {
     // console.log('returning existing load promise for ' + uri);
     promises[uri].cacheCount++;
 
-    return promises[uri].promise;
+    return promises[uri];
   }
 
   // This uri is not loaded or being loaded, load it via an xhrRequest
   const loadDICOMPromise = loadRequest(uri, imageId);
-
-  promises[uri] = {
-    cachecount: 1
-  };
 
   // handle success and failure of the XHR request load
   const promise = new Promise((resolve, reject) => {
@@ -70,7 +66,7 @@ function load (uri, loadRequest = xhrRequest, imageId) {
 
       loadedDataSets[uri] = {
         dataSet,
-        cacheCount: promises[uri].cacheCount
+        cacheCount: promise.cacheCount
       };
       cacheSizeInBytes += dataSet.byteArray.length;
       resolve(dataSet);
@@ -89,9 +85,9 @@ function load (uri, loadRequest = xhrRequest, imageId) {
     });
   });
 
-  if (promises[uri]) {
-    promises[uri].promise = promise;
-  }
+  promise.cacheCount = 1;
+
+  promises[uri] = promise;
 
   return promise;
 }
