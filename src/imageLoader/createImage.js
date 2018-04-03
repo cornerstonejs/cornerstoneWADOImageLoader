@@ -62,10 +62,10 @@ function setPixelDataType (imageFrame) {
   }
 }
 
-function createImage (imageId, pixelData, transferSyntax, options) {
+function createImage (imageId, pixelData, transferSyntax, options, dataSet) {
   const cornerstone = external.cornerstone;
   const canvas = document.createElement('canvas');
-  const imageFrame = getImageFrame(imageId);
+  const imageFrame = getImageFrame(imageId, dataSet);
   const decodePromise = decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options);
 
   return new Promise((resolve, reject) => {
