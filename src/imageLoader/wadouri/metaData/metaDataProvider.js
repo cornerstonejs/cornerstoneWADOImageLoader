@@ -6,10 +6,11 @@ import getImagePixelModule from './getImagePixelModule.js';
 import getLUTs from './getLUTs.js';
 import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixelRepresentation.js';
 
-function metaDataProvider (type, imageId) {
-  const parsedImageId = parseImageId(imageId);
-
-  const dataSet = dataSetCacheManager.get(parsedImageId.url);
+function metaDataProvider (type, imageId, dataSet) {
+  if (!dataSet) {
+    const parsedImageId = parseImageId(imageId);
+    dataSet = dataSetCacheManager.get(parsedImageId.url);
+  }
 
   if (!dataSet) {
     return;
