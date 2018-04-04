@@ -3,7 +3,6 @@ import { expect } from 'chai';
 import { external } from '../src/externalModules.js';
 import { loadImage } from '../src/imageLoader/wadouri/loadImage.js';
 import webWorkerManager from '../src/imageLoader/webWorkerManager.js';
-import configure from '../src/imageLoader/configure.js';
 
 external.cornerstone = window.cornerstone;
 
@@ -26,8 +25,10 @@ const transferSyntaxes = {
   '1.2.840.10008.1.2.4.70': 'JPEGProcess14SV1TransferSyntax',
   '1.2.840.10008.1.2.4.80': 'JPEGLSLosslessTransferSyntax',
   '1.2.840.10008.1.2.4.81': 'JPEGLSLossyTransferSyntax',
-  '1.2.840.10008.1.2.4.90': 'JPEG2000LosslessOnlyTransferSyntax',
-  '1.2.840.10008.1.2.4.91': 'JPEG2000TransferSyntax',
+
+  // TODO: Need dcmcjp2k to create these
+  // '1.2.840.10008.1.2.4.90': 'JPEG2000LosslessOnlyTransferSyntax',
+  // '1.2.840.10008.1.2.4.91': 'JPEG2000TransferSyntax',
   '1.2.840.10008.1.2.5': 'RLELosslessTransferSyntax'
 };
 
@@ -54,11 +55,6 @@ describe('loadImage', function () {
     };
 
     webWorkerManager.initialize(config);
-
-    configure({
-      strict: true,
-      useWebWorkers: false
-    });
   });
 
   Object.keys(transferSyntaxes).forEach((transferSyntaxUid) => {
@@ -85,20 +81,5 @@ describe('loadImage', function () {
         done();
       }, done);
     });
-  });
-
-  it('should result in an error when the DICOM file has no pixelData', (done) => {
-    const imageId = `${url}no-pixel-data.dcm`;
-    let promise;
-
-    try {
-      promise = loadImage(imageId).promise;
-    } catch (error) {
-      done(error);
-    }
-
-    promise.
-      then(() => done(new Error('Should not have successed'))).
-      catch(() => done());
   });
 });

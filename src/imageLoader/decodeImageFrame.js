@@ -1,19 +1,23 @@
 import { getOptions } from './internal/options.js';
 import webWorkerManager from './webWorkerManager.js';
 import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
-import { default as decodeImageFrameHandler } from '../webWorker/decodeTask/decodeImageFrame.js';
+import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
+import calculateMinMax from '../shared/calculateMinMax.js';
 
 function processDecodeTask (imageFrame, transferSyntax, pixelData, options) {
   const priority = options.priority || undefined;
   const transferList = options.transferPixelData ? [pixelData.buffer] : undefined;
   const loaderOptions = getOptions();
-  const decodeConfig = loaderOptions.decodeConfig;
+  const strict = loaderOptions.strict;
+  const decodeConfig = { usePDFJS: loaderOptions.usePDFJS };
 
-  if (decodeConfig.useWebWorkers === false) {
+  if (loaderOptions.useWebWorkers === false) {
     return new Promise((resolve, reject) => {
       try {
         const decodeArguments = [imageFrame, transferSyntax, pixelData, decodeConfig, options];
         const decodedImageFrame = decodeImageFrameHandler(...decodeArguments);
+
+        calculateMinMax(decodedImageFrame, strict);
 
         resolve(decodedImageFrame);
       } catch (error) {
@@ -29,10 +33,7 @@ function processDecodeTask (imageFrame, transferSyntax, pixelData, options) {
       transferSyntax,
       pixelData,
       options
-    },
-    priority,
-    transferList
-  ).promise;
+    }, priority, transferList).promise;
 }
 
 function decodeImageFrame (imageFrame, transferSyntax, pixelData, canvas, options = {}) {

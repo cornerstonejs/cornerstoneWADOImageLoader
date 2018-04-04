@@ -1,9 +1,9 @@
 /* eslint import/extensions: 0 */
 import { expect } from 'chai';
 import { external } from '../src/externalModules.js';
-import { initializeJPEGLS } from '../src/webWorker/decodeTask/decoders/decodeJPEGLS.js';
-import { initializeJPEG2000 } from '../src/webWorker/decodeTask/decoders/decodeJPEG2000.js';
-import decodeImageFrame from '../src/webWorker/decodeTask/decodeImageFrame.js';
+import { initializeJPEGLS } from '../src/shared/decoders/decodeJPEGLS.js';
+import { initializeJPEG2000 } from '../src/shared/decoders/decodeJPEG2000.js';
+import decodeImageFrame from '../src/shared/decodeImageFrame.js';
 import getImageFrame from '../src/imageLoader/getImageFrame.js';
 import getPixelData from '../src/imageLoader/wadouri/getPixelData.js';
 import xhrRequest from '../src/imageLoader/internal/xhrRequest.js';

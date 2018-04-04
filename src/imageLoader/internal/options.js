@@ -1,4 +1,4 @@
-const options = {
+let options = {
   // callback allowing customization of the xhr (e.g. adding custom auth headers, cors, etc)
   beforeSend (/* xhr, imageId */) {
   },
@@ -6,13 +6,12 @@ const options = {
   imageCreated (/* image */) {
   },
   strict: false,
-  decodeConfig: {}
+  useWebWorkers: true,
+  usePDFJS: false
 };
 
 export function setOptions (newOptions) {
-  Object.keys(newOptions).forEach((key) => {
-    options[key] = newOptions[key];
-  });
+  options = Object.assign(options, newOptions);
 }
 
 export function getOptions () {
