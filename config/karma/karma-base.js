@@ -1,6 +1,9 @@
 const path = require('path');
 const webpackConfig = require('../webpack');
 
+/* eslint no-process-env:0 */
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+
 // Deleting output.library to avoid "Uncaught SyntaxError: Unexpected token /" error
 // when running testes (var test/foo_test.js = ...)
 delete webpackConfig.output.library;
@@ -24,7 +27,6 @@ module.exports = {
   reporters: ['progress', 'coverage'],
   files: [
     'dist/cornerstoneWADOImageLoaderCodecs.js',
-    'node_modules/promise-polyfill/dist/promise.min.js',
     'node_modules/cornerstone-core/dist/cornerstone.js',
     'node_modules/dicom-parser/dist/dicomParser.js',
     'test/**/*_test.js',
@@ -35,7 +37,6 @@ module.exports = {
   plugins: [
     'karma-webpack',
     'karma-mocha',
-    'karma-phantomjs-launcher',
     'karma-chrome-launcher',
     'karma-firefox-launcher',
     'karma-coverage'
