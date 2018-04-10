@@ -8,7 +8,13 @@ module.exports = function (config) {
   config.set({
     basePath: './',
     singleRun: true,
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeHeadlessNoSandbox'],
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
     frameworks: ['mocha'],
     reporters: ['progress'],
     files: [

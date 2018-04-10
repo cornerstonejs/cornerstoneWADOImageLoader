@@ -4,6 +4,12 @@ module.exports = function (config) {
   'use strict';
   config.set(extendConfiguration({
     singleRun: true,
-    browsers: ['ChromeHeadless']
+    browsers: ['ChromeHeadlessNoSandbox'],
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    }
   }));
 };

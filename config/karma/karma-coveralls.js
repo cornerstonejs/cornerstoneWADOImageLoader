@@ -5,6 +5,12 @@ module.exports = function (config) {
   config.set(extendConfiguration({
     singleRun: true,
     reporters: ['progress', 'coverage', 'coveralls'],
-    browsers: ['ChromeHeadless']
+    browsers: ['ChromeHeadlessNoSandbox'],
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    }
   }));
 };
