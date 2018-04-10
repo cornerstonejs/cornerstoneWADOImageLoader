@@ -1,8 +1,8 @@
-import { external } from '../../externalModules.js';
+import external from '../../externalModules.js';
 import { getOptions } from './options.js';
 
 function xhrRequest (url, imageId, headers = {}, params = {}) {
-  const cornerstone = external.cornerstone;
+  const { cornerstone } = external;
   const options = getOptions();
 
   // Make the request for the DICOM P10 SOP Instance
@@ -25,6 +25,7 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
 
     // Event triggered when downloading an image starts
     xhr.onloadstart = function (event) {
+
       // Action
       if (options.onloadstart) {
         options.onloadstart(event, params);
@@ -37,10 +38,13 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
       };
 
       cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadstart', eventData);
+
+
     };
 
     // Event triggered when downloading an image ends
     xhr.onloadend = function (event) {
+
       // Action
       if (options.onloadend) {
         options.onloadend(event, params);
@@ -53,6 +57,8 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
 
       // Event
       cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadend', eventData);
+
+
     };
 
     // handle response data
@@ -103,6 +109,8 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
       };
 
       cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadprogress', eventData);
+
+
     };
 
     xhr.send();

@@ -1,18 +1,29 @@
 /* eslint import/extensions:0 */
-import * as dicomParser from 'dicom-parser';
 import registerLoaders from './imageLoader/registerLoaders.js';
 
-let cornerstone;
+let internalCornerstone;
+let internalDicomParser;
 
-const external = {
+export default {
   set cornerstone (cs) {
-    cornerstone = cs;
-
-    registerLoaders(cornerstone);
+    internalCornerstone = cs;
+    registerLoaders();
   },
   get cornerstone () {
-    return cornerstone;
+    if (!internalCornerstone && window && window.cornerstone) {
+      internalCornerstone = window.cornerstone; // default to window.cornerstone
+      registerLoaders();
+    }
+    return internalCornerstone;
+  },
+  set dicomParser (dp) {
+    internalDicomParser = dp;
+  },
+  get dicomParser () {
+    if (!internalDicomParser && window && window.dicomParser) {
+      internalDicomParser = window.dicomParser; // default to window.dicomParser
+    }
+    return internalDicomParser;
   }
 };
 
-export { dicomParser, external };
