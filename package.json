@@ -59,7 +59,7 @@
     "coveralls": "^3.0.0",
     "docdash": "^0.4.0",
     "eslint": "^4.16.0",
-    "eslint-loader": "^1.9.0",
+    "eslint-loader": "^2.0.0",
     "eslint-plugin-import": "^2.8.0",
     "fs-extra": "^5.0.0",
     "istanbul-instrumenter-loader": "^3.0.0",
@@ -69,14 +69,16 @@
     "karma-coverage": "^1.1.1",
     "karma-firefox-launcher": "^1.1.0",
     "karma-mocha": "^1.3.0",
-    "karma-webpack": "^2.0.9",
+    "karma-webpack": "^3.0.0",
     "lodash": "^4.17.4",
     "mocha": "^5.0.0",
     "opn-cli": "^3.1.0",
     "puppeteer": "^1.2.0",
     "shx": "^0.2.2",
     "uglify-js": "^3.3.9",
-    "webpack": "^3.10.0"
+    "uglifyjs-webpack-plugin": "^1.2.4",
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.13"
   },
   "dependencies": {
     "dicom-parser": "^1.7.6"
