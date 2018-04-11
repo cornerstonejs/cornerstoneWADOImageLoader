@@ -5,6 +5,7 @@ module.exports = function (config) {
   config.set(extendConfiguration({
     singleRun: true,
     browsers: ['ChromeHeadlessNoSandbox'],
+    reporters: ['spec'],
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',

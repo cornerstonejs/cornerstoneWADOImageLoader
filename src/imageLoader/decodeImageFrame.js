@@ -3,15 +3,25 @@ import webWorkerManager from './webWorkerManager.js';
 import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
 import calculateMinMax from '../shared/calculateMinMax.js';
+import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
+import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
+
+let codecsInitialized = false;
 
 function processDecodeTask (imageFrame, transferSyntax, pixelData, options) {
   const priority = options.priority || undefined;
   const transferList = options.transferPixelData ? [pixelData.buffer] : undefined;
   const loaderOptions = getOptions();
-  const strict = loaderOptions.strict;
-  const decodeConfig = { usePDFJS: loaderOptions.usePDFJS };
+  const { strict, decodeConfig, useWebWorkers } = loaderOptions;
 
-  if (loaderOptions.useWebWorkers === false) {
+  if (useWebWorkers === false) {
+    if (codecsInitialized === false) {
+      initializeJPEG2000(decodeConfig);
+      initializeJPEGLS(decodeConfig);
+
+      codecsInitialized = true;
+    }
+
     return new Promise((resolve, reject) => {
       try {
         const decodeArguments = [imageFrame, transferSyntax, pixelData, decodeConfig, options];

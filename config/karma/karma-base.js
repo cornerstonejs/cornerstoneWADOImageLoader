@@ -24,14 +24,14 @@ webpackConfig.module.rules.push({
 module.exports = {
   basePath: '../../',
   frameworks: ['mocha'],
-  reporters: ['progress', 'coverage'],
+  reporters: ['progress', 'coverage', 'spec'],
   files: [
-    'dist/cornerstoneWADOImageLoaderCodecs.js',
     'node_modules/cornerstone-core/dist/cornerstone.js',
     'node_modules/dicom-parser/dist/dicomParser.js',
     'test/**/*_test.js',
     {pattern: 'testImages/*', included: false},
     {pattern: 'dist/*', included: false},
+    {pattern: 'codecs/*', included: true},
   ],
 
   plugins: [
@@ -39,7 +39,8 @@ module.exports = {
     'karma-mocha',
     'karma-chrome-launcher',
     'karma-firefox-launcher',
-    'karma-coverage'
+    'karma-coverage',
+    'karma-spec-reporter'
   ],
 
   preprocessors: {

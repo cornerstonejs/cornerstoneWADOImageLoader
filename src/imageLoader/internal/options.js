@@ -7,7 +7,9 @@ let options = {
   },
   strict: false,
   useWebWorkers: true,
-  usePDFJS: false
+  decodeConfig: {
+    usePDFJS: false
+  }
 };
 
 export function setOptions (newOptions) {
