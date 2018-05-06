@@ -10,7 +10,7 @@ import getMinMax from './getMinMax.js';
  * @param {Object} imageFrame
  * @param {Boolean} strict
  */
-export default function calculateMinMax (imageFrame, strict = true) {
+export default function calculateMinMax (imageFrame, strict = false) {
   const minMax = getMinMax(imageFrame.pixelData);
   const mustAssign = !(isNumber(imageFrame.smallestPixelValue) && isNumber(imageFrame.largestPixelValue));
 
