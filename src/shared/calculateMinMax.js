@@ -12,8 +12,10 @@ import getMinMax from './getMinMax.js';
  */
 export default function calculateMinMax (imageFrame, strict = true) {
   const minMax = getMinMax(imageFrame.pixelData);
+  const mustAssign = !(isNumber(imageFrame.smallestPixelValue) && isNumber(imageFrame.largestPixelValue));
 
-  if (strict === true) {
+
+  if (strict === true && !mustAssign) {
     if (imageFrame.smallestPixelValue !== minMax.min) {
       console.warn('Image smallestPixelValue tag is incorrect. Rendering performance will suffer considerably.');
     }
@@ -25,4 +27,8 @@ export default function calculateMinMax (imageFrame, strict = true) {
     imageFrame.smallestPixelValue = minMax.min;
     imageFrame.largestPixelValue = minMax.max;
   }
+}
+
+function isNumber(numValue) {
+  return typeof numValue === "number";
 }
