@@ -17,15 +17,10 @@ const transferSyntaxes = {
 
   '1.2.840.10008.1.2.2': 'BigEndianExplicitTransferSyntax',
 
-  // Back and investigate! The compressing method (dcmtk) changes the pixels.
-  // is not an issue w/ our decoding library
+  // TODO: These are failing
   // '1.2.840.10008.1.2.4.50': 'JPEGProcess1TransferSyntax',
   // '1.2.840.10008.1.2.4.51': 'JPEGProcess2_4TransferSyntax',
-
-  // No decoder for transfer syntax 1.2.840.10008.1.2.4.53
   // '1.2.840.10008.1.2.4.53': 'JPEGProcess6_8TransferSyntax',
-
-  // No decoder for transfer syntax 1.2.840.10008.1.2.4.55
   // '1.2.840.10008.1.2.4.55': 'JPEGProcess10_12TransferSyntax',
 
   '1.2.840.10008.1.2.4.57': 'JPEGProcess14TransferSyntax',

@@ -23,23 +23,23 @@ const transferSyntaxes = {
 const base = 'CTImage.dcm';
 const url = 'dicomweb://localhost:9876/base/testImages/';
 
-describe('Test lossy TransferSyntaxes decoding', function() {
+describe('Test lossy TransferSyntaxes decoding', function () {
 
   let uncompressedPixelData = null;
   let uncompressedImage = null;
   let rescaleInterceptUncompressed = null;
   let rescaleSlopeUncompressed = null;
 
-  before(function(done) {
+  before(function (done) {
     // loads uncompressed study (the original one)
     const imageId = `${url}${base}`;
     const parsedImageId = parseImageId(imageId);
 
     configure({
       // callback allowing customization of the xhr (e.g. adding custom auth headers, cors, etc)
-      beforeSend(/* xhr, imageId */) { },
+      beforeSend (/* xhr, imageId */) { },
       // callback allowing modification of newly created image objects
-      imageCreated(/* image */) { },
+      imageCreated (/* image */) { },
       strict: false,
       useWebWorkers: false,
       decodeConfig: {
@@ -62,7 +62,7 @@ describe('Test lossy TransferSyntaxes decoding', function() {
     }).catch(done);
   });
 
-  after(function() {
+  after(function () {
     dataSetCacheManager.purge();
   });
 
@@ -71,7 +71,7 @@ describe('Test lossy TransferSyntaxes decoding', function() {
     const name = testsData.name;
     const filename = `${base}_${name}_${transferSyntaxUid}.dcm`;
 
-    it(`should properly decode ${name}`, function(done) {
+    it(`should properly decode ${name}`, function (done) {
       this.timeout(5000);
       const imageId = `${url}${filename}`;
       const parsedImageId = parseImageId(imageId);
