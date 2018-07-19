@@ -1,4 +1,4 @@
-import { external } from '../externalModules.js';
+import external from '../externalModules.js';
 import getImageFrame from './getImageFrame.js';
 import decodeImageFrame from './decodeImageFrame.js';
 import isColorImageFn from './isColorImage.js';
@@ -68,7 +68,7 @@ function createImage (imageId, pixelData, transferSyntax, options, dataSet) {
     return Promise.reject(new Error('The file does not contain image data.'));
   }
 
-  const cornerstone = external.cornerstone;
+  const { cornerstone } = external;
   const canvas = document.createElement('canvas');
   const imageFrame = getImageFrame(imageId, dataSet);
   const decodePromise = decodeImageFrame(imageFrame, transferSyntax, pixelData, canvas, options);
@@ -117,7 +117,6 @@ function createImage (imageId, pixelData, transferSyntax, options, dataSet) {
         invert: imageFrame.photometricInterpretation === 'MONOCHROME1',
         minPixelValue: imageFrame.smallestPixelValue,
         maxPixelValue: imageFrame.largestPixelValue,
-        render: undefined, // set below
         rowPixelSpacing: imagePlaneModule.pixelSpacing ? imagePlaneModule.pixelSpacing[0] : undefined,
         rows: imageFrame.rows,
         sizeInBytes: imageFrame.pixelData.length,
@@ -144,9 +143,7 @@ function createImage (imageId, pixelData, transferSyntax, options, dataSet) {
         image.getPixelData = () => imageFrame.pixelData;
       }
 
-      // Setup the renderer
       if (image.color) {
-        image.render = cornerstone.renderColorImage;
         image.getCanvas = function () {
           if (lastImageIdDrawn === imageId) {
             return canvas;
@@ -161,9 +158,6 @@ function createImage (imageId, pixelData, transferSyntax, options, dataSet) {
 
           return canvas;
         };
-
-      } else {
-        image.render = cornerstone.renderGrayscaleImage;
       }
 
       // Modality LUT
