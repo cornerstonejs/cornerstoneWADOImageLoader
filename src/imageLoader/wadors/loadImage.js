@@ -7,7 +7,7 @@ import createImage from '../createImage.js';
  * @param {string} contentType The value of the content-type header as returned by the WADO-RS server.
  * @return The transfer-syntax as announced by the server, or Implicit Little Endian by default.
  */
-export function getTransferSyntaxForContentType (contentType) {
+export function getTransferSyntaxForContentType(contentType) {
   const defaultTransferSyntax = '1.2.840.10008.1.2'; // Default is Implicit Little Endian.
 
   if (!contentType) {
@@ -54,9 +54,17 @@ export function getTransferSyntaxForContentType (contentType) {
   return defaultTransferSyntax;
 }
 
-function loadImage (imageId, options) {
+function loadImage(imageId, options) {
   const start = new Date().getTime();
   const uri = imageId.substring(7);
+
+
+
+  // TODO: load bulk data items that we might need
+  const mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
+
+  // get the pixel data from the server
+  const pixelDataLoadObj = getPixelData(uri, imageId, mediaType);
 
   const promise = new Promise((resolve, reject) => {
     // check to make sure we have metadata for this imageId
@@ -64,15 +72,10 @@ function loadImage (imageId, options) {
 
     if (metaData === undefined) {
       const error = new Error(`no metadata for imageId ${imageId}`);
-
+      pixelDataLoadObj.cancelFn();
       return reject(error);
     }
-
-    // TODO: load bulk data items that we might need
-    const mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
-
-    // get the pixel data from the server
-    getPixelData(uri, imageId, mediaType).then((result) => {
+    pixelDataLoadObj.promise.then((result) => {
       const transferSyntax = getTransferSyntaxForContentType(result.contentType);
       const pixelData = result.imageFrame.pixelData;
       const imagePromise = createImage(imageId, pixelData, transferSyntax, options);
@@ -89,7 +92,7 @@ function loadImage (imageId, options) {
 
   return {
     promise,
-    cancelFn: undefined
+    cancelFn: pixelDataLoadObj.cancelFn
   };
 }
 
