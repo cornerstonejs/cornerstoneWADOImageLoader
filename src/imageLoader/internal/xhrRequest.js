@@ -63,7 +63,7 @@ function xhrRequest(url, imageId, headers = {}, params = {}) {
         cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadend', eventData);
       };
 
-      xhr.onabort = function (event) {
+      xhr.onabort = function () {
         reject(xhr);
       };
 
