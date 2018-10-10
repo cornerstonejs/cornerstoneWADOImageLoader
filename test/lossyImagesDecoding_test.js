@@ -38,9 +38,9 @@ describe('Test lossy TransferSyntaxes decoding', function () {
 
     configure({
       // callback allowing customization of the xhr (e.g. adding custom auth headers, cors, etc)
-      beforeSend (/* xhr, imageId */) { },
+      beforeSend(/* xhr, imageId */) { },
       // callback allowing modification of newly created image objects
-      imageCreated (/* image */) { },
+      imageCreated(/* image */) { },
       strict: false,
       useWebWorkers: false,
       decodeConfig: {
@@ -48,12 +48,12 @@ describe('Test lossy TransferSyntaxes decoding', function () {
       }
     });
 
-    dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId).then((dataSet) => {
+    dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId).promise.then((dataSet) => {
       const transferSyntax = dataSet.string('x00020010');
 
       rescaleInterceptUncompressed = dataSet.floatString('x00281052');
       rescaleSlopeUncompressed = dataSet.floatString('x00281053');
-      uncompressedPixelData = getPixelData(dataSet);
+      uncompressedPixelData = getPixelData(dataSet).promise;
 
       createImage(imageId, uncompressedPixelData, transferSyntax, {}).then((image) => {
         uncompressedImage = image;
@@ -76,11 +76,11 @@ describe('Test lossy TransferSyntaxes decoding', function () {
       this.timeout(5000);
       const imageId = `${url}${filename}`;
       const parsedImageId = parseImageId(imageId);
-      const dataSetPromise = dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId);
+      const dataSetPromise = dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId).promise;
 
       dataSetPromise.then((dataSet) => {
         try {
-          const pixelData = getPixelData(dataSet);
+          const pixelData = getPixelData(dataSet).promise;
           const curTransferSyntax = dataSet.string('x00020010');
           const rescaleIntercept = dataSet.floatString('x00281052');
           const rescaleSlope = dataSet.floatString('x00281053');

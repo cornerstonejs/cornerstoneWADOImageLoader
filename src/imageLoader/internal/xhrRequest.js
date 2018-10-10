@@ -5,108 +5,122 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
   const { cornerstone } = external;
   const options = getOptions();
 
+
+  const xhr = new XMLHttpRequest();
+
+  const cancelFn = function () {
+    if (xhr.readyState < 4) {
+      xhr.abort();
+    }
+  };
+
   // Make the request for the DICOM P10 SOP Instance
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
+  return {
+    promise: new Promise((resolve, reject) => {
+      xhr.open('get', url, true);
+      xhr.responseType = 'arraybuffer';
+      options.beforeSend(xhr, imageId);
+      Object.keys(headers).forEach(function (key) {
+        xhr.setRequestHeader(key, headers[key]);
+      });
 
-    xhr.open('get', url, true);
-    xhr.responseType = 'arraybuffer';
-    options.beforeSend(xhr, imageId);
-    Object.keys(headers).forEach(function (key) {
-      xhr.setRequestHeader(key, headers[key]);
-    });
-
-    params.deferred = {
-      resolve,
-      reject
-    };
-    params.url = url;
-    params.imageId = imageId;
-
-    // Event triggered when downloading an image starts
-    xhr.onloadstart = function (event) {
-      // Action
-      if (options.onloadstart) {
-        options.onloadstart(event, params);
-      }
-
-      // Event
-      const eventData = {
-        url,
-        imageId
+      params.deferred = {
+        resolve,
+        reject
       };
+      params.url = url;
+      params.imageId = imageId;
 
-      cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadstart', eventData);
-    };
-
-    // Event triggered when downloading an image ends
-    xhr.onloadend = function (event) {
-      // Action
-      if (options.onloadend) {
-        options.onloadend(event, params);
-      }
-
-      const eventData = {
-        url,
-        imageId
-      };
-
-      // Event
-      cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadend', eventData);
-    };
-
-    // handle response data
-    xhr.onreadystatechange = function (event) {
-      // Action
-      if (options.onreadystatechange) {
-        options.onreadystatechange(event, params);
-
-        return;
-      }
-
-      // Default action
-      // TODO: consider sending out progress messages here as we receive the pixel data
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          resolve(xhr.response, xhr);
-        } else {
-          // request failed, reject the Promise
-          reject(xhr);
+      // Event triggered when downloading an image starts
+      xhr.onloadstart = function (event) {
+        // Action
+        if (options.onloadstart) {
+          options.onloadstart(event, params);
         }
-      }
-    };
 
-    // Event triggered when downloading an image progresses
-    xhr.onprogress = function (oProgress) {
-      // console.log('progress:',oProgress)
-      const loaded = oProgress.loaded; // evt.loaded the bytes browser receive
-      let total;
-      let percentComplete;
+        // Event
+        const eventData = {
+          url,
+          imageId
+        };
 
-      if (oProgress.lengthComputable) {
-        total = oProgress.total; // evt.total the total bytes seted by the header
-        percentComplete = Math.round((loaded / total) * 100);
-      }
-
-      // Action
-      if (options.onprogress) {
-        options.onprogress(oProgress, params);
-      }
-
-      // Event
-      const eventData = {
-        url,
-        imageId,
-        loaded,
-        total,
-        percentComplete
+        cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadstart', eventData);
       };
 
-      cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadprogress', eventData);
-    };
+      // Event triggered when downloading an image ends
+      xhr.onloadend = function (event) {
+        // Action
+        if (options.onloadend) {
+          options.onloadend(event, params);
+        }
 
-    xhr.send();
-  });
+        const eventData = {
+          url,
+          imageId
+        };
+
+        // Event
+        cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadend', eventData);
+      };
+
+      xhr.onabort = function (event) {
+        reject(xhr);
+      };
+
+      // handle response data
+      xhr.onreadystatechange = function (event) {
+        // Action
+        if (options.onreadystatechange) {
+          options.onreadystatechange(event, params);
+
+          return;
+        }
+
+        // Default action
+        // TODO: consider sending out progress messages here as we receive the pixel data
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            resolve(xhr.response, xhr);
+          } else {
+            // request failed, reject the Promise
+            reject(xhr);
+          }
+        }
+      };
+
+      // Event triggered when downloading an image progresses
+      xhr.onprogress = function (oProgress) {
+        // console.log('progress:',oProgress)
+        const loaded = oProgress.loaded; // evt.loaded the bytes browser receive
+        let total;
+        let percentComplete;
+
+        if (oProgress.lengthComputable) {
+          total = oProgress.total; // evt.total the total bytes seted by the header
+          percentComplete = Math.round((loaded / total) * 100);
+        }
+
+        // Action
+        if (options.onprogress) {
+          options.onprogress(oProgress, params);
+        }
+
+        // Event
+        const eventData = {
+          url,
+          imageId,
+          loaded,
+          total,
+          percentComplete
+        };
+
+        cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadprogress', eventData);
+      };
+
+      xhr.send();
+    }),
+    cancelFn
+  };
 }
 
 export default xhrRequest;
