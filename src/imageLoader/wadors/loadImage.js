@@ -59,7 +59,6 @@ function loadImage(imageId, options) {
   const uri = imageId.substring(7);
 
 
-
   // TODO: load bulk data items that we might need
   const mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
 
@@ -72,7 +71,9 @@ function loadImage(imageId, options) {
 
     if (metaData === undefined) {
       const error = new Error(`no metadata for imageId ${imageId}`);
+
       pixelDataLoadObj.cancelFn();
+
       return reject(error);
     }
     pixelDataLoadObj.promise.then((result) => {

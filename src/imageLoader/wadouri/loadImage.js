@@ -6,7 +6,7 @@ import getPixelData from './getPixelData.js';
 import { xhrRequest } from '../internal/index.js';
 
 // add a decache callback function to clear out our dataSetCacheManager
-function addDecache(imageLoadObject, imageId) {
+function addDecache (imageLoadObject, imageId) {
   imageLoadObject.decache = function () {
     // console.log('decache');
     const parsedImageId = parseImageId(imageId);
@@ -15,7 +15,7 @@ function addDecache(imageLoadObject, imageId) {
   };
 }
 
-function loadImageFromPromise(dataSetLoadObj, imageId, frame = 0, sharedCacheKey, options, callbacks) {
+function loadImageFromPromise (dataSetLoadObj, imageId, frame = 0, sharedCacheKey, options, callbacks) {
   const start = new Date().getTime();
   const imageLoadObject = {
     cancelFn: dataSetLoadObj.cancelFn
@@ -59,7 +59,7 @@ function loadImageFromPromise(dataSetLoadObj, imageId, frame = 0, sharedCacheKey
   return imageLoadObject;
 }
 
-function loadImageFromDataSet(dataSet, imageId, frame = 0, sharedCacheKey, options) {
+function loadImageFromDataSet (dataSet, imageId, frame = 0, sharedCacheKey, options) {
   const start = new Date().getTime();
   const pixelData = getPixelData(dataSet, frame);
 
@@ -98,7 +98,7 @@ function loadImageFromDataSet(dataSet, imageId, frame = 0, sharedCacheKey, optio
   };
 }
 
-function getLoaderForScheme(scheme) {
+function getLoaderForScheme (scheme) {
   if (scheme === 'dicomweb' || scheme === 'wadouri') {
     return xhrRequest;
   } else if (scheme === 'dicomfile') {
@@ -106,7 +106,7 @@ function getLoaderForScheme(scheme) {
   }
 }
 
-function loadImage(imageId, options = {}) {
+function loadImage (imageId, options = {}) {
   const parsedImageId = parseImageId(imageId);
 
   options = Object.assign({}, options);
