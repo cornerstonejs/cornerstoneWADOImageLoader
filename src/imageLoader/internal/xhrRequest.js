@@ -1,7 +1,7 @@
 import external from '../../externalModules.js';
 import { getOptions } from './options.js';
 
-function xhrRequest (url, imageId, headers = {}, params = {}) {
+function xhrRequest(url, imageId, headers = {}, params = {}) {
   const { cornerstone } = external;
   const options = getOptions();
 
@@ -63,7 +63,7 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
         cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadend', eventData);
       };
 
-      xhr.onabort = function (event) {
+      xhr.onabort = function () {
         reject(xhr);
       };
 
