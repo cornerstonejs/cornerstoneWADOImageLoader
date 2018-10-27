@@ -26,7 +26,9 @@ export function getTransferSyntaxForContentType (contentType) {
       return;
     }
 
-    params[parameterValues[0].trim()] = parameterValues[1].trim();
+    const value = parameterValues[1].trim().replace(/"/g,'');
+
+    params[parameterValues[0].trim()] = value;
   });
 
   // This is useful if the PACS doesn't respond with a syntax
@@ -40,16 +42,12 @@ export function getTransferSyntaxForContentType (contentType) {
     'image/jpx': '1.2.840.10008.1.2.4.92'
   };
 
-  // dcm4che seems to be reporting the content type as just 'image/jp2'?
-  if (!Object.keys(params).length) {
-    return defaultTransferSyntaxByType[contentType];
-  }
-
   if (params['transfer-syntax']) {
     return params['transfer-syntax'];
-  }
-
-  if (params.type) {
+  } else if (contentType && !Object.keys(params).length) {
+    // dcm4che seems to be reporting the content type as just 'image/jp2'?
+    return defaultTransferSyntaxByType[contentType];
+  } else if (params.type && defaultTransferSyntaxByType[params.type]) {
     return defaultTransferSyntaxByType[params.type];
   }
 
