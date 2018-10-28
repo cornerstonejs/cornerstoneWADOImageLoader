@@ -53,7 +53,7 @@ describe('Test lossy TransferSyntaxes decoding', function () {
 
       rescaleInterceptUncompressed = dataSet.floatString('x00281052');
       rescaleSlopeUncompressed = dataSet.floatString('x00281053');
-      uncompressedPixelData = getPixelData(dataSet).promise;
+      uncompressedPixelData = getPixelData(dataSet);
 
       createImage(imageId, uncompressedPixelData, transferSyntax, {}).then((image) => {
         uncompressedImage = image;
