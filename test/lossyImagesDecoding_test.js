@@ -80,7 +80,7 @@ describe('Test lossy TransferSyntaxes decoding', function () {
 
       dataSetPromise.then((dataSet) => {
         try {
-          const pixelData = getPixelData(dataSet).promise;
+          const pixelData = getPixelData(dataSet);
           const curTransferSyntax = dataSet.string('x00020010');
           const rescaleIntercept = dataSet.floatString('x00281052');
           const rescaleSlope = dataSet.floatString('x00281053');
