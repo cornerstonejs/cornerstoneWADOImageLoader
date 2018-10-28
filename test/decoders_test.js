@@ -60,7 +60,7 @@ describe('Test lossless TransferSyntaxes decoding', function () {
     dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId).promise.then((dataSet) => {
       const transferSyntax = dataSet.string('x00020010');
 
-      uncompressedPixelData = getPixelData(dataSet).promise;
+      uncompressedPixelData = getPixelData(dataSet);
 
       createImage(imageId, uncompressedPixelData, transferSyntax, {}).then((image) => {
         uncompressedImage = image;
@@ -86,7 +86,7 @@ describe('Test lossless TransferSyntaxes decoding', function () {
 
       dataSetPromise.then((dataSet) => {
         try {
-          const pixelData = getPixelData(dataSet).promise;
+          const pixelData = getPixelData(dataSet);
           const curTransferSyntax = dataSet.string('x00020010');
 
           curTransferSyntax.should.to.be.equals(transferSyntaxUid);
