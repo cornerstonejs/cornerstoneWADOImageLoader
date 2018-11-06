@@ -1,7 +1,7 @@
 import external from '../../externalModules.js';
 import { getOptions } from './options.js';
 
-function reportProgress(options, params, cornerstone) {
+function reportProgress (options, params, cornerstone) {
   const url = params.url;
   const imageId = params.imageId;
 
@@ -34,9 +34,11 @@ function reportProgress(options, params, cornerstone) {
   };
 }
 
-function reportLoadStart(options, params, cornerstone) {
+function reportLoadStart (options, params, cornerstone) {
   const url = params.url;
   const imageId = params.imageId;
+
+
   return function (event) {
     // Action
     if (options.onloadstart) {
@@ -53,9 +55,11 @@ function reportLoadStart(options, params, cornerstone) {
   };
 }
 
-function reportLoadEnd(options, params, cornerstone) {
+function reportLoadEnd (options, params, cornerstone) {
   const url = params.url;
   const imageId = params.imageId;
+
+
   return function (event) {
     // Action
     if (options.onloadend) {
@@ -72,7 +76,7 @@ function reportLoadEnd(options, params, cornerstone) {
   };
 }
 
-function handleStateChange(options, params, xhr) {
+function handleStateChange (options, params, xhr) {
   const resolve = params.deferred.resolve;
   const reject = params.deferred.reject;
 
@@ -97,7 +101,7 @@ function handleStateChange(options, params, xhr) {
   };
 }
 
-function xhrRequest(url, imageId, headers = {}, params = {}) {
+function xhrRequest (url, imageId, headers = {}, params = {}) {
   const options = getOptions();
   const { cornerstone } = external;
 

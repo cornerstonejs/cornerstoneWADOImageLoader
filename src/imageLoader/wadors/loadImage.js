@@ -7,7 +7,7 @@ import createImage from '../createImage.js';
  * @param {string} contentType The value of the content-type header as returned by the WADO-RS server.
  * @return The transfer-syntax as announced by the server, or Implicit Little Endian by default.
  */
-export function getTransferSyntaxForContentType(contentType) {
+export function getTransferSyntaxForContentType (contentType) {
   const defaultTransferSyntax = '1.2.840.10008.1.2'; // Default is Implicit Little Endian.
 
   if (!contentType) {
@@ -54,7 +54,7 @@ export function getTransferSyntaxForContentType(contentType) {
   return defaultTransferSyntax;
 }
 
-function loadImage(imageId, options) {
+function loadImage (imageId, options) {
   const start = new Date().getTime();
   const uri = imageId.substring(7);
 
@@ -78,10 +78,13 @@ function loadImage(imageId, options) {
     pixelDataLoadObj.promise.then((result) => {
       const transferSyntax = getTransferSyntaxForContentType(result.contentType);
       const pixelData = result.imageFrame.pixelData;
+
+
       return createImage(imageId, pixelData, transferSyntax, options);
     }).then((image) => {
       // add the loadTimeInMS property
       const end = new Date().getTime();
+
       image.loadTimeInMS = end - start;
       resolve(image);
     }).catch(reject);

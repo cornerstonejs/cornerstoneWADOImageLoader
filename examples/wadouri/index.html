@@ -304,7 +304,7 @@
         let url = document.getElementById('wadoURL').value;
         url = "wadouri:" + url;
         imgLoadObj = cornerstone.imageCache.getImageLoadObject(url);
-        if (imgLoadObj.cancelFn) {
+        if (imgLoadObj && imgLoadObj.cancelFn) {
             imgLoadObj.cancelFn();
         }
     }

@@ -181,7 +181,7 @@
 
     function cancelDownload() {
         imgLoadObj = cornerstone.imageCache.getImageLoadObject(g_image_id);
-        if (imgLoadObj.cancelFn) {
+        if (imgLoadObj && imgLoadObj.cancelFn) {
             imgLoadObj.cancelFn();
         }
     }
