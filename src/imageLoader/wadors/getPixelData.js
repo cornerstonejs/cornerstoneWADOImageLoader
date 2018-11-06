@@ -36,49 +36,47 @@ function getPixelData (uri, imageId, mediaType = 'application/octet-stream') {
 
   const loadObject = xhrRequest(uri, imageId, headers);
 
+  const promise = loadObject.promise.then(function (imageFrameAsArrayBuffer/* , xhr*/) {
+    // request succeeded, Parse the multi-part mime response
+    const response = new Uint8Array(imageFrameAsArrayBuffer);
+
+    // First look for the multipart mime header
+    const tokenIndex = findIndexOfString(response, '\r\n\r\n');
+
+    if (tokenIndex === -1) {
+      throw (new Error('invalid response - no multipart mime header'));
+    }
+    const header = uint8ArrayToString(response, 0, tokenIndex);
+    // Now find the boundary  marker
+    const split = header.split('\r\n');
+    const boundary = findBoundary(split);
+
+    if (!boundary) {
+      throw (new Error('invalid response - no boundary marker'));
+    }
+    const offset = tokenIndex + 4; // skip over the \r\n\r\n
+
+    // find the terminal boundary marker
+    const endIndex = findIndexOfString(response, boundary, offset);
+
+    if (endIndex === -1) {
+      throw (new Error('invalid response - terminating boundary not found'));
+    }
+
+    // Remove \r\n from the length
+    const length = endIndex - offset - 2;
+
+    // return the info for this pixel data
+    return ({
+      contentType: findContentType(split),
+      imageFrame: {
+        pixelData: new Uint8Array(imageFrameAsArrayBuffer, offset, length)
+      }
+    });
+  });
+
   return {
-    promise: new Promise((resolve, reject) => {
-
-      loadObject.promise.then(function (imageFrameAsArrayBuffer/* , xhr*/) {
-
-        // request succeeded, Parse the multi-part mime response
-        const response = new Uint8Array(imageFrameAsArrayBuffer);
-
-        // First look for the multipart mime header
-        const tokenIndex = findIndexOfString(response, '\r\n\r\n');
-
-        if (tokenIndex === -1) {
-          reject(new Error('invalid response - no multipart mime header'));
-        }
-        const header = uint8ArrayToString(response, 0, tokenIndex);
-        // Now find the boundary  marker
-        const split = header.split('\r\n');
-        const boundary = findBoundary(split);
-
-        if (!boundary) {
-          reject(new Error('invalid response - no boundary marker'));
-        }
-        const offset = tokenIndex + 4; // skip over the \r\n\r\n
-
-        // find the terminal boundary marker
-        const endIndex = findIndexOfString(response, boundary, offset);
-
-        if (endIndex === -1) {
-          reject(new Error('invalid response - terminating boundary not found'));
-        }
-
-        // Remove \r\n from the length
-        const length = endIndex - offset - 2;
-
-        // return the info for this pixel data
-        resolve({
-          contentType: findContentType(split),
-          imageFrame: {
-            pixelData: new Uint8Array(imageFrameAsArrayBuffer, offset, length)
-          }
-        });
-      }).catch(reject);
-    }),
+    promise,
     cancelFn: loadObject.cancelFn
   };
 }
