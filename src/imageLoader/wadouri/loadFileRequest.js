@@ -6,7 +6,7 @@ function loadFileRequest (uri) {
   const fileIndex = parseInt(parsedImageId.url, 10);
   const file = fileManager.get(fileIndex);
 
-  return new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     const fileReader = new FileReader();
 
     fileReader.onload = (e) => {
@@ -19,6 +19,11 @@ function loadFileRequest (uri) {
 
     fileReader.readAsArrayBuffer(file);
   });
+
+  return {
+    promise,
+    cancelFn: undefined
+  };
 }
 
 export default loadFileRequest;
