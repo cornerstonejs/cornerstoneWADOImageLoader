@@ -6,12 +6,12 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
   const options = getOptions();
 
   // Make the request for the DICOM P10 SOP Instance
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const xhr = new XMLHttpRequest();
 
     xhr.open('get', url, true);
     xhr.responseType = 'arraybuffer';
-    options.beforeSend(xhr, imageId, headers, params);
+    await options.beforeSend(xhr, imageId, headers, params);
     Object.keys(headers).forEach(function (key) {
       xhr.setRequestHeader(key, headers[key]);
     });
