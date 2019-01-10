@@ -34,7 +34,7 @@ function metaDataProvider (type, imageId) {
   if (type === 'imagePlaneModule') {
     const imageOrientationPatient = getNumberValues(metaData['00200037'], 6);
     const imagePositionPatient = getNumberValues(metaData['00200032'], 3);
-    const pixelSpacing = getNumberValues(metaData['00280030'], 2);
+    const pixelSpacing = getNumberValues(metaData['00280030'], 2) || getNumberValues(metaData['00181164'], 2);
     let columnPixelSpacing = null;
     let rowPixelSpacing = null;
 
