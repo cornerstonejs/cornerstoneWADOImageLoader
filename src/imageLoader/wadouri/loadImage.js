@@ -108,10 +108,14 @@ function getLoaderForScheme (scheme) {
 
 function loadImage (imageId, options = {}) {
   const parsedImageId = parseImageId(imageId);
+
+  options = Object.assign({}, options);
   let loader = options.loader;
 
   if (loader === undefined) {
     loader = getLoaderForScheme(parsedImageId.scheme);
+  } else {
+    delete options.loader;
   }
 
   // if the dataset for this url is already loaded, use it
