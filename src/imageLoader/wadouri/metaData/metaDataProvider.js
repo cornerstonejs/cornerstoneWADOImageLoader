@@ -122,7 +122,7 @@ function metaDataProvider (type, imageId) {
     };
   }
 
-  if (type === 'overlays') {
+  if (type === 'overlayPlaneModule') {
     let overlays=[];
 
     for (let overlayGroup = 0x00; overlayGroup <= 0x0f; overlayGroup += 0x01) {
