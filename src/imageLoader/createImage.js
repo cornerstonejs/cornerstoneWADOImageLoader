@@ -80,6 +80,7 @@ function createImage (imageId, pixelData, transferSyntax, options) {
       const modalityLutModule = cornerstone.metaData.get('modalityLutModule', imageId) || {};
       const sopCommonModule = cornerstone.metaData.get('sopCommonModule', imageId) || {};
       const isColorImage = isColorImageFn(imageFrame.photometricInterpretation);
+      const overlays = cornerstone.metaData.get('overlayPlaneModule', imageId);
 
       // JPEGBaseline (8 bits) is already returning the pixel data in the right format (rgba)
       // because it's using a canvas to load and decode images.
@@ -125,7 +126,8 @@ function createImage (imageId, pixelData, transferSyntax, options) {
         windowCenter: voiLutModule.windowCenter ? voiLutModule.windowCenter[0] : undefined,
         windowWidth: voiLutModule.windowWidth ? voiLutModule.windowWidth[0] : undefined,
         decodeTimeInMS: imageFrame.decodeTimeInMS,
-        floatPixelData: undefined
+        floatPixelData: undefined,
+        overlays
       };
 
       // add function to return pixel data
