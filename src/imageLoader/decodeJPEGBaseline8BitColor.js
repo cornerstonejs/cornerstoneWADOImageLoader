@@ -1,8 +1,6 @@
 import getMinMax from '../shared/getMinMax.js';
 
 function decodeJPEGBaseline8BitColor (imageFrame, pixelData, canvas) {
-  console.log('decodeJPEGBaseline8BitColor');
-
   const start = new Date().getTime();
   const imgBlob = new Blob([pixelData], { type: 'image/jpeg' });
 
