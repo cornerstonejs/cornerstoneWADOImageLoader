@@ -1,10 +1,12 @@
 function getNumberValues (dataSet, tag, minimumLength) {
   const values = [];
-  const valueAsString = dataSet.string(tag);
+  let valueAsString = dataSet.string(tag);
 
   if (!valueAsString) {
     return;
   }
+
+  valueAsString = valueAsString.replace('\\\\', '\\');
   const split = valueAsString.split('\\');
 
   if (minimumLength && split.length < minimumLength) {
