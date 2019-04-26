@@ -4,6 +4,7 @@ import unpackBinaryFrame from './unpackBinaryFrame.js';
  * Function to deal with extracting an image frame from an encapsulated data set.
  */
 
+
 function getUncompressedImageFrame (dataSet, frameIndex) {
   const pixelDataElement = dataSet.elements.x7fe00010 || dataSet.elements.x7fe00008;
   const bitsAllocated = dataSet.uint16('x00280100');
