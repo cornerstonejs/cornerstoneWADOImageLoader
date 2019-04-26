@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - 2.0.0 - 2018-01-29 | (c) 2016 Chris Hafey | https://github.com/cornerstonejs/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - 2.0.0 - 2019-04-26 | (c) 2016 Chris Hafey | https://github.com/cornerstonejs/cornerstoneWADOImageLoader */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("dicom-parser"));
@@ -8,7 +8,7 @@
 		exports["cornerstoneWADOImageLoader"] = factory(require("dicom-parser"));
 	else
 		root["cornerstoneWADOImageLoader"] = factory(root["dicomParser"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_46__) {
+})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_46__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -2521,10 +2521,23 @@ function loadImageFromPromise(dataSetPromise, imageId) {
 
   imageLoadObject.promise = new Promise(function (resolve, reject) {
     dataSetPromise.then(function (dataSet /* , xhr*/) {
-      var pixelData = (0, _getPixelData2.default)(dataSet, frame);
-      var transferSyntax = dataSet.string('x00020010');
-      var loadEnd = new Date().getTime();
-      var imagePromise = (0, _createImage2.default)(imageId, pixelData, transferSyntax, options);
+
+      var imagePromise = void 0;
+      var loadEnd = void 0;
+
+      try {
+        var pixelData = (0, _getPixelData2.default)(dataSet, frame);
+        var transferSyntax = dataSet.string('x00020010');
+
+        loadEnd = new Date().getTime();
+        imagePromise = (0, _createImage2.default)(imageId, pixelData, transferSyntax, options);
+      } catch (error) {
+        reject({
+          error: error,
+          dataSet: dataSet
+        });
+        return;
+      }
 
       addDecache(imageLoadObject, imageId);
 
