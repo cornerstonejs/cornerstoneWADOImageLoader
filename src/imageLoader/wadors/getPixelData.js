@@ -9,14 +9,6 @@ function findBoundary (header) {
   }
 }
 
-function findContentType (header) {
-  for (let i = 0; i < header.length; i++) {
-    if (header[i].substr(0, 13) === 'Content-Type:') {
-      return header[i].substr(13).trim();
-    }
-  }
-}
-
 function uint8ArrayToString (data, offset, length) {
   offset = offset || 0;
   length = length || data.length - offset;
@@ -27,6 +19,14 @@ function uint8ArrayToString (data, offset, length) {
   }
 
   return str;
+}
+
+function findContentType (header) {
+  for (let i = 0; i < header.length; i++) {
+    if (header[i].substr(0, 13) === 'Content-Type:') {
+      return header[i].substr(13).trim();
+    }
+  }
 }
 
 function getPixelData (uri, imageId, mediaType = 'application/octet-stream') {
