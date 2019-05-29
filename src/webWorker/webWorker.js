@@ -103,11 +103,11 @@ self.onmessage = function (msg) {
         }, transferList);
       });
     } catch (error) {
-      console.log(`task ${msg.data.taskType} failed - ${error}`);
+      console.log(`task ${msg.data.taskType} failed - ${error.message}`);
       self.postMessage({
         taskType: msg.data.taskType,
         status: 'failed',
-        result: error,
+        result: error.message,
         workerIndex: msg.data.workerIndex
       });
     }
