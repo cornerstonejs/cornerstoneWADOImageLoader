@@ -1,5 +1,6 @@
 import external from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
+import storeVoiPresetTab from '../storeVoiPresetTab.js';
 
 /**
  * This object supports loading of DICOM P10 dataset from a uri and caching it so it can be accessed
@@ -60,6 +61,8 @@ function load (uri, loadRequest = xhrRequest, imageId) {
 
       try {
         dataSet = dicomParser.parseDicom(byteArray);
+        // Store the VOI preset tab (in dataSet.storedValues.voiPresetTab)
+        storeVoiPresetTab(dataSet);
       } catch (error) {
         return reject(error);
       }
