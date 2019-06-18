@@ -1,20 +1,126 @@
 import external from '../../externalModules.js';
 import { getOptions } from './options.js';
 
+function reportProgress (options, params, cornerstone) {
+  const url = params.url;
+  const imageId = params.imageId;
+
+  return function (oProgress) {
+    // console.log('progress:',oProgress)
+    const loaded = oProgress.loaded; // evt.loaded the bytes browser receive
+    let total;
+    let percentComplete;
+
+    if (oProgress.lengthComputable) {
+      total = oProgress.total; // evt.total the total bytes seted by the header
+      percentComplete = Math.round((loaded / total) * 100);
+    }
+
+    // Action
+    if (options.onprogress) {
+      options.onprogress(oProgress, params);
+    }
+
+    // Event
+    const eventData = {
+      url,
+      imageId,
+      loaded,
+      total,
+      percentComplete
+    };
+
+    cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadprogress', eventData);
+  };
+}
+
+function reportLoadStart (options, params, cornerstone) {
+  const url = params.url;
+  const imageId = params.imageId;
+
+
+  return function (event) {
+    // Action
+    if (options.onloadstart) {
+      options.onloadstart(event, params);
+    }
+
+    // Event
+    const eventData = {
+      url,
+      imageId
+    };
+
+    cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadstart', eventData);
+  };
+}
+
+function reportLoadEnd (options, params, cornerstone) {
+  const url = params.url;
+  const imageId = params.imageId;
+
+
+  return function (event) {
+    // Action
+    if (options.onloadend) {
+      options.onloadend(event, params);
+    }
+
+    const eventData = {
+      url,
+      imageId
+    };
+
+    // Event
+    cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadend', eventData);
+  };
+}
+
+function handleStateChange (options, params, xhr) {
+  const resolve = params.deferred.resolve;
+  const reject = params.deferred.reject;
+
+  return function (event) {
+    // Action
+    if (options.onreadystatechange) {
+      options.onreadystatechange(event, params);
+
+      return;
+    }
+
+    // Default action
+    // TODO: consider sending out progress messages here as we receive the pixel data
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        resolve(xhr.response, xhr);
+      } else {
+        // request failed, reject the Promise
+        reject(xhr);
+      }
+    }
+  };
+}
+
 function xhrRequest (url, imageId, headers = {}, params = {}) {
-  const { cornerstone } = external;
   const options = getOptions();
+  const { cornerstone } = external;
 
-  // Make the request for the DICOM P10 SOP Instance
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
+  const xhr = new XMLHttpRequest();
 
-    xhr.open('get', url, true);
-    xhr.responseType = 'arraybuffer';
-    options.beforeSend(xhr, imageId, headers, params);
-    Object.keys(headers).forEach(function (key) {
-      xhr.setRequestHeader(key, headers[key]);
-    });
+  const cancelFn = function () {
+    if (xhr.readyState < 4) {
+      xhr.abort();
+    }
+  };
+
+  xhr.open('get', url, true);
+  xhr.responseType = 'arraybuffer';
+  options.beforeSend(xhr, imageId, headers, params);
+  Object.keys(headers).forEach(function (key) {
+    xhr.setRequestHeader(key, headers[key]);
+  });
+
+  const p = new Promise((resolve, reject) => {
 
     params.deferred = {
       resolve,
@@ -24,89 +130,30 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
     params.imageId = imageId;
 
     // Event triggered when downloading an image starts
-    xhr.onloadstart = function (event) {
-      // Action
-      if (options.onloadstart) {
-        options.onloadstart(event, params);
-      }
-
-      // Event
-      const eventData = {
-        url,
-        imageId
-      };
-
-      cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadstart', eventData);
-    };
+    xhr.onloadstart = reportLoadStart(options, params, cornerstone);
 
     // Event triggered when downloading an image ends
-    xhr.onloadend = function (event) {
-      // Action
-      if (options.onloadend) {
-        options.onloadend(event, params);
-      }
-
-      const eventData = {
-        url,
-        imageId
-      };
-
-      // Event
-      cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadend', eventData);
-    };
+    xhr.onloadend = reportLoadEnd(options, params, cornerstone);
 
     // handle response data
-    xhr.onreadystatechange = function (event) {
-      // Action
-      if (options.onreadystatechange) {
-        options.onreadystatechange(event, params);
-
-        return;
-      }
-
-      // Default action
-      // TODO: consider sending out progress messages here as we receive the pixel data
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          resolve(xhr.response, xhr);
-        } else {
-          // request failed, reject the Promise
-          reject(xhr);
-        }
-      }
-    };
+    xhr.onreadystatechange = handleStateChange(options, params, xhr);
 
     // Event triggered when downloading an image progresses
-    xhr.onprogress = function (oProgress) {
-      // console.log('progress:',oProgress)
-      const loaded = oProgress.loaded; // evt.loaded the bytes browser receive
-      let total;
-      let percentComplete;
+    xhr.onprogress = reportProgress(options, params, cornerstone);
 
-      if (oProgress.lengthComputable) {
-        total = oProgress.total; // evt.total the total bytes seted by the header
-        percentComplete = Math.round((loaded / total) * 100);
-      }
-
-      // Action
-      if (options.onprogress) {
-        options.onprogress(oProgress, params);
-      }
-
-      // Event
-      const eventData = {
-        url,
-        imageId,
-        loaded,
-        total,
-        percentComplete
-      };
-
-      cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadprogress', eventData);
+    // Triggered when request is aborted, for example using cancelFn
+    xhr.onabort = function () {
+      reject(xhr);
     };
 
     xhr.send();
   });
+
+  // Make the request for the DICOM P10 SOP Instance
+  return {
+    promise: p,
+    cancelFn
+  };
 }
 
 export default xhrRequest;

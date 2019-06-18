@@ -10,7 +10,7 @@ import { xhrRequest } from '../internal/index.js';
 let cacheSizeInBytes = 0;
 
 let loadedDataSets = {};
-let promises = {};
+let loadObjects = {};
 
 // returns true if the wadouri for the specified index has been loaded
 function isLoaded (uri) {
@@ -33,26 +33,33 @@ function load (uri, loadRequest = xhrRequest, imageId) {
   // if already loaded return it right away
   if (loadedDataSets[uri]) {
     // console.log('using loaded dataset ' + uri);
-    return new Promise((resolve) => {
-      loadedDataSets[uri].cacheCount++;
-      resolve(loadedDataSets[uri].dataSet);
-    });
+    return {
+      promise: new Promise((resolve) => {
+        loadedDataSets[uri].cacheCount++;
+        resolve(loadedDataSets[uri].dataSet);
+      }),
+      cancelFn: undefined
+    };
   }
 
   // if we are currently loading this uri, increment the cacheCount and return its promise
-  if (promises[uri]) {
+  if (loadObjects[uri]) {
     // console.log('returning existing load promise for ' + uri);
-    promises[uri].cacheCount++;
+    loadObjects[uri].cacheCount++;
 
-    return promises[uri];
+    return loadObjects[uri];
   }
 
   // This uri is not loaded or being loaded, load it via an xhrRequest
-  const loadDICOMPromise = loadRequest(uri, imageId);
+  const loadDICOMObject = loadRequest(uri, imageId);
+
+  const loadObj = {
+    cancelFn: loadDICOMObject.cancelFn
+  };
 
   // handle success and failure of the XHR request load
   const promise = new Promise((resolve, reject) => {
-    loadDICOMPromise.then(function (dicomPart10AsArrayBuffer/* , xhr*/) {
+    loadDICOMObject.promise.then(function (dicomPart10AsArrayBuffer/* , xhr*/) {
       const byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
 
       // Reject the promise if parsing the dicom file fails
@@ -66,7 +73,7 @@ function load (uri, loadRequest = xhrRequest, imageId) {
 
       loadedDataSets[uri] = {
         dataSet,
-        cacheCount: promise.cacheCount
+        cacheCount: loadObj.cacheCount
       };
       cacheSizeInBytes += dataSet.byteArray.length;
       resolve(dataSet);
@@ -78,18 +85,18 @@ function load (uri, loadRequest = xhrRequest, imageId) {
       });
     }, reject).then(() => {
       // Remove the promise if success
-      delete promises[uri];
+      delete loadObjects[uri];
     }, () => {
       // Remove the promise if failure
-      delete promises[uri];
+      delete loadObjects[uri];
     });
   });
 
-  promise.cacheCount = 1;
+  loadObj.promise = promise;
+  loadObj.cacheCount = 1;
+  loadObjects[uri] = loadObj;
 
-  promises[uri] = promise;
-
-  return promise;
+  return loadObj;
 }
 
 // remove the cached/loaded dicom dataset for the specified wadouri to free up memory
@@ -123,7 +130,7 @@ export function getInfo () {
 // removes all cached datasets from memory
 function purge () {
   loadedDataSets = {};
-  promises = {};
+  loadObjects = {};
 }
 
 export default {

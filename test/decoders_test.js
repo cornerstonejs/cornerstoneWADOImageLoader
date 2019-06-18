@@ -47,9 +47,9 @@ describe('Test lossless TransferSyntaxes decoding', function () {
 
     configure({
       // callback allowing customization of the xhr (e.g. adding custom auth headers, cors, etc)
-      beforeSend (/* xhr, imageId */) { },
+      beforeSend(/* xhr, imageId */) { },
       // callback allowing modification of newly created image objects
-      imageCreated (/* image */) { },
+      imageCreated(/* image */) { },
       strict: false,
       useWebWorkers: false,
       decodeConfig: {
@@ -57,7 +57,7 @@ describe('Test lossless TransferSyntaxes decoding', function () {
       }
     });
 
-    dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId).then((dataSet) => {
+    dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId).promise.then((dataSet) => {
       const transferSyntax = dataSet.string('x00020010');
 
       uncompressedPixelData = getPixelData(dataSet);
@@ -82,7 +82,7 @@ describe('Test lossless TransferSyntaxes decoding', function () {
       this.timeout(5000);
       const imageId = `${url}${filename}`;
       const parsedImageId = parseImageId(imageId);
-      const dataSetPromise = dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId);
+      const dataSetPromise = dataSetCacheManager.load(parsedImageId.url, xhrRequest, imageId).promise;
 
       dataSetPromise.then((dataSet) => {
         try {

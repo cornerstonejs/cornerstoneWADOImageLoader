@@ -58,6 +58,12 @@ function loadImage (imageId, options) {
   const start = new Date().getTime();
   const uri = imageId.substring(7);
 
+  // TODO: load bulk data items that we might need
+  const mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
+
+  // get the pixel data from the server
+  const pixelDataLoadObj = getPixelData(uri, imageId, mediaType);
+
   const promise = new Promise((resolve, reject) => {
     // check to make sure we have metadata for this imageId
     const metaData = metaDataManager.get(imageId);
@@ -65,31 +71,28 @@ function loadImage (imageId, options) {
     if (metaData === undefined) {
       const error = new Error(`no metadata for imageId ${imageId}`);
 
+      pixelDataLoadObj.cancelFn();
+
       return reject(error);
     }
-
-    // TODO: load bulk data items that we might need
-    const mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
-
-    // get the pixel data from the server
-    getPixelData(uri, imageId, mediaType).then((result) => {
+    pixelDataLoadObj.promise.then((result) => {
       const transferSyntax = getTransferSyntaxForContentType(result.contentType);
       const pixelData = result.imageFrame.pixelData;
-      const imagePromise = createImage(imageId, pixelData, transferSyntax, options);
 
-      imagePromise.then((image) => {
-        // add the loadTimeInMS property
-        const end = new Date().getTime();
 
-        image.loadTimeInMS = end - start;
-        resolve(image);
-      }, reject);
-    }, reject);
+      return createImage(imageId, pixelData, transferSyntax, options);
+    }).then((image) => {
+      // add the loadTimeInMS property
+      const end = new Date().getTime();
+
+      image.loadTimeInMS = end - start;
+      resolve(image);
+    }).catch(reject);
   });
 
   return {
     promise,
-    cancelFn: undefined
+    cancelFn: pixelDataLoadObj.cancelFn
   };
 }
 

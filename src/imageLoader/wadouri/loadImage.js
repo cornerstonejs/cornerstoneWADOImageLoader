@@ -15,14 +15,14 @@ function addDecache (imageLoadObject, imageId) {
   };
 }
 
-function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKey, options, callbacks) {
+function loadImageFromPromise (dataSetLoadObj, imageId, frame = 0, sharedCacheKey, options, callbacks) {
   const start = new Date().getTime();
   const imageLoadObject = {
-    cancelFn: undefined
+    cancelFn: dataSetLoadObj.cancelFn
   };
 
   imageLoadObject.promise = new Promise((resolve, reject) => {
-    dataSetPromise.then((dataSet/* , xhr*/) => {
+    dataSetLoadObj.promise.then((dataSet/* , xhr*/) => {
       const pixelData = getPixelData(dataSet, frame);
       const transferSyntax = dataSet.string('x00020010');
       const loadEnd = new Date().getTime();
@@ -61,13 +61,13 @@ function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKe
 
 function loadImageFromDataSet (dataSet, imageId, frame = 0, sharedCacheKey, options) {
   const start = new Date().getTime();
+  const pixelData = getPixelData(dataSet, frame);
 
   const promise = new Promise((resolve, reject) => {
     const loadEnd = new Date().getTime();
     let imagePromise;
 
     try {
-      const pixelData = getPixelData(dataSet, frame);
       const transferSyntax = dataSet.string('x00020010');
 
       imagePromise = createImage(imageId, pixelData, transferSyntax, options);
@@ -94,7 +94,7 @@ function loadImageFromDataSet (dataSet, imageId, frame = 0, sharedCacheKey, opti
 
   return {
     promise,
-    cancelFn: undefined
+    cancelFn: pixelData.cancelFn
   };
 }
 
@@ -126,9 +126,9 @@ function loadImage (imageId, options = {}) {
   }
 
   // load the dataSet via the dataSetCacheManager
-  const dataSetPromise = dataSetCacheManager.load(parsedImageId.url, loader, imageId);
+  const dataSetLoadObj = dataSetCacheManager.load(parsedImageId.url, loader, imageId);
 
-  return loadImageFromPromise(dataSetPromise, imageId, parsedImageId.frame, parsedImageId.url, options);
+  return loadImageFromPromise(dataSetLoadObj, imageId, parsedImageId.frame, parsedImageId.url, options);
 }
 
 export { loadImageFromPromise, getLoaderForScheme, loadImage };

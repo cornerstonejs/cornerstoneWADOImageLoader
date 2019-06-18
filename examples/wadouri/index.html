@@ -1,22 +1,24 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
     <!-- twitter bootstrap CSS stylesheet - included to make things pretty, not needed or used by cornerstone -->
     <link href="../bootstrap.min.css" rel="stylesheet">
     <link href="../cornerstone.min.css" rel="stylesheet">
 </head>
+
 <body>
-<div class="container">
-    <div class="page-header">
-        <h1>Example of displaying a DICOM P10 image using Cornerstone</h1>
-        <p class="lead">
-            Enter a URL for a DICOM P10 object below to view it using cornerstone.
-            <button id='toggleCollapseInfo' class="btn btn-primary" type="button">
-                Click for more info
-            </button>
-        </p>
-        <ul>
-            <!--
+    <div class="container">
+        <div class="page-header">
+            <h1>Example of displaying a DICOM P10 image using Cornerstone</h1>
+            <p class="lead">
+                Enter a URL for a DICOM P10 object below to view it using cornerstone.
+                <button id='toggleCollapseInfo' class="btn btn-primary" type="button">
+                    Click for more info
+                </button>
+            </p>
+            <ul>
+                <!--
             <li>/cornerstoneWADOImageLoader/examples/testImages/ile/gray16.DCM</li>
             <li>/cornerstoneWADOImageLoader/examples/testImages/ile/gray8.DCM</li>
             <li>/cornerstoneWADOImageLoader/examples/testImages/ile/ybrFull.DCM</li>
@@ -39,111 +41,113 @@
             <li>/cornerstoneWADOImageLoader/examples/testImages/jpeg2000.91/grayu16.dcm</li>
             <li>/cornerstoneWADOImageLoader/examples/testImages/jpeg2000.91/ybrict.dcm</li>
             -->
-        </ul>
-    </div>
-    <div id="collapseInfo" class="collapse" style="display:none;">
-        <p>
-            This example illustrates how to use the cornerstoneWADOImageLoader to get a DICOM P10
-            SOP instance using HTTP and display it in your web browser using cornerstone.
-            Not all transfer syntaxes are currently supported,
-            <a href="https://github.com/cornerstonejs/cornerstoneWADOImageLoader/blob/master/docs/TransferSyntaxes.md">
-                click here for the full list.
-            </a>
-            For WADO-URI requests,
-            you can request that the server return the SOP Instance in explicit little endian by
-            appending the following query string to your URL:
-            <code>&transferSyntax=1.2.840.10008.1.2.1</code>
-        </p>
-        <P>
-            Use the query string parameter <i>frame</i> to specify which frame to display from a multiframe
-            object (defaults to the first frame if not specified). <code>?frame=2</code>
-        </P>
-        <strong>If you get an HTTP error and your URL is correct, it is probably because the server is not configured to
-            allow <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing">Cross Origin Requests</a>.
-            Most browsers will allow you to enable cross domain requests via settings or command line switches,
-            you can start chrome with the command line switch <code>--disable-web-security</code> to allow cross origin requests.
-            See the  <a href="http://enable-cors.org/">Enable CORS site</a> for information about CORS.
-        </strong>
-        <br>
-        <br>
-        <p>
-            Looking for a CORS proxy?  Try <a href="https://www.npmjs.com/package/corsproxy">CORSProxy</a>
-        </p>
-        <strong>Use of this example require IE10+ or any other modern browser.</strong>
-        <hr>
-    </div>
-    <div id="loadProgress">Image Load Progress:</div>
+            </ul>
+        </div>
+        <div id="collapseInfo" class="collapse" style="display:none;">
+            <p>
+                This example illustrates how to use the cornerstoneWADOImageLoader to get a DICOM P10
+                SOP instance using HTTP and display it in your web browser using cornerstone.
+                Not all transfer syntaxes are currently supported,
+                <a href="https://github.com/cornerstonejs/cornerstoneWADOImageLoader/blob/master/docs/TransferSyntaxes.md">
+                    click here for the full list.
+                </a>
+                For WADO-URI requests,
+                you can request that the server return the SOP Instance in explicit little endian by
+                appending the following query string to your URL:
+                <code>&transferSyntax=1.2.840.10008.1.2.1</code>
+            </p>
+            <P>
+                Use the query string parameter <i>frame</i> to specify which frame to display from a multiframe
+                object (defaults to the first frame if not specified). <code>?frame=2</code>
+            </P>
+            <strong>If you get an HTTP error and your URL is correct, it is probably because the server is not
+                configured to
+                allow <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing">Cross Origin Requests</a>.
+                Most browsers will allow you to enable cross domain requests via settings or command line switches,
+                you can start chrome with the command line switch <code>--disable-web-security</code> to allow cross
+                origin requests.
+                See the <a href="http://enable-cors.org/">Enable CORS site</a> for information about CORS.
+            </strong>
+            <br>
+            <br>
+            <p>
+                Looking for a CORS proxy? Try <a href="https://www.npmjs.com/package/corsproxy">CORSProxy</a>
+            </p>
+            <strong>Use of this example require IE10+ or any other modern browser.</strong>
+            <hr>
+        </div>
+        <div id="loadProgress">Image Load Progress:</div>
 
-    <div class="row">
-        <form id="form" class="form-horizontal">
-            <div class="form-group">
-                <label class="control-label col-sm-1" for="wadoURL">URL</label>
-                <div class="col-sm-8">
-                    <input class="form-control" type="text" id="wadoURL" placeholder="Enter WADO URL" value="https://raw.githubusercontent.com/cornerstonejs/cornerstoneWADOImageLoader/master/testImages/CT2_J2KR">
+        <div class="row">
+            <form id="form" class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-1" for="wadoURL">URL</label>
+                    <div class="col-sm-8">
+                        <input class="form-control" type="text" id="wadoURL" placeholder="Enter WADO URL" value="https://raw.githubusercontent.com/cornerstonejs/cornerstoneWADOImageLoader/master/testImages/CT2_J2KR">
+                    </div>
+                    <div class="col-sm-3">
+                        <button class="form-control" type="button" id="downloadAndView" class="btn btn-primary">Download
+                            and View</button>
+                    </div>
                 </div>
-                <div class="col-sm-3">
-                    <button class="form-control" type="button" id="downloadAndView" class="btn btn-primary">Download and View</button>
+                <div class="form-group">
+                    <div class="col-sm-2">
+                        <button class="form-control" type="button" id="load" class="btn btn-primary">Load</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button class="form-control" type="button" id="unload" class="btn btn-primary">Unload</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button class="form-control" type="button" id="purge" class="btn btn-primary">Purge Cache</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button class="form-control" type="button" id="cancel" class="btn btn-primary">Cancel Request</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <input type="checkbox" id="toggleModalityLUT">Apply Modality LUT</input>
+        <input type="checkbox" id="toggleVOILUT">Apply VOI LUT</input>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                <div style="width:512px;height:512px;position:relative;color: white;display:inline-block;border-style:solid;border-color:black;"
+                    oncontextmenu="return false" class='disable-selection noIbar' unselectable='on' onselectstart='return false;'
+                    onmousedown='return false;'>
+                    <div id="dicomImage" style="width:512px;height:512px;top:0px;left:0px; position:absolute">
+                    </div>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="col-sm-2">
-                    <button class="form-control" type="button" id="load" class="btn btn-primary">Load</button>
-                </div>
-                <div class="col-sm-2">
-                    <button class="form-control" type="button" id="unload" class="btn btn-primary">Unload</button>
-                </div>
-                <div class="col-sm-2">
-                    <button class="form-control" type="button" id="purge" class="btn btn-primary">Purge Cache</button>
-                </div>
-            </div>
-        </form>
-    </div>
-    <input type="checkbox" id="toggleModalityLUT">Apply Modality LUT</input>
-    <input type="checkbox" id="toggleVOILUT">Apply VOI LUT</input>
-    <br>
-    <div class="row">
-        <div class="col-md-6">
-            <div style="width:512px;height:512px;position:relative;color: white;display:inline-block;border-style:solid;border-color:black;"
-                 oncontextmenu="return false"
-                 class='disable-selection noIbar'
-                 unselectable='on'
-                 onselectstart='return false;'
-                 onmousedown='return false;'>
-                <div id="dicomImage"
-                     style="width:512px;height:512px;top:0px;left:0px; position:absolute">
-                </div>
+            <div class="col-md-6">
+                <span>Transfer Syntax: </span><span id="transferSyntax"></span><br>
+                <span>SOP Class: </span><span id="sopClass"></span><br>
+                <span>Samples Per Pixel: </span><span id="samplesPerPixel"></span><br>
+                <span>Photometric Interpretation: </span><span id="photometricInterpretation"></span><br>
+                <span>Number Of Frames: </span><span id="numberOfFrames"></span><br>
+                <span>Planar Configuration: </span><span id="planarConfiguration"></span><br>
+                <span>Rows: </span><span id="rows"></span><br>
+                <span>Columns: </span><span id="columns"></span><br>
+                <span>Pixel Spacing: </span><span id="pixelSpacing"></span><br>
+                <span>Row Pixel Spacing: </span><span id="rowPixelSpacing"></span><br>
+                <span>Column Pixel Spacing: </span><span id="columnPixelSpacing"></span><br>
+                <span>Bits Allocated: </span><span id="bitsAllocated"></span><br>
+                <span>Bits Stored: </span><span id="bitsStored"></span><br>
+                <span>High Bit: </span><span id="highBit"></span><br>
+                <span>Pixel Representation: </span><span id="pixelRepresentation"></span><br>
+                <span>WindowCenter: </span><span id="windowCenter"></span><br>
+                <span>WindowWidth: </span><span id="windowWidth"></span><br>
+                <span>RescaleIntercept: </span><span id="rescaleIntercept"></span><br>
+                <span>RescaleSlope: </span><span id="rescaleSlope"></span><br>
+                <span>Basic Offset Table Entries: </span><span id="basicOffsetTable"></span><br>
+                <span>Fragments: </span><span id="fragments"></span><br>
+                <span>Max Stored Pixel Value: </span><span id="minStoredPixelValue"></span><br>
+                <span>Min Stored Pixel Value: </span><span id="maxStoredPixelValue"></span><br>
+                <span>Total Time: </span><span id="totalTime"></span><br>
+                <span>Load Time: </span><span id="loadTime"></span><br>
+                <span>Decode Time: </span><span id="decodeTime"></span><br>
             </div>
         </div>
-        <div class="col-md-6">
-            <span>Transfer Syntax: </span><span id="transferSyntax"></span><br>
-            <span>SOP Class: </span><span id="sopClass"></span><br>
-            <span>Samples Per Pixel: </span><span id="samplesPerPixel"></span><br>
-            <span>Photometric Interpretation: </span><span id="photometricInterpretation"></span><br>
-            <span>Number Of Frames: </span><span id="numberOfFrames"></span><br>
-            <span>Planar Configuration: </span><span id="planarConfiguration"></span><br>
-            <span>Rows: </span><span id="rows"></span><br>
-            <span>Columns: </span><span id="columns"></span><br>
-            <span>Pixel Spacing: </span><span id="pixelSpacing"></span><br>
-            <span>Row Pixel Spacing: </span><span id="rowPixelSpacing"></span><br>
-            <span>Column Pixel Spacing: </span><span id="columnPixelSpacing"></span><br>
-            <span>Bits Allocated: </span><span id="bitsAllocated"></span><br>
-            <span>Bits Stored: </span><span id="bitsStored"></span><br>
-            <span>High Bit: </span><span id="highBit"></span><br>
-            <span>Pixel Representation: </span><span id="pixelRepresentation"></span><br>
-            <span>WindowCenter: </span><span id="windowCenter"></span><br>
-            <span>WindowWidth: </span><span id="windowWidth"></span><br>
-            <span>RescaleIntercept: </span><span id="rescaleIntercept"></span><br>
-            <span>RescaleSlope: </span><span id="rescaleSlope"></span><br>
-            <span>Basic Offset Table Entries: </span><span id="basicOffsetTable"></span><br>
-            <span>Fragments: </span><span id="fragments"></span><br>
-            <span>Max Stored Pixel Value: </span><span id="minStoredPixelValue"></span><br>
-            <span>Min Stored Pixel Value: </span><span id="maxStoredPixelValue"></span><br>
-            <span>Total Time: </span><span id="totalTime"></span><br>
-            <span>Load Time: </span><span id="loadTime"></span><br>
-            <span>Decode Time: </span><span id="decodeTime"></span><br>
-        </div>
     </div>
-</div>
 </body>
 
 <!-- include the cornerstone library -->
@@ -188,9 +192,10 @@
 
 <script>
     cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
+    cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
 
     cornerstoneWADOImageLoader.configure({
-        beforeSend: function(xhr) {
+        beforeSend: function (xhr) {
             // Add custom headers here (e.g. auth tokens)
             //xhr.setRequestHeader('APIKEY', 'my auth token');
         }
@@ -203,13 +208,13 @@
 
         try {
             var start = new Date().getTime();
-            cornerstone.loadAndCacheImage(imageId).then(function(image) {
+            cornerstone.loadAndCacheImage(imageId).then(function (image) {
                 console.log(image);
                 var viewport = cornerstone.getDefaultViewportForImage(element, image);
                 document.getElementById('toggleModalityLUT').checked = (viewport.modalityLUT !== undefined);
                 document.getElementById('toggleVOILUT').checked = (viewport.voiLUT !== undefined);
                 cornerstone.displayImage(element, image, viewport);
-                if(loaded === false) {
+                if (loaded === false) {
                     cornerstoneTools.mouseInput.enable(element);
                     cornerstoneTools.mouseWheelInput.enable(element);
                     cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
@@ -231,7 +236,7 @@
 
                 function getPixelRepresentation() {
                     const value = image.data.uint16('x00280103');
-                    if(value === undefined) {
+                    if (value === undefined) {
                         return;
                     }
                     return value + (value === 0 ? ' (unsigned)' : ' (signed)');
@@ -239,7 +244,7 @@
 
                 function getPlanarConfiguration() {
                     const value = image.data.uint16('x00280006');
-                    if(value === undefined) {
+                    if (value === undefined) {
                         return;
                     }
                     return value + (value === 0 ? ' (pixel)' : ' (plane)');
@@ -275,11 +280,12 @@
                 document.getElementById('loadTime').textContent = image.loadTimeInMS + "ms";
                 document.getElementById('decodeTime').textContent = image.decodeTimeInMS + "ms";
 
-            }, function(err) {
+            }, function (err) {
+                console.error(err);
                 alert(err);
             });
         }
-        catch(err) {
+        catch (err) {
             alert(err);
         }
     }
@@ -294,7 +300,16 @@
         loadAndViewImage(url);
     }
 
-    cornerstone.events.addEventListener('cornerstoneimageloadprogress', function(event) {
+    function cancelDownload() {
+        let url = document.getElementById('wadoURL').value;
+        url = "wadouri:" + url;
+        imgLoadObj = cornerstone.imageCache.getImageLoadObject(url);
+        if (imgLoadObj && imgLoadObj.cancelFn) {
+            imgLoadObj.cancelFn();
+        }
+    }
+
+    cornerstone.events.addEventListener('cornerstoneimageloadprogress', function (event) {
         const eventData = event.detail;
         const loadProgress = document.getElementById('loadProgress');
         loadProgress.textContent = `Image Load Progress: ${eventData.percentComplete}%`;
@@ -303,8 +318,8 @@
     function getUrlWithoutFrame() {
         var url = document.getElementById('wadoURL').value;
         var frameIndex = url.indexOf('frame=');
-        if(frameIndex !== -1) {
-            url = url.substr(0, frameIndex-1);
+        if (frameIndex !== -1) {
+            url = url.substr(0, frameIndex - 1);
         }
         return url;
     }
@@ -312,34 +327,36 @@
     var element = document.getElementById('dicomImage');
     cornerstone.enable(element);
 
-    document.getElementById('downloadAndView').addEventListener('click', function(e) {
+    document.getElementById('downloadAndView').addEventListener('click', function (e) {
         downloadAndView();
     });
-    document.getElementById('load').addEventListener('click', function(e) {
+    document.getElementById('load').addEventListener('click', function (e) {
         var url = getUrlWithoutFrame();
         cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.load(url);
     });
-    document.getElementById('unload').addEventListener('click', function(e) {
+    document.getElementById('unload').addEventListener('click', function (e) {
         var url = getUrlWithoutFrame();
         cornerstoneWADOImageLoader.wadouri.dataSetCacheManager.unload(url);
     });
 
-    document.getElementById('purge').addEventListener('click', function(e) {
+    document.getElementById('purge').addEventListener('click', function (e) {
         cornerstone.imageCache.purgeCache();
     });
-
+    document.getElementById('cancel').addEventListener('click', function (e) {
+        cancelDownload();
+    });
     const form = document.getElementById('form');
-    form.addEventListener('submit', function() {
+    form.addEventListener('submit', function () {
         downloadAndView();
         return false;
     });
 
-    document.getElementById('toggleModalityLUT').addEventListener('click', function() {
+    document.getElementById('toggleModalityLUT').addEventListener('click', function () {
         var applyModalityLUT = document.getElementById('toggleModalityLUT').checked;
         console.log('applyModalityLUT=', applyModalityLUT);
         var image = cornerstone.getImage(element);
         var viewport = cornerstone.getViewport(element);
-        if(applyModalityLUT) {
+        if (applyModalityLUT) {
             viewport.modalityLUT = image.modalityLUT;
         } else {
             viewport.modalityLUT = undefined;
@@ -347,12 +364,12 @@
         cornerstone.setViewport(element, viewport);
     });
 
-    document.getElementById('toggleVOILUT').addEventListener('click', function() {
+    document.getElementById('toggleVOILUT').addEventListener('click', function () {
         var applyVOILUT = document.getElementById('toggleVOILUT').checked;
         console.log('applyVOILUT=', applyVOILUT);
         var image = cornerstone.getImage(element);
         var viewport = cornerstone.getViewport(element);
-        if(applyVOILUT) {
+        if (applyVOILUT) {
             viewport.voiLUT = image.voiLUT;
         } else {
             viewport.voiLUT = undefined;
@@ -360,7 +377,7 @@
         cornerstone.setViewport(element, viewport);
     });
 
-    document.getElementById('toggleCollapseInfo').addEventListener('click', function() {
+    document.getElementById('toggleCollapseInfo').addEventListener('click', function () {
         if (document.getElementById('collapseInfo').style.display === 'none') {
             document.getElementById('collapseInfo').style.display = 'block';
         } else {
@@ -368,4 +385,5 @@
         }
     });
 </script>
+
 </html>
