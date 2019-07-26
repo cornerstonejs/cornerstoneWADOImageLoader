@@ -19,7 +19,7 @@
     "url": "https://github.com/cornerstonejs/cornerstoneWADOImageLoader.git"
   },
   "scripts": {
-    "build": "npm run prebuild && npm run build:es6",
+    "build": "npm run build:es6",
     "build:es6": "npm run test && npm run version && npm run webpack && npm run doc:generate",
     "clean": "npm run clean:dist && npm run clean:coverage",
     "clean:dist": "shx rm -rf dist",
@@ -32,7 +32,7 @@
     "eslint-fix": "eslint -c .eslintrc.js --fix src",
     "start": "npm run webpack",
     "start:dev": "webpack-dev-server --config ./config/webpack/webpack-dev",
-    "test": "npm run prebuild && npm run test:chrome",
+    "test": "npm run test:chrome",
     "test:all": "npm run test && npm run test:chrome && npm run test:firefox",
     "test:chrome": "karma start config/karma/karma-chrome.js",
     "test:firefox": "karma start config/karma/karma-firefox.js",
