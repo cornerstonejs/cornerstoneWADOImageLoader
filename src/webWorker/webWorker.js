@@ -75,7 +75,7 @@ function loadWebWorkerTask (data) {
  * @param msg
  */
 self.onmessage = function (msg) {
-  // console.log('web worker onmessage', msg.data);
+  console.log('web worker onmessage', msg.data);
 
   // handle initialize message
   if (msg.data.taskType === 'initialize') {

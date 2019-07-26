@@ -9,7 +9,6 @@ module.exports = {
   context,
   entry: {
     cornerstoneWADOImageLoader: './imageLoader/index.js',
-    cornerstoneWADOImageLoaderWebWorker: './webWorker/index.js'
   },
   target: 'web',
   output: {
@@ -39,6 +38,12 @@ module.exports = {
         failOnError: true
       }
     }, {
+      test: /\.worker\.js$/,
+      use: {
+        loader: 'worker-loader',
+        options: { inline: true, fallback: false }
+      }
+    }, {
       test: /\.js$/,
       exclude: /(node_modules)/,
       use: {
@@ -48,5 +53,6 @@ module.exports = {
   },
   plugins: [
     bannerPlugin()
-  ]
+  ],
+  node: { fs: 'empty' },
 };
