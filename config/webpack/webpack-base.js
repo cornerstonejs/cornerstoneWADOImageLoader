@@ -9,6 +9,7 @@ module.exports = {
   context,
   entry: {
     cornerstoneWADOImageLoader: './imageLoader/index.js',
+    cornerstoneWADOImageLoaderWebWorker: './webWorker/index.worker.js',
   },
   target: 'web',
   output: {
