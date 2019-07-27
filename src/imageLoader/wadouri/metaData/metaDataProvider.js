@@ -130,19 +130,23 @@ function metaDataProvider (type, imageId) {
 
     for (let overlayGroup = 0x00; overlayGroup <= 0x1E; overlayGroup += 0x02) {
       let groupStr = `x60${overlayGroup.toString(16)}`;
+
       if (groupStr.length === 4) {
         groupStr = `x600${overlayGroup.toString(16)}`;
       }
 
       const data = dataSet.elements[`${groupStr}3000`];
+
       if (!data) {
         continue;
       }
 
       const pixelData = [];
+
       for (let i = 0; i < data.length; i++) {
         for (let k = 0; k < 8; k++) {
           const byte_as_int = dataSet.byteArray[data.dataOffset + i];
+          
           pixelData[i * 8 + k] = (byte_as_int >> k) & 0b1; // eslint-disable-line no-bitwise
         }
       }

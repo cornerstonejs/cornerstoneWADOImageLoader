@@ -1,10 +1,12 @@
 import { getOptions } from './internal/options.js';
 import webWorkerManager from './webWorkerManager.js';
 import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
-import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
-import calculateMinMax from '../shared/calculateMinMax.js';
-import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
-import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
+
+// TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
+//import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
+//import calculateMinMax from '../shared/calculateMinMax.js';
+//import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
+//import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
 
 let codecsInitialized = false;
 
@@ -15,7 +17,7 @@ function processDecodeTask (imageFrame, transferSyntax, pixelData, options) {
   const { strict, decodeConfig, useWebWorkers } = loaderOptions;
 
   if (useWebWorkers === false) {
-    if (codecsInitialized === false) {
+    /*if (codecsInitialized === false) {
       initializeJPEG2000(decodeConfig);
       initializeJPEGLS(decodeConfig);
 
@@ -33,7 +35,7 @@ function processDecodeTask (imageFrame, transferSyntax, pixelData, options) {
       } catch (error) {
         reject(error);
       }
-    });
+    });*/
   }
 
   return webWorkerManager.addTask(
