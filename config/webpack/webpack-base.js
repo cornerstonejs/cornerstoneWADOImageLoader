@@ -46,7 +46,16 @@ module.exports = {
       }
     }, {
       test: /\.js$/,
-      exclude: /(node_modules)/,
+      include: /(codecs)/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          compact: false
+        }
+      },
+    }, {
+      test: /\.js$/,
+      exclude: [/(node_modules)/, /(codecs)/],
       use: {
         loader: 'babel-loader'
       }
