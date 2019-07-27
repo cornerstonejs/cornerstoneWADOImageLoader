@@ -126,7 +126,7 @@ If you want to create your own custom web worker tasks, follow the following ste
 2) Add the path to that source file in the webWorkerTaskPaths array
 
 3) Register your custom web worker task with the framework by calling
-   cornerstoneWADOImageLoaderWebWorker.registerTaskHandler() function.  This function accepts an object with
+   self.registerTaskHandler() function.  This function accepts an object with
    three properties:
    * taskType - A unique string used to dispatch task requests to your custom web worker task
    * handler - function that is called when work is dispatched to your custom web worker task
