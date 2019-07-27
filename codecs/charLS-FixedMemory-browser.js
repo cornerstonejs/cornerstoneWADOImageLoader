@@ -27,3 +27,5 @@ var CharLS = function(Module) {
 
   return Module;
 };
+
+export default CharLS;

@@ -25,9 +25,9 @@ const transferSyntaxes = {
 
   '1.2.840.10008.1.2.4.57': 'JPEGProcess14TransferSyntax',
   '1.2.840.10008.1.2.4.70': 'JPEGProcess14SV1TransferSyntax',
-  '1.2.840.10008.1.2.4.80': 'JPEGLSLosslessTransferSyntax',
+  //'1.2.840.10008.1.2.4.80': 'JPEGLSLosslessTransferSyntax',
 
-  '1.2.840.10008.1.2.4.90': 'JPEG2000LosslessOnlyTransferSyntax',
+  //'1.2.840.10008.1.2.4.90': 'JPEG2000LosslessOnlyTransferSyntax',
   '1.2.840.10008.1.2.5': 'RLELosslessTransferSyntax'
 };
 

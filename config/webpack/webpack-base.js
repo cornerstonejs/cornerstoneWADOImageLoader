@@ -52,7 +52,7 @@ module.exports = {
     }]
   },
   plugins: [
-    bannerPlugin()
+    bannerPlugin(),
   ],
   node: { fs: 'empty' },
 };
