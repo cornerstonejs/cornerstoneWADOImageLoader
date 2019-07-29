@@ -72,7 +72,6 @@ Building on the prior minimal example, you can configure the web worker framewor
         ],
         taskConfiguration: {
             'decodeTask' : {
-                loadCodecsOnStartup : true,
                 initializeCodecsOnStartup: false,
                 codecsPath: '../dist/cornerstoneWADOImageLoaderCodecs.js',
                 usePDFJS: false
@@ -98,11 +97,6 @@ created on initialize (default).
 
 * webWorkerTaskPaths - This is an array of paths to custom web worker tasks.  See section "Custom Web Worker Tasks"
 below for more information.
-
-* taskConfiguration.decodeTask.loadCodecsOnStartup - By default, the web worker framework will automatically load
-all codecs on startup.  The codecs are quite large and require a bit of CPU (and time) just to load and
-doing it at startup will typically lead to faster initial image display.  You may want to set this to false if you
-don't want to pay the CPU cost up front.  If disabled, the codecs will be loaded on demand once they are required.
 
 * taskConfiguration.decodeTask.initializeCodecsOnStartup - By default, the web worker framework does not initialize
 the JPEG2000 or JPEG-LS decoders on startup.  Initialization takes even more CPU (and time) than loading so it is

@@ -39,7 +39,6 @@ describe('loadImage', function () {
       startWebWorkersOnDemand: true,
       taskConfiguration: {
         decodeTask: {
-          loadCodecsOnStartup: true,
           initializeCodecsOnStartup: true,
           usePDFJS: false
         }

@@ -14,7 +14,6 @@ describe('#wadouri > metadataProvider', function () {
     startWebWorkersOnDemand: true,
     taskConfiguration: {
       decodeTask: {
-        loadCodecsOnStartup: true,
         initializeCodecsOnStartup: true,
         usePDFJS: false
       }

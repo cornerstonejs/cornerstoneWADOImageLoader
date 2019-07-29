@@ -7,7 +7,6 @@ try {
     webWorkerTaskPaths: [],
     taskConfiguration: {
       decodeTask: {
-        loadCodecsOnStartup: true,
         initializeCodecsOnStartup: false,
         usePDFJS: false,
         strict: true

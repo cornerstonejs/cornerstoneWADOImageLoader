@@ -17,7 +17,7 @@ function processDecodeTask (imageFrame, transferSyntax, pixelData, options) {
   const { strict, decodeConfig, useWebWorkers } = loaderOptions;
 
   if (useWebWorkers === false) {
-    /*if (codecsInitialized === false) {
+    if (codecsInitialized === false) {
       initializeJPEG2000(decodeConfig);
       initializeJPEGLS(decodeConfig);
 
@@ -35,7 +35,7 @@ function processDecodeTask (imageFrame, transferSyntax, pixelData, options) {
       } catch (error) {
         reject(error);
       }
-    });*/
+    });
   }
 
   return webWorkerManager.addTask(

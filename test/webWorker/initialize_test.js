@@ -6,7 +6,6 @@ const config = {
   startWebWorkersOnDemand: true,
   taskConfiguration: {
     decodeTask: {
-      loadCodecsOnStartup: true,
       initializeCodecsOnStartup: false,
       usePDFJS: false
     }

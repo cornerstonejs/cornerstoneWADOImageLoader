@@ -20,7 +20,6 @@ const defaultConfig = {
   webWorkerTaskPaths: [],
   taskConfiguration: {
     decodeTask: {
-      loadCodecsOnStartup: true,
       initializeCodecsOnStartup: false,
       usePDFJS: false,
       strict: options.strict

@@ -25,9 +25,8 @@ function loadCodecs (config) {
  */
 function initialize (config) {
   decodeConfig = config;
-  if (config.decodeTask.loadCodecsOnStartup) {
-    loadCodecs(config);
-  }
+
+  loadCodecs(config);
 }
 
 /**
