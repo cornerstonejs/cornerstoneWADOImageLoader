@@ -70,9 +70,6 @@ module.exports = {
       test: path.join(codecs, 'jpx.min.js'),
       use: 'exports-loader?JpxImage'
     }, {
-      test: path.join(codecs, 'jpegLossless.js'),
-      use: 'exports-loader?jpeg'
-    }, {
       test: /\.js$/,
       exclude: [/(node_modules)/, /(codecs)/],
       use: {
