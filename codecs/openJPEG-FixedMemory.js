@@ -28,5 +28,3 @@ var Qa=[oj,ed,We,oj];var Ra=[pj,Bi,Vh,Th,Ab,Bb,Cb,Db,Hc,Ic,Kc,$c,nd,Oe,af,od,pd,
 
   return Module;
 };
-
-export default OpenJPEG;

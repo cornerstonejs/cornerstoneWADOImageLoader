@@ -1,6 +1,7 @@
 const path = require('path');
 const rootPath = process.cwd();
 const context = path.join(rootPath, "src");
+const codecs = path.join(rootPath, "codecs");
 const outputPath = path.join(rootPath, 'dist');
 const bannerPlugin = require('./plugins/banner');
 
@@ -30,6 +31,9 @@ module.exports = {
     },
   },
   module: {
+    noParse: [
+      /(codecs)/
+    ],
     rules: [{
       enforce: 'pre',
       test: /\.js$/,
@@ -44,7 +48,7 @@ module.exports = {
         loader: 'worker-loader',
         options: { inline: true, fallback: false }
       }
-    }, {
+    }, /*{
       test: /\.js$/,
       include: /(codecs)/,
       use: {
@@ -53,6 +57,21 @@ module.exports = {
           compact: false
         }
       },
+    },*/ {
+      test: path.join(codecs, 'openJPEG-FixedMemory.js'),
+      use: 'exports-loader?OpenJPEG'
+    }, {
+      test: path.join(codecs, 'charLS-FixedMemory-browser.js'),
+      use: 'exports-loader?CharLS'
+    }, {
+      test: path.join(codecs, 'jpeg.js'),
+      use: 'exports-loader?JpegImage'
+    }, {
+      test: path.join(codecs, 'jpx.min.js'),
+      use: 'exports-loader?JpxImage'
+    }, {
+      test: path.join(codecs, 'jpegLossless.js'),
+      use: 'exports-loader?jpeg'
     }, {
       test: /\.js$/,
       exclude: [/(node_modules)/, /(codecs)/],

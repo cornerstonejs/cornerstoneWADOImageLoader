@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.jpeg = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var jpeg = (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.jpeg = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
   /*
    * Copyright (C) 2015 Michael Martinez
    * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -892,7 +892,7 @@
   };
 
   jpeg.lossless.Decoder.prototype.setValue8 = function (index, val) {
-      this.outputData[index] = val; 
+      this.outputData[index] = val;
   };
 
   jpeg.lossless.Decoder.prototype.getValue8 = function (index) {
@@ -908,13 +908,13 @@
 
   if (littleEndian) {
       // just reading from an array is fine then. Int16Array will use platform endianness.
-      jpeg.lossless.Decoder.prototype.setValue16 = jpeg.lossless.Decoder.prototype.setValue8; 
+      jpeg.lossless.Decoder.prototype.setValue16 = jpeg.lossless.Decoder.prototype.setValue8;
       jpeg.lossless.Decoder.prototype.getValue16 = jpeg.lossless.Decoder.prototype.getValue8;
-  } 
+  }
   else {
-      // If platform is big-endian, we will need to convert to little-endian 
+      // If platform is big-endian, we will need to convert to little-endian
       jpeg.lossless.Decoder.prototype.setValue16 = function (index, val) {
-          this.outputData[index] = ((val & 0xFF) << 8) | ((val >> 8) & 0xFF); 
+          this.outputData[index] = ((val & 0xFF) << 8) | ((val >> 8) & 0xFF);
       };
 
       jpeg.lossless.Decoder.prototype.getValue16 = function (index) {

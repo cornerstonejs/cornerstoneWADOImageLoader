@@ -3,10 +3,10 @@ import webWorkerManager from './webWorkerManager.js';
 import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 
 // TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
-//import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
-//import calculateMinMax from '../shared/calculateMinMax.js';
-//import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
-//import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
+import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
+import calculateMinMax from '../shared/calculateMinMax.js';
+import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
+import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
 
 let codecsInitialized = false;
 
