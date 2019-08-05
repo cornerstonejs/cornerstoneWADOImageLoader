@@ -12,3 +12,15 @@ cache:
 
 after_success:
   cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+
+jobs:
+  include:
+    - stage: release
+      node_js: lts/*
+      script:
+        - echo "skipping tests"
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script:
+          - npx semantic-release 
