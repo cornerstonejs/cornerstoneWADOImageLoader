@@ -21,6 +21,7 @@
   "scripts": {
     "cm": "npx git-cz",
     "build": "npm run build:es6",
+    "build:ci": "npm run version && npm run webpack",
     "build:es6": "npm run test && npm run version && npm run webpack && npm run doc:generate",
     "clean": "npm run clean:dist && npm run clean:coverage",
     "clean:dist": "shx rm -rf dist",
