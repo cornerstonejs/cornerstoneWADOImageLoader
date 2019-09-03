@@ -84,7 +84,9 @@ function loadImage (imageId, options) {
         image.loadTimeInMS = end - start;
         resolve(image);
       }, reject);
-    }, reject);
+    }, reject).catch((error) => {
+      reject(error);
+    });
   });
 
   return {

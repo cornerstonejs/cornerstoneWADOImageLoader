@@ -105,6 +105,14 @@ function xhrRequest (url, imageId, headers = {}, params = {}) {
       cornerstone.triggerEvent(cornerstone.events, 'cornerstoneimageloadprogress', eventData);
     };
 
+    xhr.onerror = function () {
+      reject(xhr);
+    };
+
+    xhr.onabort = function () {
+      reject(xhr);
+    };
+
     xhr.send();
   });
 }
