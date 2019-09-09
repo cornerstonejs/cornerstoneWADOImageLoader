@@ -46,6 +46,10 @@ function metaDataProvider (type, imageId) {
     if (pixelSpacing) {
       rowPixelSpacing = pixelSpacing[0];
       columnPixelSpacing = pixelSpacing[1];
+    } else {
+      const imagePixelSpacing = getNumberValues(dataSet, 'x00181164', 2);
+      rowPixelSpacing = imagePixelSpacing[0];
+      columnPixelSpacing = imagePixelSpacing[1];
     }
 
     let rowCosines = null;
