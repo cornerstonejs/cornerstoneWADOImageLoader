@@ -5,6 +5,8 @@ defaults: &defaults
   working_directory: ~/repo
   docker:
     - image: circleci/node:10.15.1
+      environment:
+        TERM: xterm # Enable colors in term
 
 jobs:
   CHECKOUT:
@@ -28,17 +30,18 @@ jobs:
           paths: .
 
   BUILD_AND_TEST:
-      - attach_workspace:
-          at: ~/repo
-      - run: npm run build && npm run test
-      # https://circleci.com/docs/2.0/collect-test-data/#karma
-      # - store_test_results:
-      #     path: reports/junit
-      # - store_artifacts:
-      #     path: reports/junit
-      - persist_to_workspace:
-          root: ~/repo
-          paths: .
+    <<: *defaults
+    - attach_workspace:
+        at: ~/repo
+    - run: npm run build && npm run test
+    # https://circleci.com/docs/2.0/collect-test-data/#karma
+    # - store_test_results:
+    #     path: reports/junit
+    # - store_artifacts:
+    #     path: reports/junit
+    - persist_to_workspace:
+        root: ~/repo
+        paths: .
 
   NPM_PUBLISH:
     <<: *defaults
