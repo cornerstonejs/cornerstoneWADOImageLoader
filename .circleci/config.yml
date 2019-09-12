@@ -57,8 +57,8 @@ jobs:
 workflows:
   version: 2
 
-  # PULL REQUESTS
-  pull_requests:
+  # PULL REQUEST
+  PULL_REQUEST:
     jobs:
       - CHECKOUT:
           filters:
@@ -72,7 +72,7 @@ workflows:
             - CHECKOUT
 
   # MERGE TO MASTER
-  cut_release:
+  TEST_AND_RELEASE:
     jobs:
       - CHECKOUT:
           filters:
