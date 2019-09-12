@@ -3,10 +3,12 @@ version: 2.1
 
 defaults: &defaults
   working_directory: ~/repo
+  # https://circleci.com/docs/2.0/circleci-images/#language-image-variants
   docker:
-    - image: circleci/node:10.15.1
+    - image: circleci/node:10.15.1-browsers
       environment:
         TERM: xterm # Enable colors in term
+        CHROME_BIN: "/usr/bin/google-chrome"
 
 jobs:
   CHECKOUT:
