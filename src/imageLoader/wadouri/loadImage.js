@@ -15,7 +15,7 @@ function addDecache (imageLoadObject, imageId) {
   };
 }
 
-function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKey, options, callbacks) {
+function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKey, options = {}) {
   const start = new Date().getTime();
   const imageLoadObject = {
     cancelFn: undefined
@@ -26,9 +26,11 @@ function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKe
       const pixelData = getPixelData(dataSet, frame);
       const transferSyntax = dataSet.string('x00020010');
       const loadEnd = new Date().getTime();
-      const imagePromise = createImage(imageId, pixelData, transferSyntax, options);
+      const imagePromise = createImage(imageId, pixelData, transferSyntax, options.decodeTask);
 
-      addDecache(imageLoadObject, imageId);
+      if (options.decache === true) {
+        addDecache(imageLoadObject, imageId);
+      }
 
       imagePromise.then((image) => {
         image.data = dataSet;
@@ -37,8 +39,8 @@ function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKe
 
         image.loadTimeInMS = loadEnd - start;
         image.totalTimeInMS = end - start;
-        if (callbacks !== undefined && callbacks.imageDoneCallback !== undefined) {
-          callbacks.imageDoneCallback(image);
+        if (options.callbacks !== undefined && options.callbacks.imageDoneCallback !== undefined) {
+          options.callbacks.imageDoneCallback(image);
         }
         resolve(image);
       }, function (error) {
@@ -59,7 +61,7 @@ function loadImageFromPromise (dataSetPromise, imageId, frame = 0, sharedCacheKe
   return imageLoadObject;
 }
 
-function loadImageFromDataSet (dataSet, imageId, frame = 0, sharedCacheKey, options) {
+function loadImageFromDataSet (dataSet, imageId, frame = 0, sharedCacheKey, options = {}) {
   const start = new Date().getTime();
 
   const promise = new Promise((resolve, reject) => {
@@ -71,7 +73,7 @@ function loadImageFromDataSet (dataSet, imageId, frame = 0, sharedCacheKey, opti
       const pixelData = getPixelData(dataSet, frame);
       const transferSyntax = dataSet.string('x00020010');
 
-      imagePromise = createImage(imageId, pixelData, transferSyntax, options);
+      imagePromise = createImage(imageId, pixelData, transferSyntax, options.decodeTask);
     } catch (error) {
       // Reject the error, and the dataSet
       reject({
@@ -128,6 +130,8 @@ function loadImage (imageId, options = {}) {
 
   // load the dataSet via the dataSetCacheManager
   const dataSetPromise = dataSetCacheManager.load(parsedImageId.url, loader, imageId);
+
+  options.decache = true;
 
   return loadImageFromPromise(dataSetPromise, imageId, parsedImageId.frame, parsedImageId.url, options);
 }
