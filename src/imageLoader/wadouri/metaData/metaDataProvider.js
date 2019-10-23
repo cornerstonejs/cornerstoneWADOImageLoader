@@ -7,11 +7,12 @@ import getOverlayPlaneModule from './getOverlayPlaneModule.js';
 import getLUTs from './getLUTs.js';
 import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixelRepresentation.js';
 
-function metaDataProvider (type, imageId) {
+function metaDataProvider (type, imageId, dataSet) {
   const { dicomParser } = external;
   const parsedImageId = parseImageId(imageId);
-
-  const dataSet = dataSetCacheManager.get(parsedImageId.url);
+  if (!dataSet) {
+    dataSet = dataSetCacheManager.get(parsedImageId.url);
+  }
 
   if (!dataSet) {
     return;
