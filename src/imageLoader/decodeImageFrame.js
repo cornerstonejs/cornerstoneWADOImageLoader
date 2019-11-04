@@ -3,12 +3,12 @@ import webWorkerManager from './webWorkerManager.js';
 import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 
 // TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
-import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
-import calculateMinMax from '../shared/calculateMinMax.js';
-import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
-import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
+// import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
+// import calculateMinMax from '../shared/calculateMinMax.js';
+// import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
+// import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
 
-let codecsInitialized = false;
+// let codecsInitialized = false;
 
 function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
   const priority = options.priority || undefined;
@@ -18,33 +18,33 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
   const loaderOptions = getOptions();
   const { strict, decodeConfig, useWebWorkers } = loaderOptions;
 
-  if (useWebWorkers === false) {
-    if (codecsInitialized === false) {
-      initializeJPEG2000(decodeConfig);
-      initializeJPEGLS(decodeConfig);
+  // if (useWebWorkers === false) {
+  //   // if (codecsInitialized === false) {
+  //   //   initializeJPEG2000(decodeConfig);
+  //   //   initializeJPEGLS(decodeConfig);
 
-      codecsInitialized = true;
-    }
+  //   //   codecsInitialized = true;
+  //   // }
 
-    return new Promise((resolve, reject) => {
-      try {
-        const decodeArguments = [
-          imageFrame,
-          transferSyntax,
-          pixelData,
-          decodeConfig,
-          options,
-        ];
-        const decodedImageFrame = decodeImageFrameHandler(...decodeArguments);
+  //   return new Promise((resolve, reject) => {
+  //     try {
+  //       const decodeArguments = [
+  //         imageFrame,
+  //         transferSyntax,
+  //         pixelData,
+  //         decodeConfig,
+  //         options,
+  //       ];
+  //       const decodedImageFrame = decodeImageFrameHandler(...decodeArguments);
 
-        calculateMinMax(decodedImageFrame, strict);
+  //       calculateMinMax(decodedImageFrame, strict);
 
-        resolve(decodedImageFrame);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
+  //       resolve(decodedImageFrame);
+  //     } catch (error) {
+  //       reject(error);
+  //     }
+  //   });
+  // }
 
   return webWorkerManager.addTask(
     'decodeTask',
