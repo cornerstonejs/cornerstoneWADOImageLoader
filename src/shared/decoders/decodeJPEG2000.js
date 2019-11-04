@@ -1,7 +1,60 @@
-import JpxImage from './../codecs/jpx.min.js';
+let openJPEG;
 
-function decodeJpx(imageFrame, pixelData) {
-  const jpxImage = new JpxImage();
+async function initializeJPEG2000(decodeConfig) {
+  // check to make sure codec is loaded
+  if (!decodeConfig.usePDFJS) {
+    if (typeof OpenJPEG === 'undefined') {
+      throw new Error('OpenJPEG decoder not loaded');
+    }
+  }
+
+  if (!openJPEG) {
+    const OpenJpegCodec = await import(
+      /* webpackPrefetch: true, webpackChunkName: "OpenJPEG" */ './../codecs/openJPEG-FixedMemory.js'
+    );
+
+    openJPEG = OpenJpegCodec();
+    if (!openJPEG || !openJPEG._jp2_decode) {
+      throw new Error('OpenJPEG failed to initialize');
+    }
+  }
+}
+
+/**
+ * Decodes an image frame by decoding the provided pixelData and updating the
+ * imageFrame by reference.
+ *
+ * @exports
+ * @param {*} imageFrame
+ * @param {*} pixelData
+ * @param {object} decodeConfig
+ * @param {bool} [decodeConfig.usePDFJS] - If true, uses PDFJS decoder instead of OPENJPEG
+ * @param {object} [options={}]
+ * @param {bool} [options.usePDFJS] - If true, uses PDFJS decoder instead of OPENJPEG
+ */
+function decodeJPEG2000(imageFrame, pixelData, decodeConfig, options = {}) {
+  initializeJPEG2000(decodeConfig);
+
+  if (options.usePDFJS || decodeConfig.usePDFJS) {
+    return _decodeJpx(imageFrame, pixelData);
+  }
+
+  return _decodeOpenJpeg2000(imageFrame, pixelData);
+}
+
+/**
+ * Decodes an image frame by decoding the provided pixelData and updating the
+ * imageFrame by reference. This is the faster, but less reliable, PDFJS decode.
+ *
+ * @param {*} imageFrame
+ * @param {*} pixelData
+ */
+async function _decodeJpx(imageFrame, pixelData) {
+  const JpxImageCodec = await import(
+    /* webpackPrefetch: true, webpackChunkName: "JpxImage" */ './../codecs/jpx.min.js'
+  );
+
+  const jpxImage = new JpxImageCodec();
 
   jpxImage.parse(pixelData);
 
@@ -20,9 +73,39 @@ function decodeJpx(imageFrame, pixelData) {
   return imageFrame;
 }
 
-let openJPEG;
+/**
+ * Decodes an image frame by decoding the provided pixelData and updating the
+ * imageFrame by reference. This is the slower, but more accurate, OpenJPEG
+ * emscripten decode.
+ *
+ * @param {*} imageFrame
+ * @param {*} pixelData
+ */
+function _decodeOpenJpeg2000(imageFrame, pixelData) {
+  const bytesPerPixel = imageFrame.bitsAllocated <= 8 ? 1 : 2;
+  const signed = imageFrame.pixelRepresentation === 1;
 
-function decodeOpenJPEG(data, bytesPerPixel, signed) {
+  const image = _decodeOpenJPEG(pixelData, bytesPerPixel, signed);
+
+  imageFrame.columns = image.sx;
+  imageFrame.rows = image.sy;
+  imageFrame.pixelData = image.pixelData;
+  if (image.nbChannels > 1) {
+    imageFrame.photometricInterpretation = 'RGB';
+  }
+
+  return imageFrame;
+}
+
+/**
+ * This maps our emscripten OpenJPEG decode to the output we expect.
+ * It also cleans up after itself (memory).
+ *
+ * @param {*} data
+ * @param {*} bytesPerPixel
+ * @param {*} signed
+ */
+function _decodeOpenJPEG(data, bytesPerPixel, signed) {
   const dataPtr = openJPEG._malloc(data.length);
 
   openJPEG.writeArrayToMemory(data, dataPtr);
@@ -119,56 +202,6 @@ function decodeOpenJPEG(data, bytesPerPixel, signed) {
   openJPEG._free(imageSizeCompPtr);
 
   return image;
-}
-
-function decodeOpenJpeg2000(imageFrame, pixelData) {
-  const bytesPerPixel = imageFrame.bitsAllocated <= 8 ? 1 : 2;
-  const signed = imageFrame.pixelRepresentation === 1;
-
-  const image = decodeOpenJPEG(pixelData, bytesPerPixel, signed);
-
-  imageFrame.columns = image.sx;
-  imageFrame.rows = image.sy;
-  imageFrame.pixelData = image.pixelData;
-  if (image.nbChannels > 1) {
-    imageFrame.photometricInterpretation = 'RGB';
-  }
-
-  return imageFrame;
-}
-
-async function initializeJPEG2000(decodeConfig) {
-  // check to make sure codec is loaded
-  if (!decodeConfig.usePDFJS) {
-    if (typeof OpenJPEG === 'undefined') {
-      throw new Error('OpenJPEG decoder not loaded');
-    }
-  }
-
-  if (!openJPEG) {
-    const OpenJPEG = await import(
-      /* webpackPrefetch: true, webpackChunkName: "OpenJPEG" */ './../codecs/openJPEG-FixedMemory.js'
-    );
-
-    openJPEG = OpenJPEG();
-    if (!openJPEG || !openJPEG._jp2_decode) {
-      throw new Error('OpenJPEG failed to initialize');
-    }
-  }
-}
-
-function decodeJPEG2000(imageFrame, pixelData, decodeConfig, options = {}) {
-  initializeJPEG2000(decodeConfig);
-
-  if (options.usePDFJS || decodeConfig.usePDFJS) {
-    // OHIF image-JPEG2000 https://github.com/OHIF/image-JPEG2000
-    // console.log('PDFJS')
-    return decodeJpx(imageFrame, pixelData);
-  }
-
-  // OpenJPEG2000 https://github.com/jpambrun/openjpeg
-  // console.log('OpenJPEG')
-  return decodeOpenJpeg2000(imageFrame, pixelData);
 }
 
 export default decodeJPEG2000;
