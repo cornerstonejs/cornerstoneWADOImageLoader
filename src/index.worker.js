@@ -1,6 +1,6 @@
-import { registerTaskHandler } from './webWorker.js';
-import decodeTask from './decodeTask/decodeTask.js';
-import { default as version } from '../version.js';
+import { registerTaskHandler } from './webWorker/index.js';
+import decodeTask from './webWorker/decodeTask/decodeTask.js';
+// import { default as version } from '../version.js';
 
 // TODO: Not sure if this is necessary, but we probably need it for deflate in dicomParser
 /* eslint-disable-next-line import/extensions */
@@ -11,9 +11,9 @@ registerTaskHandler(decodeTask);
 
 const cornerstoneWADOImageLoaderWebWorker = {
   registerTaskHandler,
-  version,
+  version: '0.0.0',
 };
 
-export { registerTaskHandler, version };
+export { registerTaskHandler }; // , version };
 
 export default cornerstoneWADOImageLoaderWebWorker;

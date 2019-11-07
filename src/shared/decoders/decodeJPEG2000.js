@@ -13,7 +13,9 @@ async function initializeJPEG2000(decodeConfig) {
       /* webpackPrefetch: true, webpackChunkName: "OpenJPEG" */ './../codecs/openJPEG-FixedMemory.js'
     );
 
+    // eslint-disable-next-line
     openJPEG = OpenJpegCodec();
+
     if (!openJPEG || !openJPEG._jp2_decode) {
       throw new Error('OpenJPEG failed to initialize');
     }

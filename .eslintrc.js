@@ -227,7 +227,6 @@ module.exports = {
     'sort-keys': 'off',
     'sort-vars': 'off',
     'space-before-blocks': 'warn',
-    'space-before-function-paren': 'warn',
     'space-in-parens': ['warn', 'never'],
     'space-infix-ops': 'warn',
     'space-unary-ops': 'warn',

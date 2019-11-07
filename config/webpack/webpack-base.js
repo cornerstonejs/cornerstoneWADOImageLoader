@@ -1,16 +1,19 @@
+// ~~ Paths
 const path = require('path');
-const rootPath = process.cwd();
-const context = path.join(rootPath, 'src');
-const codecs = path.join(rootPath, 'src', 'shared', 'codecs');
-const outputPath = path.join(rootPath, 'dist');
-const bannerPlugin = require('./plugins/banner');
+const REPO_ROOT = process.cwd();
+const SRC_PATH = path.join(REPO_ROOT, 'src');
+const OUTPUT_PATH = path.join(REPO_ROOT, 'dist');
+const codecs = path.join(REPO_ROOT, 'src', 'shared', 'codecs');
+// ~~ Plugins
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   mode: 'development',
-  context,
+  context: SRC_PATH,
+  // Relative to context
   entry: {
-    cornerstoneWADOImageLoader: './imageLoader/index.js',
-    // cornerstoneWADOImageLoaderWebWorker: './webWorker/index.worker.js',
+    cornerstoneWADOImageLoader: './index.js',
+    cornerstoneWADOImageLoaderWebWorker: './index.worker.js',
   },
   target: 'web',
   output: {
@@ -18,8 +21,9 @@ module.exports = {
     library: '[name]',
     libraryTarget: 'umd',
     globalObject: 'this',
-    path: outputPath,
+    path: OUTPUT_PATH,
     umdNamedDefine: true,
+    publicPath: '/',
   },
   devtool: 'source-map',
   externals: {
@@ -36,43 +40,20 @@ module.exports = {
       {
         enforce: 'pre',
         test: /\.js$/,
-        exclude: /(node_modules)/,
+        exclude: [/(node_modules)/, /(codecs)/],
         loader: 'eslint-loader',
         options: {
           failOnError: true,
         },
       },
+      // If we import a file with this syntax...?
+      // What if it's the entry point?
       {
         test: /\.worker\.js$/,
         use: {
           loader: 'worker-loader',
-          options: { inline: true, fallback: false },
+          options: { inline: false, fallback: false },
         },
-      },
-      /*{
-      test: /\.js$/,
-      include: /(codecs)/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          compact: false
-        }
-      },
-    },*/ {
-        test: path.join(codecs, 'openJPEG-FixedMemory.js'),
-        use: 'exports-loader?OpenJPEG',
-      },
-      {
-        test: path.join(codecs, 'charLS-FixedMemory-browser.js'),
-        use: 'exports-loader?CharLS',
-      },
-      {
-        test: path.join(codecs, 'jpeg.js'),
-        use: 'exports-loader?JpegImage',
-      },
-      {
-        test: path.join(codecs, 'jpx.min.js'),
-        use: 'exports-loader?JpxImage',
       },
       {
         test: /\.js$/,
@@ -83,6 +64,9 @@ module.exports = {
       },
     ],
   },
-  plugins: [bannerPlugin()],
+  plugins: [
+    // Clean output.path
+    new CleanWebpackPlugin(),
+  ],
   node: { fs: 'empty' },
 };

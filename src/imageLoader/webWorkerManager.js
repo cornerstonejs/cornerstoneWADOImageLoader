@@ -67,6 +67,7 @@ function startTaskOnWebWorker() {
       // assign this task to this web worker and send the web worker
       // a message to execute it
       webWorkers[i].task = task;
+      console.log(6);
       webWorkers[i].worker.postMessage(
         {
           taskType: task.taskType,
@@ -120,6 +121,7 @@ function handleMessageFromWorker(msg) {
  * Spawns a new web worker
  */
 function spawnWebWorker() {
+  console.warn('SPAWN');
   // prevent exceeding maxWebWorkers
   if (webWorkers.length >= config.maxWebWorkers) {
     return;
@@ -138,6 +140,7 @@ function spawnWebWorker() {
     status: 'initializing',
   });
   worker.addEventListener('message', handleMessageFromWorker);
+  console.log(7);
   worker.postMessage({
     taskType: 'initialize',
     workerIndex: webWorkers.length - 1,
@@ -201,6 +204,7 @@ function loadWebWorkerTask(sourcePath, taskConfig) {
 
   // tell each spawned web worker to load this task
   for (let i = 0; i < webWorkers.length; i++) {
+    console.log(8);
     webWorkers[i].worker.postMessage({
       taskType: 'loadWebWorkerTask',
       workerIndex: webWorkers.length - 1,
