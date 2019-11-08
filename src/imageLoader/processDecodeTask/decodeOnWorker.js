@@ -17,7 +17,6 @@ export default function _decodeOnWorker(
   canvas,
   options = {}
 ) {
-  console.log(imageFrame, transferSyntax, pixelData, canvas, options);
   const transferList = [pixelData.buffer];
   const priority = options.priority || undefined;
 
