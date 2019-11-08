@@ -1,4 +1,4 @@
-// import cornerstoneWADOImageLoaderWebWorker from '../webWorker/index.worker.js';
+import cornerstoneWADOImageLoaderWebWorker from './../index.worker.js';
 import { getOptions } from './internal/options.js';
 
 // the taskId to assign to the next task added via addTask()
@@ -24,7 +24,6 @@ const defaultConfig = {
       strict: options.strict,
     },
   },
-  workerClass: null,
 };
 
 let config;
@@ -101,6 +100,7 @@ function handleMessageFromWorker(msg) {
     const start = webWorkers[msg.data.workerIndex].task.start;
 
     const action = msg.data.status === 'success' ? 'resolve' : 'reject';
+
     webWorkers[msg.data.workerIndex].task.deferred[action](msg.data.result);
 
     webWorkers[msg.data.workerIndex].task = undefined;
@@ -127,13 +127,7 @@ function spawnWebWorker() {
     return;
   }
 
-  // spawn the webworker
-  if (!config.workerClass) {
-    console.warn('No WorkerClass set in `config`; unable to spawn new worker');
-    return;
-  }
-
-  const worker = new config.workerClass();
+  const worker = new cornerstoneWADOImageLoaderWebWorker();
 
   webWorkers.push({
     worker,
