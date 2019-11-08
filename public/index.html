@@ -1,133 +1,91 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <!-- twitter bootstrap CSS stylesheet - included to make things pretty, not needed or used by cornerstone -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.css"
+      rel="stylesheet"
+    />
     <style>
-    .cornerstone-enabled-image{
-        -webkit-touch-callout:none;
-        -webkit-user-select:none;
-        -khtml-user-select:none;
-        -moz-user-select:none;
-        -ms-user-select:none;
-        user-select:none;
-        cursor:default
-    }
+      .cornerstone-enabled-image {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: default;
+      }
     </style>
-</head>
-<body>
-<div class="container">
-    <div class="page-header">
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/cornerstone-core"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/dicom-parser@1.8.3/dist/dicomParser.min.js"
+    ></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
         <h1>Example of displaying a DICOM P10 image using Cornerstone</h1>
-    </div>
-    <div id="loadProgress">Image Load Progress:</div>
+      </div>
 
-    <div class="row">
-        <form id="form" class="form-horizontal">
-            <div class="form-group">
-                <label class="control-label col-sm-1" for="wadoURL">URL</label>
-                <div class="col-sm-8">
-                    <input class="form-control" type="text" id="wadoURL" placeholder="Enter WADO URL" value="https://raw.githubusercontent.com/cornerstonejs/cornerstoneWADOImageLoader/master/testImages/CT2_J2KR">
-                </div>
-                <div class="col-sm-3">
-                    <button class="form-control" type="button" id="downloadAndView" class="btn btn-primary">Download and View</button>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-2">
-                    <button class="form-control" type="button" id="load" class="btn btn-primary">Load</button>
-                </div>
-                <div class="col-sm-2">
-                    <button class="form-control" type="button" id="unload" class="btn btn-primary">Unload</button>
-                </div>
-                <div class="col-sm-2">
-                    <button class="form-control" type="button" id="purge" class="btn btn-primary">Purge Cache</button>
-                </div>
-            </div>
-        </form>
-    </div>
-    <input type="checkbox" id="toggleModalityLUT">Apply Modality LUT</input>
-    <input type="checkbox" id="toggleVOILUT">Apply VOI LUT</input>
-    <br>
-    <div class="row">
+      <br />
+      <div class="row">
         <div class="col-md-6">
-            <div style="width:512px;height:512px;position:relative;color: white;display:inline-block;border-style:solid;border-color:black;"
-                 oncontextmenu="return false"
-                 class='disable-selection noIbar'
-                 unselectable='on'
-                 onselectstart='return false;'
-                 onmousedown='return false;'>
-                <div id="dicomImage"
-                     style="width:512px;height:512px;top:0px;left:0px; position:absolute">
-                </div>
-            </div>
+          <div
+            style="width:512px;height:512px;position:relative;color: white;display:inline-block;border-style:solid;border-color:black;"
+            oncontextmenu="return false"
+            class="disable-selection noIbar"
+            unselectable="on"
+            onselectstart="return false;"
+            onmousedown="return false;"
+          >
+            <div
+              id="dicomImage"
+              style="width:512px;height:512px;top:0px;left:0px; position:absolute"
+            ></div>
+          </div>
         </div>
-        <div class="col-md-6">
-            <span>Transfer Syntax: </span><span id="transferSyntax"></span><br>
-            <span>SOP Class: </span><span id="sopClass"></span><br>
-            <span>Samples Per Pixel: </span><span id="samplesPerPixel"></span><br>
-            <span>Photometric Interpretation: </span><span id="photometricInterpretation"></span><br>
-            <span>Number Of Frames: </span><span id="numberOfFrames"></span><br>
-            <span>Planar Configuration: </span><span id="planarConfiguration"></span><br>
-            <span>Rows: </span><span id="rows"></span><br>
-            <span>Columns: </span><span id="columns"></span><br>
-            <span>Pixel Spacing: </span><span id="pixelSpacing"></span><br>
-            <span>Row Pixel Spacing: </span><span id="rowPixelSpacing"></span><br>
-            <span>Column Pixel Spacing: </span><span id="columnPixelSpacing"></span><br>
-            <span>Bits Allocated: </span><span id="bitsAllocated"></span><br>
-            <span>Bits Stored: </span><span id="bitsStored"></span><br>
-            <span>High Bit: </span><span id="highBit"></span><br>
-            <span>Pixel Representation: </span><span id="pixelRepresentation"></span><br>
-            <span>WindowCenter: </span><span id="windowCenter"></span><br>
-            <span>WindowWidth: </span><span id="windowWidth"></span><br>
-            <span>RescaleIntercept: </span><span id="rescaleIntercept"></span><br>
-            <span>RescaleSlope: </span><span id="rescaleSlope"></span><br>
-            <span>Basic Offset Table Entries: </span><span id="basicOffsetTable"></span><br>
-            <span>Fragments: </span><span id="fragments"></span><br>
-            <span>Max Stored Pixel Value: </span><span id="minStoredPixelValue"></span><br>
-            <span>Min Stored Pixel Value: </span><span id="maxStoredPixelValue"></span><br>
-            <span>Total Time: </span><span id="totalTime"></span><br>
-            <span>Load Time: </span><span id="loadTime"></span><br>
-            <span>Decode Time: </span><span id="decodeTime"></span><br>
-        </div>
+      </div>
     </div>
-</div>
-</body>
+  </body>
 
-<script src="uids.js"></script>
+  <script>
+    window.cornerstoneWADOImageLoader.webWorkerManager.initialize({
+      maxWebWorkers: 4,
+      startWebWorkersOnDemand: true,
+      webWorkerTaskPaths: [],
+      taskConfiguration: {
+        decodeTask: {
+          initializeCodecsOnStartup: false,
+          usePDFJS: false,
+          strict: true,
+        },
+      },
+    });
 
-<script>
-
-    try {
-        window.cornerstoneWADOImageLoader.webWorkerManager.initialize({
-            maxWebWorkers: 4,
-            startWebWorkersOnDemand: true,
-            webWorkerTaskPaths: [],
-            taskConfiguration: {
-            decodeTask: {
-                initializeCodecsOnStartup: false,
-                usePDFJS: false,
-                strict: true
-            },
-            workerClass: cornerstoneWADOImageLoaderWebWorker
-            }
-        });
-    } catch (error) {
-        throw new Error('cornerstoneWADOImageLoader is not loaded');
-    }
-
-
-    console.log(cornerstoneWADOImageLoader);
-    console.log(cornerstoneWADOImageLoaderWebWorker);
-
-    cornerstoneWADOImageLoader.external.dicomParser = dicomParser
+    cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
     cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 
     cornerstoneWADOImageLoader.configure({
-        beforeSend: function(xhr) {
-            // Add custom headers here (e.g. auth tokens)
-            //xhr.setRequestHeader('APIKEY', 'my auth token');
-        }
+      beforeSend: function(xhr) {
+        // Add custom headers here (e.g. auth tokens)
+        //xhr.setRequestHeader('APIKEY', 'my auth token');
+      },
     });
-</script>
+
+    const element = document.querySelector('#dicomImage');
+
+    cornerstone.enable(element);
+
+    cornerstone
+      .loadImage('dicomweb:http://localhost:3000/1.dcm')
+      .then(image => {
+        console.log('image from decoder: ', image);
+        cornerstone.displayImage(element, image);
+      });
+  </script>
 </html>
