@@ -86,8 +86,6 @@ self.onmessage = function(msg) {
   if (taskHandler) {
     console.log('dispatching for... ', msg.data.taskType);
     console.log(taskHandler);
-    // eslint-disable-next-line
-    debugger;
     try {
       taskHandler.handler(msg.data, function(result, transferList) {
         self.postMessage(
