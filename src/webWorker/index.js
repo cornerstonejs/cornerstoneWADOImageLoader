@@ -113,15 +113,12 @@ self.onmessage = function(msg) {
   }
 
   // not task handler registered - send a failure message back to ui thread
-  console.log('no task handler for ', msg.data.taskType);
-  console.log(taskHandlers);
-  console.log(4);
-  // self.postMessage({
-  //   taskType: msg.data.taskType,
-  //   status: 'failed - no task handler registered',
-  //   result: 'error message',
-  //   workerIndex: msg.data.workerIndex,
-  // });
+  self.postMessage({
+    taskType: msg.data.taskType,
+    status: 'failed - no task handler registered',
+    result: 'error message',
+    workerIndex: msg.data.workerIndex,
+  });
 };
 
 /**
