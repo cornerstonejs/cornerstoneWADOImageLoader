@@ -1,5 +1,5 @@
 import { registerTaskHandler } from './webWorker/index.js';
-import decodeTask from './webWorker/decodeTask/decodeTask.js';
+import decodeTask from './webWorker/tasks/decodeTask.js';
 // import { default as version } from '../version.js';
 
 // TODO: Not sure if this is necessary, but we probably need it for deflate in dicomParser
