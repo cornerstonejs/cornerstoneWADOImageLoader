@@ -88,6 +88,7 @@ describe('loadImage', function () {
   it('should result in an error when the DICOM file has no pixelData', (done) => {
     this.timeout(5000);
     const imageId = `${url}no-pixel-data.dcm`;
+
     let loadObject;
 
     try {

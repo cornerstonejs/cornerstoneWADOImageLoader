@@ -97,6 +97,7 @@ function handleMessageFromWorker (msg) {
     const start = webWorkers[msg.data.workerIndex].task.start;
 
     const action = msg.data.status === 'success' ? 'resolve' : 'reject';
+
     webWorkers[msg.data.workerIndex].task.deferred[action](msg.data.result);
 
     webWorkers[msg.data.workerIndex].task = undefined;

@@ -26,8 +26,11 @@ const url = 'dicomweb://localhost:9876/base/testImages/';
 describe('Test lossy TransferSyntaxes decoding', function () {
 
   let uncompressedPixelData = null;
+
   let uncompressedImage = null;
+
   let rescaleInterceptUncompressed = null;
+
   let rescaleSlopeUncompressed = null;
 
   before(function (done) {
