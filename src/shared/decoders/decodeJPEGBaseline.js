@@ -10,6 +10,8 @@ async function decodeJPEGBaseline(imageFrame, pixelData) {
     /* webpackPrefetch: true, webpackChunkName: "JpegBaseline" */ './../codecs/jpeg.js'
   );
 
+  console.log('JpegImageCodec', JpegImageCodec);
+
   if (typeof JpegImageCodec === 'undefined') {
     throw new Error('No JPEG Baseline decoder loaded');
   }

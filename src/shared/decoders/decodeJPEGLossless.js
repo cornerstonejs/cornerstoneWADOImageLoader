@@ -10,6 +10,8 @@ async function decodeJPEGLossless(imageFrame, pixelData) {
     /* webpackPrefetch: true, webpackChunkName: "JpegLossless" */ './../codecs/jpegLossless.js'
   );
 
+  console.log('JpegLosslessCodec', JpegLosslessCodec);
+
   // check to make sure codec is loaded
   if (
     typeof JpegLosslessCodec === 'undefined' ||

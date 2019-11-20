@@ -66,7 +66,8 @@ function startTaskOnWebWorker() {
       // assign this task to this web worker and send the web worker
       // a message to execute it
       webWorkers[i].task = task;
-      console.log(6);
+      console.log('Dispatching task to worker');
+      console.log(task.data, task.transferList);
       webWorkers[i].worker.postMessage(
         {
           taskType: task.taskType,
@@ -92,7 +93,7 @@ function startTaskOnWebWorker() {
  * @param msg
  */
 function handleMessageFromWorker(msg) {
-  // console.log('handleMessageFromWorker', msg.data);
+  console.log('MAIN: RECEIVE MESSAGE', msg.data);
   if (msg.data.taskType === 'initialize') {
     webWorkers[msg.data.workerIndex].status = 'ready';
     startTaskOnWebWorker();
@@ -127,6 +128,8 @@ function spawnWebWorker() {
     return;
   }
 
+  console.log(cornerstoneWADOImageLoaderWebWorker);
+
   const worker = new cornerstoneWADOImageLoaderWebWorker();
 
   webWorkers.push({
@@ -147,6 +150,7 @@ function spawnWebWorker() {
  * @param configObject
  */
 function initialize(configObject) {
+  console.warn('INITIALIZE');
   configObject = configObject || defaultConfig;
 
   // prevent being initialized more than once
@@ -154,6 +158,7 @@ function initialize(configObject) {
     throw new Error('WebWorkerManager already initialized');
   }
 
+  console.log(configObject);
   config = configObject;
 
   config.maxWebWorkers =

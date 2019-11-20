@@ -20,6 +20,8 @@ export default function _decodeOnWorker(
   const transferList = [pixelData.buffer];
   const priority = options.priority || undefined;
 
+  console.log('decode on worker...');
+
   return webWorkerManager.addTask(
     'decodeTask',
     {

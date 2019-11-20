@@ -61,6 +61,7 @@ function load(uri, loadRequest = xhrRequest, imageId) {
 
         try {
           dataSet = dicomParser.parseDicom(byteArray);
+          console.log(dataSet);
         } catch (error) {
           return reject(error);
         }

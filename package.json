@@ -12,8 +12,8 @@
   "author": "Chris Hafey",
   "homepage": "https://github.com/cornerstonejs/cornerstoneWADOImageLoader",
   "license": "MIT",
-  "main": "./dist/cornerstoneWADOImageLoader.min.js",
-  "module": "./dist/cornerstoneWADOImageLoader.min.js",
+  "main": "./dist/cornerstoneWADOImageLoader.js",
+  "module": "./src/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/cornerstonejs/cornerstoneWADOImageLoader.git"
@@ -37,6 +37,7 @@
     "test:watch": "karma start config/karma/karma-watch.js",
     "version": "node -p -e \"'export default \\'' + require('./package.json').version + '\\';'\" > src/version.js",
     "watch": "npm run clean && shx mkdir dist && npm run webpack:watch",
+    "lint": "eslint ./src/ --fix",
     "webpack": "npm run webpack:dev",
     "webpack:dev": "webpack --progress --config ./config/webpack/webpack-dev",
     "webpack:prod": "webpack --progress --config ./config/webpack/webpack-prod",

@@ -13,17 +13,18 @@ module.exports = {
   // Relative to context
   entry: {
     cornerstoneWADOImageLoader: './index.js',
-    cornerstoneWADOImageLoaderWebWorker: './index.worker.js',
   },
   target: 'web',
   output: {
     filename: '[name].js',
+    chunkFilename: '[name].js',
+    publicPath: '/',
+    path: OUTPUT_PATH,
+    //
     library: '[name]',
     libraryTarget: 'umd',
     globalObject: 'this',
-    path: OUTPUT_PATH,
     umdNamedDefine: true,
-    publicPath: '/',
   },
   devtool: 'source-map',
   externals: {
@@ -52,7 +53,11 @@ module.exports = {
         test: /\.worker\.js$/,
         use: {
           loader: 'worker-loader',
-          options: { inline: false, fallback: false },
+          options: {
+            // inline: false,
+            // fallback: false,
+            name: 'worker.[hash].js', // [hash]
+          },
         },
       },
       {

@@ -7,6 +7,16 @@
       rel="stylesheet"
     />
     <style>
+      .viewport-container {
+        position: relative;
+        color: white;
+        display: inline-block;
+        border-style: solid;
+        border-color: black;
+      }
+      .enabled-element {
+        flex-grow: 1;
+      }
       .cornerstone-enabled-image {
         -webkit-touch-callout: none;
         -webkit-user-select: none;
@@ -27,33 +37,32 @@
     ></script>
   </head>
   <body>
-    <div class="container">
-      <div class="page-header">
-        <h1>Example of displaying a DICOM P10 image using Cornerstone</h1>
+    <div style="display: flex;">
+      <div
+        class="viewport-container"
+        oncontextmenu="return false"
+        class="disable-selection noIbar"
+        unselectable="on"
+        onselectstart="return false;"
+        onmousedown="return false;"
+      >
+        <div class="enabled-element"></div>
       </div>
-
-      <br />
-      <div class="row">
-        <div class="col-md-6">
-          <div
-            style="width:512px;height:512px;position:relative;color: white;display:inline-block;border-style:solid;border-color:black;"
-            oncontextmenu="return false"
-            class="disable-selection noIbar"
-            unselectable="on"
-            onselectstart="return false;"
-            onmousedown="return false;"
-          >
-            <div
-              id="dicomImage"
-              style="width:512px;height:512px;top:0px;left:0px; position:absolute"
-            ></div>
-          </div>
-        </div>
+      <div
+        class="viewport-container"
+        oncontextmenu="return false"
+        class="disable-selection noIbar"
+        unselectable="on"
+        onselectstart="return false;"
+        onmousedown="return false;"
+      >
+        <div class="enabled-element"></div>
       </div>
     </div>
   </body>
 
   <script>
+    // window.cornerstoneWADOImageLoader.webWorkerManager.setWorkerClass(worker);
     window.cornerstoneWADOImageLoader.webWorkerManager.initialize({
       maxWebWorkers: 4,
       startWebWorkersOnDemand: true,
@@ -77,15 +86,34 @@
       },
     });
 
-    const element = document.querySelector('#dicomImage');
+    const element = document.querySelector('.enabled-element');
+    const element2 = document.querySelectorAll('.enabled-element')[1];
 
     cornerstone.enable(element);
+    cornerstone.enable(element2);
 
     cornerstone
       .loadImage('dicomweb:http://localhost:3000/1.dcm')
       .then(image => {
         console.log('image from decoder: ', image);
         cornerstone.displayImage(element, image);
+
+        // Breaks
+        // const meta = cornerstone.metaData.get('imagePlaneModule', 'dicomweb:http://localhost:3000/1.dcm');
+        // console.log(meta);
+      });
+
+    cornerstone
+      .loadImage('dicomweb:http://localhost:3000/j2kr.dcm')
+      .then(image => {
+        console.log('image from decoder: ', image);
+        cornerstone.displayImage(element2, image);
+
+        const meta = cornerstone.metaData.get(
+          'imagePlaneModule',
+          'dicomweb:http://localhost:3000/j2kr.dcm'
+        );
+        console.log(meta);
       });
   </script>
 </html>

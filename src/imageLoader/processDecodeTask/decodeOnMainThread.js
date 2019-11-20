@@ -1,9 +1,9 @@
 import { getOptions } from './../internal/options.js';
 
 // TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
-import { default as decodeImageFrameHandler } from './../../shared/decodeImageFrame.js';
+import { default as decodeImageFrameHandler } from './../../shared/decodeImageFrameAsync.js';
 import calculateMinMax from './../../shared/calculateMinMax.js';
-import { initializeJPEG2000 } from './../../shared/decoders/decodeJPEG2000.js';
+import { initializeJPEG2000Async } from './../../shared/decoders/decodeJPEG2000Async.js';
 import { initializeJPEGLS } from './../../shared/decoders/decodeJPEGLS.js';
 
 let codecsInitialized = false;
@@ -17,7 +17,7 @@ let codecsInitialized = false;
  * @param {object} [options={}]
  * @param {bool} [options.priority]
  */
-export default function _decodeOnMainThread(
+export default async function _decodeOnMainThread(
   imageFrame,
   transferSyntax,
   pixelData,
@@ -28,8 +28,10 @@ export default function _decodeOnMainThread(
 
   // Note: May cause issues
   if (codecsInitialized === false) {
-    initializeJPEG2000(decodeConfig);
+    await initializeJPEG2000Async(decodeConfig);
     initializeJPEGLS(decodeConfig);
+
+    // eslint-disable-next-line
     codecsInitialized = true;
   }
 

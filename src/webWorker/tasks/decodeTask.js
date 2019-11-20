@@ -1,7 +1,7 @@
-import { initializeJPEG2000 } from '../../shared/decoders/decodeJPEG2000.js';
+import { initializeJPEG2000Async } from '../../shared/decoders/decodeJPEG2000Async.js';
 import { initializeJPEGLS } from '../../shared/decoders/decodeJPEGLS.js';
 import calculateMinMax from '../../shared/calculateMinMax.js';
-import decodeImageFrame from '../../shared/decodeImageFrame.js';
+import decodeImageFrameAsync from '../../shared/decodeImageFrameAsync.js';
 
 // the configuration object for the decodeTask
 let decodeConfig;
@@ -10,10 +10,10 @@ let decodeConfig;
  * Function to control loading and initializing the codecs
  * @param config
  */
-function loadCodecs(config) {
+async function loadCodecs(config) {
   // Initialize the codecs
   if (config.decodeTask.initializeCodecsOnStartup) {
-    initializeJPEG2000(config.decodeTask);
+    await initializeJPEG2000Async(config.decodeTask);
     initializeJPEGLS(config.decodeTask);
   }
 }
@@ -21,34 +21,47 @@ function loadCodecs(config) {
 /**
  * Task initialization function
  */
-function initialize(config) {
+async function initialize(config) {
   decodeConfig = config;
 
-  loadCodecs(config);
+  await loadCodecs(config);
 }
 
 /**
  * Task handler function
  */
-function handler(data, doneCallback) {
+
+/**
+ *
+ * @param {*} data
+ * @param {*} doneCallback
+ */
+async function handler(data, doneCallback) {
   // Load the codecs if they aren't already loaded
-  loadCodecs(decodeConfig);
+  await loadCodecs(decodeConfig);
 
   const strict =
     decodeConfig && decodeConfig.decodeTask && decodeConfig.decodeTask.strict;
-  const imageFrame = data.data.imageFrame;
-
-  // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
-  // not typed arrays
-  const pixelData = new Uint8Array(data.data.pixelData);
-
-  decodeImageFrame(
+  const {
     imageFrame,
-    data.data.transferSyntax,
-    pixelData,
+    pixelData: encodedArrayBuffer,
+    transferSyntax,
+    options: decodeOptions,
+  } = data.data;
+
+  // Convert from ArrayBuffer to Uint8Array
+  // Web workers support passing ArrayBuffers but not typed arrays
+  const encodedPixelData = new Uint8Array(encodedArrayBuffer);
+
+  await decodeImageFrameAsync(
+    imageFrame,
+    transferSyntax,
+    encodedPixelData,
     decodeConfig.decodeTask,
-    data.data.options
+    decodeOptions
   );
+
+  console.warn('magic should have happened by now');
 
   if (!imageFrame.pixelData) {
     throw new Error(

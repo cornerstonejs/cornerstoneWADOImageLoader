@@ -76,7 +76,7 @@ function loadImage(imageId, options) {
     const mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
 
     // get the pixel data from the server
-    getPixelData(uri, imageId, mediaType).then(result => {
+    getPixelData(uri, imageId, mediaType).then(async result => {
       const transferSyntax = getTransferSyntaxForContentType(
         result.contentType
       );
@@ -88,13 +88,16 @@ function loadImage(imageId, options) {
         options
       );
 
-      imagePromise.then(image => {
+      try {
+        const image = await imagePromise;
         // add the loadTimeInMS property
         const end = new Date().getTime();
 
         image.loadTimeInMS = end - start;
         resolve(image);
-      }, reject);
+      } catch (err) {
+        reject(err);
+      }
     }, reject);
   });
 

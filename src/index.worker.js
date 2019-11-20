@@ -1,4 +1,4 @@
-import { registerTaskHandler } from './webWorker/index.js';
+import { registerTaskHandler } from './webWorker/webWorker.js';
 import decodeTask from './webWorker/tasks/decodeTask.js';
 // import { default as version } from '../version.js';
 
@@ -11,9 +11,12 @@ registerTaskHandler(decodeTask);
 
 const cornerstoneWADOImageLoaderWebWorker = {
   registerTaskHandler,
-  version: '0.0.0',
+  //  version,
 };
 
-export { registerTaskHandler }; // , version };
+export {
+  registerTaskHandler,
+  // version
+};
 
 export default cornerstoneWADOImageLoaderWebWorker;

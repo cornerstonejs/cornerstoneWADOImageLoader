@@ -5,6 +5,8 @@ async function initializeJPEGLS() {
     /* webpackPrefetch: true, webpackChunkName: "CharLS" */ './../codecs/charLS-FixedMemory-browser.js'
   );
 
+  console.log('CharLsCodec', CharLsCodec);
+
   // check to make sure codec is loaded
   if (typeof CharLsCodec === 'undefined') {
     throw new Error('No JPEG-LS decoder loaded');
