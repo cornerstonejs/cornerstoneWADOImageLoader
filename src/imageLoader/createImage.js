@@ -83,6 +83,7 @@ function createImage(imageId, pixelData, transferSyntax, options) {
   );
 
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line complexity
     decodePromise.then(function(imageFrame) {
       const imagePlaneModule =
         cornerstone.metaData.get('imagePlaneModule', imageId) || {};
