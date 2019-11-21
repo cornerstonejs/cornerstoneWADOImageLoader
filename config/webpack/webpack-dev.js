@@ -34,9 +34,16 @@ const devConfig = {
     new HtmlWebpackPlugin({
       template: path.join(PUBLIC_DIR, 'index.html'),
       filename: 'index.html',
-      // templateParameters: {
-      //   PUBLIC_URL: PUBLIC_URL,
-      // },
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(PUBLIC_DIR, 'react-cornerstone-viewport.html'),
+      filename: 'react-cornerstone-viewport.html',
+      inject: 'head',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(PUBLIC_DIR, 'wadors.html'),
+      filename: 'wadors.html',
+      inject: 'head',
     }),
   ],
 };
