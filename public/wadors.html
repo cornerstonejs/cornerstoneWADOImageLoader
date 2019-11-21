@@ -219,8 +219,6 @@
         xhr.send();
       }
 
-      // TODO: WAS HERE
-
       const element = document.getElementById('dicomImage');
       cornerstone.enable(element);
 
@@ -235,6 +233,18 @@
         downloadAndView();
         return false;
       });
+
+      const handleImageLoadProgress = function(imageLoadProgressEvent = {}) {
+        const loadProgress = document.getElementById('loadProgress');
+        loadProgress.textContent =
+          'Image Load Progress: ' +
+          imageLoadProgressEvent.detail.percentComplete;
+      };
+
+      cornerstone.events.addEventListener(
+        'cornerstoneimageloadprogress',
+        handleImageLoadProgress
+      );
     </script>
   </body>
 </html>
