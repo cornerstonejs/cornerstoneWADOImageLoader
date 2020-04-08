@@ -2,11 +2,11 @@ export default function(imageFrame, rgbaBuffer) {
   if (imageFrame === undefined) {
     throw new Error('decodeRGB: ybrBuffer must not be undefined');
   }
-  if (imageFrame.length % 3 !== 0) {
+  if (imageFrame.length % 2 !== 0) {
     throw new Error('decodeRGB: ybrBuffer length must be divisble by 3');
   }
 
-  const numPixels = imageFrame.length / 3;
+  const numPixels = imageFrame.length / 2;
 
   let ybrIndex = 0;
 
