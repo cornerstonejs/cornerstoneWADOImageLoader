@@ -78,6 +78,9 @@ function xhrRequest(url, imageId, headers = {}, params = {}) {
         if (xhr.status === 200) {
           resolve(xhr.response, xhr);
         } else {
+          if (typeof options.errorInterceptor === 'function') {
+            options.errorInterceptor(xhr);
+          }
           // request failed, reject the Promise
           reject(xhr);
         }
@@ -119,10 +122,16 @@ function xhrRequest(url, imageId, headers = {}, params = {}) {
       );
     };
     xhr.onerror = function() {
+      if (typeof options.errorInterceptor === 'function') {
+        options.errorInterceptor(xhr);
+      }
       reject(xhr);
     };
 
     xhr.onabort = function() {
+      if (typeof options.errorInterceptor === 'function') {
+        options.errorInterceptor(xhr);
+      }
       reject(xhr);
     };
     xhr.send();
