@@ -12,7 +12,6 @@ function xhrRequest(url, imageId, headers = {}, params = {}) {
       error.request = xhr;
       error.response = xhr.response;
       error.status = xhr.status;
-
       options.errorInterceptor(error);
     }
   };
