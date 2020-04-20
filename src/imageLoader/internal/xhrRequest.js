@@ -5,6 +5,18 @@ function xhrRequest(url, imageId, headers = {}, params = {}) {
   const { cornerstone } = external;
   const options = getOptions();
 
+  const errorInterceptor = xhr => {
+    if (typeof options.errorInterceptor === 'function') {
+      const error = new Error('request failed');
+
+      error.request = xhr;
+      error.response = xhr.response;
+      error.status = xhr.status;
+
+      options.errorInterceptor(error);
+    }
+  };
+
   // Make the request for the DICOM P10 SOP Instance
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -78,9 +90,7 @@ function xhrRequest(url, imageId, headers = {}, params = {}) {
         if (xhr.status === 200) {
           resolve(xhr.response, xhr);
         } else {
-          if (typeof options.errorInterceptor === 'function') {
-            options.errorInterceptor(xhr);
-          }
+          errorInterceptor(xhr);
           // request failed, reject the Promise
           reject(xhr);
         }
@@ -122,16 +132,12 @@ function xhrRequest(url, imageId, headers = {}, params = {}) {
       );
     };
     xhr.onerror = function() {
-      if (typeof options.errorInterceptor === 'function') {
-        options.errorInterceptor(xhr);
-      }
+      errorInterceptor(xhr);
       reject(xhr);
     };
 
     xhr.onabort = function() {
-      if (typeof options.errorInterceptor === 'function') {
-        options.errorInterceptor(xhr);
-      }
+      errorInterceptor(xhr);
       reject(xhr);
     };
     xhr.send();
