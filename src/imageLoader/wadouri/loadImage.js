@@ -7,7 +7,7 @@ import { xhrRequest } from '../internal/index.js';
 
 // add a decache callback function to clear out our dataSetCacheManager
 function addDecache(imageLoadObject, imageId) {
-  imageLoadObject.decache = function () {
+  imageLoadObject.decache = function() {
     // console.log('decache');
     const parsedImageId = parseImageId(imageId);
 
@@ -60,7 +60,7 @@ function loadImageFromPromise(
               }
               resolve(image);
             },
-            function (error) {
+            function(error) {
               // Reject the error, and the dataSet
               reject({
                 error,
@@ -68,16 +68,14 @@ function loadImageFromPromise(
               });
             }
           );
-        }
-        catch (error) {
+        } catch (error) {
           reject({
             error,
             dataSet,
           });
         }
-
       },
-      function (error) {
+      function(error) {
         // Reject the error
         reject({
           error,
