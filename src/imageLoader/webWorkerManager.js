@@ -25,6 +25,7 @@ const defaultConfig = {
       strict: options.strict,
     },
   },
+  workerRecycleThreshold: 0
 };
 
 let config;
@@ -93,26 +94,33 @@ function startTaskOnWebWorker() {
  */
 function handleMessageFromWorker(msg) {
   // console.log('handleMessageFromWorker', msg.data);
+  const index = msg.data.workerIndex;
+  const item = webWorkers[index];
+
   if (msg.data.taskType === 'initialize') {
-    webWorkers[msg.data.workerIndex].status = 'ready';
+    item.status = 'ready';
     startTaskOnWebWorker();
   } else {
-    const start = webWorkers[msg.data.workerIndex].task.start;
+    const start = item.task.start;
 
     const action = msg.data.status === 'success' ? 'resolve' : 'reject';
-
-    webWorkers[msg.data.workerIndex].task.deferred[action](msg.data.result);
-
-    webWorkers[msg.data.workerIndex].task = undefined;
-
+    item.task.deferred[action](msg.data.result);
+    item.task = undefined;
     statistics.numTasksExecuting--;
-    webWorkers[msg.data.workerIndex].status = 'ready';
+    item.status = 'ready';
     statistics.numTasksCompleted++;
+
+    // recycle thread
+    ++item.numTasksCompleted;
+    const threshold = config.workerRecycleThreshold || 0;
+    if (threshold > 0 && item.numTasksCompleted >= threshold) {
+      item.worker.terminate();
+      spawnWebWorker(index);
+    }
 
     const end = new Date().getTime();
 
     statistics.totalTaskTimeInMS += end - start;
-
     startTaskOnWebWorker();
   }
 }
@@ -120,24 +128,35 @@ function handleMessageFromWorker(msg) {
 /**
  * Spawns a new web worker
  */
-function spawnWebWorker() {
+function spawnWebWorker(workerIndex) {
+  if (workerIndex === undefined) {
+    workerIndex = webWorkers.length;
+  }
+
   // prevent exceeding maxWebWorkers
-  if (webWorkers.length >= config.maxWebWorkers) {
+  if (workerIndex >= config.maxWebWorkers) {
     return;
   }
 
   // spawn the webworker
-  const worker = new cornerstoneWADOImageLoaderWebWorker();
-
-  webWorkers.push({
-    worker,
+  const item =
+  {
+    worker: new Worker(config.webWorkerPath),
     status: 'initializing',
-  });
-  worker.addEventListener('message', handleMessageFromWorker);
-  worker.postMessage({
+    numTasksCompleted: 0
+  };
+
+  if (workerIndex < webWorkers.length) {
+    webWorkers[workerIndex] = item;
+  } else {
+    webWorkers.push(item);
+  }
+
+  item.worker.addEventListener('message', handleMessageFromWorker);
+  item.worker.postMessage({
     taskType: 'initialize',
-    workerIndex: webWorkers.length - 1,
-    config,
+    workerIndex,
+    config
   });
 }
 
@@ -145,7 +164,7 @@ function spawnWebWorker() {
  * Initialization function for the web worker manager - spawns web workers
  * @param configObject
  */
-function initialize(configObject) {
+function initialize (configObject) {
   configObject = configObject || defaultConfig;
 
   // prevent being initialized more than once
@@ -157,6 +176,7 @@ function initialize(configObject) {
 
   config.maxWebWorkers =
     config.maxWebWorkers || (navigator.hardwareConcurrency || 1);
+  config.workerRecycleThreshold = config.workerRecycleThreshold || 0; // 0 means never recycle
 
   // Spawn new web workers
   if (!config.startWebWorkersOnDemand) {
@@ -260,6 +280,21 @@ function addTask(taskType, data, priority = 0, transferList) {
   };
 }
 
+
+/**
+  * purge tasks leaving only as many tasks as 'ready' threads
+ */
+function purgeTasks () {
+  let keep = 0;
+  for (let i = 0; i < webWorkers.length; i++) {
+    if (webWorkers[i].status === 'ready') {
+      ++keep;
+    }
+  }
+  tasks.splice(keep);
+}
+
+
 /**
  * Changes the priority of a queued task
  * @param taskId - the taskId to change the priority of
@@ -336,4 +371,5 @@ export default {
   cancelTask,
   webWorkers,
   terminate,
+  purgeTasks
 };
