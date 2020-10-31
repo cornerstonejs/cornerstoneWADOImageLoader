@@ -38,35 +38,38 @@ function handler(data, doneCallback) {
 
   const strict =
     decodeConfig && decodeConfig.decodeTask && decodeConfig.decodeTask.strict;
-  const imageFrame = data.data.imageFrame;
+  const imageFrameData = data.data.imageFrame;
 
   // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
   // not typed arrays
   const pixelData = new Uint8Array(data.data.pixelData);
 
-  decodeImageFrame(
-    imageFrame,
+  const result = decodeImageFrame(
+    imageFrameData,
     data.data.transferSyntax,
     pixelData,
     decodeConfig.decodeTask,
     data.data.options
   );
 
-  if (!imageFrame.pixelData) {
-    throw new Error(
-      'decodeTask: imageFrame.pixelData is undefined after decoding'
-    );
-  }
+  Promise.resolve(result).then(imageFrame => {
+    if (!imageFrame.pixelData) {
+      throw new Error(
+        'decodeTask: imageFrame.pixelData is undefined after decoding'
+      );
+    }
 
-  calculateMinMax(imageFrame, strict);
+    // TODO: do we need this here? min/max is being calculated in imageLoader\createImage again!
+    calculateMinMax(imageFrame, strict);
 
-  // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
-  // typed arrays
-  imageFrame.pixelData = imageFrame.pixelData.buffer;
+    // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
+    // typed arrays
+    imageFrame.pixelData = imageFrame.pixelData.buffer;
 
-  // invoke the callback with our result and pass the pixelData in the transferList to move it to
-  // UI thread without making a copy
-  doneCallback(imageFrame, [imageFrame.pixelData]);
+    // invoke the callback with our result and pass the pixelData in the transferList to move it to
+    // UI thread without making a copy
+    doneCallback(imageFrame, [imageFrame.pixelData]);
+  });
 }
 
 export default {

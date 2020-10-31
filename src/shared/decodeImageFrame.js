@@ -5,6 +5,7 @@ import decodeJPEGBaseline from './decoders/decodeJPEGBaseline.js';
 import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
 import decodeJPEGLS from './decoders/decodeJPEGLS.js';
 import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
+import decodeJPEGBaseline8BitColor from './decoders/decodeJPEGBaseline8BitColor.js';
 
 function decodeImageFrame(
   imageFrame,
@@ -32,6 +33,12 @@ function decodeImageFrame(
     imageFrame = decodeRLE(imageFrame, pixelData);
   } else if (transferSyntax === '1.2.840.10008.1.2.4.50') {
     // JPEG Baseline lossy process 1 (8 bit)
+    if (
+      imageFrame.bitsAllocated === 8 &&
+      (imageFrame.samplesPerPixel === 3 || imageFrame.samplesPerPixel === 4)
+    ) {
+      return decodeJPEGBaseline8BitColor(imageFrame, pixelData);
+    }
     imageFrame = decodeJPEGBaseline(imageFrame, pixelData);
   } else if (transferSyntax === '1.2.840.10008.1.2.4.51') {
     // JPEG Baseline lossy process 2 & 4 (12 bit)
