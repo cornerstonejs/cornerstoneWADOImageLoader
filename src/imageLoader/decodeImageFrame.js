@@ -1,7 +1,8 @@
 import { getOptions } from './internal/options.js';
 import webWorkerManager from './webWorkerManager.js';
 import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
-
+import isNativeJpeg8ColorDecoderSupported from './isNativeJpeg8ColorDecoderSupported.js';
+import isJPEGBaseline8BitColor from './isJPEGBaseline8BitColor.js';
 // TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
 import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
 import calculateMinMax from '../shared/calculateMinMax.js';
@@ -88,8 +89,9 @@ function decodeImageFrame(
     // Handle 8-bit JPEG Baseline color images using the browser's built-in
     // JPEG decoding
     if (
-      imageFrame.bitsAllocated === 8 &&
-      (imageFrame.samplesPerPixel === 3 || imageFrame.samplesPerPixel === 4)
+      isJPEGBaseline8BitColor(imageFrame, transferSyntax) &&
+      (options.useBrowserDecoderForJpeg8Color ||
+        !isNativeJpeg8ColorDecoderSupported())
     ) {
       return decodeJPEGBaseline8BitColor(imageFrame, pixelData, canvas);
     }

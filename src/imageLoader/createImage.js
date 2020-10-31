@@ -122,6 +122,8 @@ function createImage(imageId, pixelData, transferSyntax, options) {
           imageFrame.smallestPixelValue = minMax.min;
           imageFrame.largestPixelValue = minMax.max;
         }
+      } else {
+        imageFrame.pixelData = new Uint8Array(imageFrame.pixelData);
       }
 
       const image = {
