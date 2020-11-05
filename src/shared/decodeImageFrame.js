@@ -108,7 +108,7 @@ function decodeImageFrame(
 
     const imageFramePixelData = imageFrame.pixelData;
 
-    if (typedArray.length !== imageFramePixelData.length) {
+    if (length !== imageFramePixelData.length) {
       throw new Error(
         'target array for image does not have the same length as the decoded image length.'
       );
@@ -116,13 +116,15 @@ function decodeImageFrame(
 
     const typedArray = new TypedArrayConstructor(buffer, offset, length);
 
-    // Set is api level and ~50
+    // TypedArray.Set is api level and ~50x faster than copying elements even for
+    // Arrays of different types, which aren't simply memcpy ops.
     typedArray.set(imageFramePixelData, 0);
+
+    // Note: if the buffer happens to be a SharedArrayBuffer, we can't return
+    // It from postMessage, so must set the imageFrame to point at it on the main thread.
 
     // Add option to rescale here.
     // Have to rescale all the way to SUV.
-
-    imageFrame.pixelData = typedArray;
 
     // TODO -> Go through and see if this affects anything in the cornerstone image.
     // Cache size!

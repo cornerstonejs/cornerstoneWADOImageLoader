@@ -20,7 +20,7 @@
   },
   "scripts": {
     "cm": "npx git-cz",
-    "build": "npm run version && npm run webpack",
+    "build": "npm run version && npm run webpack:prod",
     "clean": "npm run clean:dist && npm run clean:coverage",
     "clean:dist": "shx rm -rf dist",
     "clean:docs": "shx rm -rf documentation",
@@ -43,7 +43,7 @@
     "webpack:dev": "webpack --progress --config ./config/webpack/webpack-dev",
     "webpack:prod": "webpack --progress --config ./config/webpack/webpack-prod",
     "webpack:watch": "webpack --progress --debug --watch  --config ./config/webpack",
-    "prepublishOnly": "npm run build && npm run test && npm run doc:generate"
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",

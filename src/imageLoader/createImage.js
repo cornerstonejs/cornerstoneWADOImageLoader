@@ -82,21 +82,38 @@ function createImage(imageId, pixelData, transferSyntax, options) {
     options
   );
 
-  /*
-     let pixelData;
-
-        if (options.pixelDataArray) {
-          const pixelData
-
-        } else {
-          pixelData = imageFramepixelData;
-        }
-
-  */
-
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line complexity
     decodePromise.then(function(imageFrame) {
+      // If we have a target buffer that was written to in the
+      // Decode task, point the image to it here.
+      // We can't have done it within the thread incase it was a SharedArrayBuffer.
+      if (options.targetBuffer) {
+        const { buffer, offset, length, type } = options.targetBuffer;
+
+        let TypedArrayConstructor;
+
+        switch (type) {
+          case 'Uint8Array':
+            TypedArrayConstructor = Uint8Array;
+            break;
+          case 'Uint16Array':
+            TypedArrayConstructor = Uint16Array;
+            break;
+          case 'Float32Array':
+            TypedArrayConstructor = Float32Array;
+            break;
+          default:
+            throw new Error(
+              'target array for image does not have a valid type.'
+            );
+        }
+
+        const targetArray = new TypedArrayConstructor(buffer, offset, length);
+
+        imageFrame.pixelData = targetArray;
+      }
+
       const imagePlaneModule =
         cornerstone.metaData.get('imagePlaneModule', imageId) || {};
       const voiLutModule =
