@@ -73,6 +73,7 @@ function loadImage(imageId, options) {
           result.contentType
         );
         const pixelData = result.imageFrame.pixelData;
+
         const imagePromise = createImage(
           imageId,
           pixelData,

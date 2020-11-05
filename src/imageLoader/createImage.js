@@ -82,6 +82,18 @@ function createImage(imageId, pixelData, transferSyntax, options) {
     options
   );
 
+  /*
+     let pixelData;
+
+        if (options.pixelDataArray) {
+          const pixelData
+
+        } else {
+          pixelData = imageFramepixelData;
+        }
+
+  */
+
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line complexity
     decodePromise.then(function(imageFrame) {

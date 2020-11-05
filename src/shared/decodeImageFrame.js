@@ -86,6 +86,48 @@ function decodeImageFrame(
     }
   }
 
+  if (options.targetBuffer) {
+    // If we have a target buffer, write to that instead. This helps reduce memory duplication.
+    const { buffer, offset, length, type } = options.targetBuffer;
+
+    let TypedArrayConstructor;
+
+    switch (type) {
+      case 'Uint8Array':
+        TypedArrayConstructor = Uint8Array;
+        break;
+      case 'Uint16Array':
+        TypedArrayConstructor = Uint16Array;
+        break;
+      case 'Float32Array':
+        TypedArrayConstructor = Float32Array;
+        break;
+      default:
+        throw new Error('target array for image does not have a valid type.');
+    }
+
+    const imageFramePixelData = imageFrame.pixelData;
+
+    if (typedArray.length !== imageFramePixelData.length) {
+      throw new Error(
+        'target array for image does not have the same length as the decoded image length.'
+      );
+    }
+
+    const typedArray = new TypedArrayConstructor(buffer, offset, length);
+
+    // Set is api level and ~50
+    typedArray.set(imageFramePixelData, 0);
+
+    // Add option to rescale here.
+    // Have to rescale all the way to SUV.
+
+    imageFrame.pixelData = typedArray;
+
+    // TODO -> Go through and see if this affects anything in the cornerstone image.
+    // Cache size!
+  }
+
   const end = new Date().getTime();
 
   imageFrame.decodeTimeInMS = end - start;
