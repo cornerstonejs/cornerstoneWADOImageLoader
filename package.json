@@ -12,8 +12,8 @@
   "author": "Chris Hafey",
   "homepage": "https://github.com/cornerstonejs/cornerstoneWADOImageLoader",
   "license": "MIT",
-  "main": "./dist/cornerstoneWADOImageLoader.min.js",
-  "module": "./dist/cornerstoneWADOImageLoader.min.js",
+  "main": "./dist/cornerstoneWADOImageLoader.js",
+  "module": "./dist/cornerstoneWADOImageLoader.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/cornerstonejs/cornerstoneWADOImageLoader.git"
@@ -43,7 +43,7 @@
     "webpack:dev": "webpack --progress --config ./config/webpack/webpack-dev",
     "webpack:prod": "webpack --progress --config ./config/webpack/webpack-prod",
     "webpack:watch": "webpack --progress --debug --watch  --config ./config/webpack",
-    "prepublishOnly": "npm run build && npm run test && npm run doc:generate"
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",

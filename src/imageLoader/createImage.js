@@ -74,6 +74,9 @@ function createImage(imageId, pixelData, transferSyntax, options) {
   const { cornerstone } = external;
   const canvas = document.createElement('canvas');
   const imageFrame = getImageFrame(imageId);
+
+  const t0 = new Date().getTime();
+
   const decodePromise = decodeImageFrame(
     imageFrame,
     transferSyntax,
@@ -84,7 +87,7 @@ function createImage(imageId, pixelData, transferSyntax, options) {
 
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line complexity
-    decodePromise.then(function(imageFrame) {
+    decodePromise.then(function handleDecodeResponse(imageFrame) {
       // If we have a target buffer that was written to in the
       // Decode task, point the image to it here.
       // We can't have done it within the thread incase it was a SharedArrayBuffer.
@@ -113,6 +116,8 @@ function createImage(imageId, pixelData, transferSyntax, options) {
 
         imageFrame.pixelData = targetArray;
       }
+
+      const t1 = new Date().getTime();
 
       const imagePlaneModule =
         cornerstone.metaData.get('imagePlaneModule', imageId) || {};
@@ -244,6 +249,8 @@ function createImage(imageId, pixelData, transferSyntax, options) {
         image.windowWidth = maxVoi - minVoi;
         image.windowCenter = (maxVoi + minVoi) / 2;
       }
+
+      console.log('CREATEIMAGETIME: ' + (t1 - t0));
       resolve(image);
     }, reject);
   });

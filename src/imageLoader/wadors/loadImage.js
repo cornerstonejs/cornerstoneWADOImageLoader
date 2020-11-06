@@ -72,6 +72,7 @@ function loadImage(imageId, options) {
         const transferSyntax = getTransferSyntaxForContentType(
           result.contentType
         );
+
         const pixelData = result.imageFrame.pixelData;
         const imagePromise = createImage(
           imageId,

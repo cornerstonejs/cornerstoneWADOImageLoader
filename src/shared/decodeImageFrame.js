@@ -6,6 +6,7 @@ import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
 import decodeJPEGLS from './decoders/decodeJPEGLS.js';
 import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
 import getScalingFunction from './scaling/getScalingFunction.js';
+import scaleArray from './scaling/scaleArray.js';
 
 function decodeImageFrame(
   imageFrame,
@@ -131,11 +132,16 @@ function decodeImageFrame(
   if (options.preScale) {
     const { scalingParameters } = options.preScale;
 
-    const scalingFunction = getScalingFunction(scalingParameters);
+    scaleArray(pixelDataArray, scalingParameters);
 
-    for (let i = 0; i < pixelDataArray.length; i++) {
-      pixelDataArray[i] = scalingFunction(pixelDataArray[i]);
-    }
+    //const scalingFunction = getScalingFunction(scalingParameters);
+
+    // Max call stack reached if do this:
+    //scalingFunction.apply(null, pixelDataArray);
+
+    // for (let i = 0; i < pixelDataArray.length; i++) {
+    //   pixelDataArray[i] = scalingFunction(pixelDataArray[i]);
+    // }
   }
 
   const end = new Date().getTime();
