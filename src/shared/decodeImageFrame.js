@@ -5,6 +5,7 @@ import decodeJPEGBaseline from './decoders/decodeJPEGBaseline.js';
 import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
 import decodeJPEGLS from './decoders/decodeJPEGLS.js';
 import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
+import getScalingFunction from './scaling/getScalingFunction.js';
 
 function decodeImageFrame(
   imageFrame,
@@ -86,6 +87,9 @@ function decodeImageFrame(
     }
   }
 
+  // Cache the pixelData reference quickly incase we want to set a targetBuffer _and_ scale.
+  let pixelDataArray = imageFrame.pixelData;
+
   if (options.targetBuffer) {
     // If we have a target buffer, write to that instead. This helps reduce memory duplication.
     const { buffer, offset, length, type } = options.targetBuffer;
@@ -120,14 +124,18 @@ function decodeImageFrame(
     // Arrays of different types, which aren't simply memcpy ops.
     typedArray.set(imageFramePixelData, 0);
 
-    // Note: if the buffer happens to be a SharedArrayBuffer, we can't return
-    // It from postMessage, so must set the imageFrame to point at it on the main thread.
+    // If need to scale, need to scale correct array.
+    pixelDataArray = typedArray;
+  }
 
-    // Add option to rescale here.
-    // Have to rescale all the way to SUV.
+  if (options.preScale) {
+    const { scalingParameters } = options.preScale;
 
-    // TODO -> Go through and see if this affects anything in the cornerstone image.
-    // Cache size!
+    const scalingFunction = getScalingFunction(scalingParameters);
+
+    for (let i = 0; i < pixelDataArray.length; i++) {
+      pixelDataArray[i] = scalingFunction(pixelDataArray[i]);
+    }
   }
 
   const end = new Date().getTime();

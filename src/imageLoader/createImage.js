@@ -47,6 +47,10 @@ function convertToIntPixelData(floatPixelData) {
   };
 }
 
+function getScalingParameters(imageId) {
+  // TODO
+}
+
 /**
  * Helper function to set pixel data to the right typed array.  This is needed because web workers
  * can transfer array buffers but not typed arrays
