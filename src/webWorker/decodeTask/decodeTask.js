@@ -42,10 +42,6 @@ function handler(data, doneCallback) {
 
   // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
   // not typed arrays
-
-  // TODO JAMES: Note test if this is unnecessary
-  // IF so remove .buffer within call tree
-
   const pixelData = new Uint8Array(data.data.pixelData);
 
   decodeImageFrame(
