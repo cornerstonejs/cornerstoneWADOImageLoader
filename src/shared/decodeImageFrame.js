@@ -5,7 +5,6 @@ import decodeJPEGBaseline from './decoders/decodeJPEGBaseline.js';
 import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
 import decodeJPEGLS from './decoders/decodeJPEGLS.js';
 import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
-import getScalingFunction from './scaling/getScalingFunction.js';
 import scaleArray from './scaling/scaleArray.js';
 
 function decodeImageFrame(
@@ -93,7 +92,7 @@ function decodeImageFrame(
 
   if (options.targetBuffer) {
     // If we have a target buffer, write to that instead. This helps reduce memory duplication.
-    const { buffer, offset, length, type } = options.targetBuffer;
+    const { arrayBuffer, offset, length, type } = options.targetBuffer;
 
     let TypedArrayConstructor;
 
@@ -119,7 +118,7 @@ function decodeImageFrame(
       );
     }
 
-    const typedArray = new TypedArrayConstructor(buffer, offset, length);
+    const typedArray = new TypedArrayConstructor(arrayBuffer, offset, length);
 
     // TypedArray.Set is api level and ~50x faster than copying elements even for
     // Arrays of different types, which aren't simply memcpy ops.
@@ -133,15 +132,6 @@ function decodeImageFrame(
     const { scalingParameters } = options.preScale;
 
     scaleArray(pixelDataArray, scalingParameters);
-
-    //const scalingFunction = getScalingFunction(scalingParameters);
-
-    // Max call stack reached if do this:
-    //scalingFunction.apply(null, pixelDataArray);
-
-    // for (let i = 0; i < pixelDataArray.length; i++) {
-    //   pixelDataArray[i] = scalingFunction(pixelDataArray[i]);
-    // }
   }
 
   const end = new Date().getTime();

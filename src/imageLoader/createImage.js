@@ -92,7 +92,7 @@ function createImage(imageId, pixelData, transferSyntax, options) {
       // Decode task, point the image to it here.
       // We can't have done it within the thread incase it was a SharedArrayBuffer.
       if (options.targetBuffer) {
-        const { buffer, offset, length, type } = options.targetBuffer;
+        const { arrayBuffer, offset, length, type } = options.targetBuffer;
 
         let TypedArrayConstructor;
 
@@ -112,7 +112,11 @@ function createImage(imageId, pixelData, transferSyntax, options) {
             );
         }
 
-        const targetArray = new TypedArrayConstructor(buffer, offset, length);
+        const targetArray = new TypedArrayConstructor(
+          arrayBuffer,
+          offset,
+          length
+        );
 
         imageFrame.pixelData = targetArray;
       }
