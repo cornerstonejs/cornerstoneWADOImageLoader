@@ -5,16 +5,16 @@ const TerserPlugin = require('terser-webpack-plugin');
 const prodConfig = {
   mode: 'production',
   output: {
-    filename: '[name].js',
+    filename: '[name].min.js',
   },
-  // optimization: {
-  //   minimizer: [
-  //     new TerserPlugin({
-  //       sourceMap: true,
-  //       parallel: true
-  //     })
-  //   ]
-  // }
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        sourceMap: true,
+        parallel: true,
+      }),
+    ],
+  },
 };
 
 module.exports = merge(baseConfig, prodConfig);

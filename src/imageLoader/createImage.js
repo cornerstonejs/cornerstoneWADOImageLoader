@@ -75,8 +75,6 @@ function createImage(imageId, pixelData, transferSyntax, options) {
   const canvas = document.createElement('canvas');
   const imageFrame = getImageFrame(imageId);
 
-  const t0 = new Date().getTime();
-
   const decodePromise = decodeImageFrame(
     imageFrame,
     transferSyntax,
@@ -120,8 +118,6 @@ function createImage(imageId, pixelData, transferSyntax, options) {
 
         imageFrame.pixelData = targetArray;
       }
-
-      const t1 = new Date().getTime();
 
       const imagePlaneModule =
         cornerstone.metaData.get('imagePlaneModule', imageId) || {};
@@ -253,8 +249,6 @@ function createImage(imageId, pixelData, transferSyntax, options) {
         image.windowWidth = maxVoi - minVoi;
         image.windowCenter = (maxVoi + minVoi) / 2;
       }
-
-      console.log('CREATEIMAGETIME: ' + (t1 - t0));
       resolve(image);
     }, reject);
   });
