@@ -1,12 +1,12 @@
 let options = {
   // callback allowing customization of the xhr (e.g. adding custom auth headers, cors, etc)
-  beforeSend(/* xhr, imageId */) {},
+  beforeSend(/* xhr, imageId */) { },
   // callback allowing modification of the xhr response before creating image objects
   beforeProcessing(xhr) {
-    return Promise.resolve(xhr.response, xhr);
+    return Promise.resolve(xhr.response);
   },
   // callback allowing modification of newly created image objects
-  imageCreated(/* image */) {},
+  imageCreated(/* image */) { },
   strict: false,
   useWebWorkers: true,
   decodeConfig: {
