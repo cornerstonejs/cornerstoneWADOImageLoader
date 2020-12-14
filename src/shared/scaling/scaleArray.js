@@ -2,10 +2,10 @@ export default function scaleArray(array, scalingParameters) {
   const arrayLength = array.length;
 
   if (scalingParameters.modality === 'PT') {
-    const { rescaleSlope, rescaleIntercept, suvFactor } = scalingParameters;
+    const { rescaleSlope, rescaleIntercept, suvbw } = scalingParameters;
 
     for (let i = 0; i < arrayLength; i++) {
-      array[i] = suvFactor * (array[i] * rescaleSlope + rescaleIntercept);
+      array[i] = suvbw * (array[i] * rescaleSlope + rescaleIntercept);
     }
   } else {
     const { rescaleSlope, rescaleIntercept } = scalingParameters;
