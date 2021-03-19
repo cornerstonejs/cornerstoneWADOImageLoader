@@ -4,9 +4,10 @@ module.exports = {
     es6: true,
     node: true,
     mocha: true,
+    "jest/globals": true
   },
   extends: ['eslint:recommended', 'plugin:prettier/recommended'],
-  plugins: ['import'],
+  plugins: ['import', 'jest'],
   parser: 'babel-eslint',
   parserOptions: {
     sourceType: 'module',
