@@ -4,6 +4,7 @@ const context = path.join(rootPath, 'src');
 const codecs = path.join(rootPath, 'codecs');
 const outputPath = path.join(rootPath, 'dist');
 const bannerPlugin = require('./plugins/banner');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -11,6 +12,12 @@ module.exports = {
   entry: {
     cornerstoneWADOImageLoader: './imageLoader/index.js',
     cornerstoneWADOImageLoaderWebWorker: './webWorker/index.worker.js',
+    decodeJpegBaseline: './shared/decoders/decodeJPEGBaseline.js',
+    decodeJpeg2000: './shared/decoders/decodeJPEG2000.js',
+    decodeJpegLS: './shared/decoders/decodeJPEGLS.js',
+    decodeJpegLossless: './shared/decoders/decodeJPEGLossless.js',
+    decodeHtj2k: './shared/decoders/decodeHTJ2K.js',
+    // allDecoders: './shared/decoders/allExternalDecoders.js',
   },
   target: 'web',
   output: {
@@ -83,6 +90,11 @@ module.exports = {
       },
     ],
   },
-  plugins: [bannerPlugin()],
+  plugins: [
+    bannerPlugin(),
+    new CopyPlugin({
+      patterns: [{ from: '../codecs/openjphjs.wasm', to: 'openjphjs.wasm' }],
+    }),
+  ],
   node: { fs: 'empty' },
 };

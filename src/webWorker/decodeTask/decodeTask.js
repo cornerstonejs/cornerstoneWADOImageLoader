@@ -50,23 +50,23 @@ function handler(data, doneCallback) {
     pixelData,
     decodeConfig.decodeTask,
     data.data.options
-  );
+  ).then(decodedImageFrame => {
+    if (!decodedImageFrame.pixelData) {
+      throw new Error(
+        'decodeTask: imageFrame.pixelData is undefined after decoding'
+      );
+    }
 
-  if (!imageFrame.pixelData) {
-    throw new Error(
-      'decodeTask: imageFrame.pixelData is undefined after decoding'
-    );
-  }
+    calculateMinMax(decodedImageFrame, strict);
 
-  calculateMinMax(imageFrame, strict);
+    // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
+    // typed arrays
+    decodedImageFrame.pixelData = decodedImageFrame.pixelData.buffer;
 
-  // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
-  // typed arrays
-  imageFrame.pixelData = imageFrame.pixelData.buffer;
-
-  // invoke the callback with our result and pass the pixelData in the transferList to move it to
-  // UI thread without making a copy
-  doneCallback(imageFrame, [imageFrame.pixelData]);
+    // invoke the callback with our result and pass the pixelData in the transferList to move it to
+    // UI thread without making a copy
+    doneCallback(decodedImageFrame, [decodedImageFrame.pixelData]);
+  });
 }
 
 export default {
