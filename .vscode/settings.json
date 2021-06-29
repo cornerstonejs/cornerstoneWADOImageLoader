@@ -18,13 +18,15 @@
   // ===
 
   "editor.formatOnSave": true,
-  "eslint.autoFixOnSave": true,
   "eslint.run": "onSave",
-  "eslint.validate": [
-    { "language": "javascript", "autoFix": true },
-    { "language": "javascriptreact", "autoFix": true }
-  ],
-  "prettier.disableLanguages": [],
+  "eslint.validate": ["javascript", "javascriptreact"],
+  // "eslint.validate": [
+  //   { "language": "javascript", "autoFix": true },
+  //   { "language": "javascriptreact", "autoFix": true }
+  // ],
   "prettier.endOfLine": "lf",
-  "workbench.colorCustomizations": {}
+  "workbench.colorCustomizations": {},
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }

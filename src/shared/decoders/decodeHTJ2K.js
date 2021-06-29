@@ -4,6 +4,7 @@ import Module from '../../../codecs/openjphjs.js';
 
 function getArrayBuffer(buffer) {
   const { buffer: b, byteOffset, byteLength } = buffer;
+
   return b.slice(byteOffset, byteOffset + byteLength);
 }
 
@@ -56,6 +57,7 @@ function decodeHTJ2K(imageFrame, pixelData) {
 
   return jph2raw(pixelData).then(data => {
     imageFrame.pixelData = getArrayBuffer(data);
+
     return imageFrame;
   });
 }

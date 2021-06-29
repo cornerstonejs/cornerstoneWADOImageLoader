@@ -13,6 +13,7 @@ const {
   decodeHTJ2K,
 } = externalDecoders.decoders;
 
+// eslint-disable-next-line complexity
 function decodeImageFrame(
   imageFrame,
   transferSyntax,
@@ -21,6 +22,7 @@ function decodeImageFrame(
   options
 ) {
   const start = new Date().getTime();
+
   let imageFramePromise;
 
   if (transferSyntax === '1.2.840.10008.1.2') {
@@ -129,8 +131,8 @@ function decodeImageFrame(
 
     if (shouldShift && shift !== undefined) {
       for (let i = 0; i < decodedImageFrame.pixelData.length; i++) {
-        // eslint-disable-next-line no-bitwise
         decodedImageFrame.pixelData[i] =
+          // eslint-disable-next-line no-bitwise
           (decodedImageFrame.pixelData[i] << shift) >> shift;
       }
     }

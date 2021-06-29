@@ -40,6 +40,7 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
           decodeConfig,
           options,
         ];
+
         decodeImageFrameHandler(...decodeArguments).then(decodedImageFrame => {
           calculateMinMax(decodedImageFrame, strict);
 
