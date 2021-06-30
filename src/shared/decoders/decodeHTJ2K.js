@@ -1,6 +1,5 @@
-import Module from '../../../codecs/openjphjs.js';
-
-// import('../../../codecs/openjphjs.wasm');
+import Module from '../../../codecs/openjphjs-wasm.js';
+import { setPixelDataType } from '../../imageLoader/setPixelDataType.js';
 
 function getArrayBuffer(buffer) {
   const { buffer: b, byteOffset, byteLength } = buffer;
@@ -57,6 +56,9 @@ function decodeHTJ2K(imageFrame, pixelData) {
 
   return jph2raw(pixelData).then(data => {
     imageFrame.pixelData = getArrayBuffer(data);
+    // imageFrame.pixelData = data;
+
+    setPixelDataType(imageFrame);
 
     return imageFrame;
   });
