@@ -156,6 +156,7 @@
 
 <!-- include desired codecs -->
 <script src="../../dist/decodeHtj2k.js"></script>
+<!-- <script src="../../dist/allDecoders.js"></script> -->
 
 <!-- include the cornerstoneWADOImageLoader library -->
 <script src="../../dist/cornerstoneWADOImageLoader.js"></script>
@@ -163,8 +164,22 @@
 <script src="../dicomfile/uids.js"></script>
 
 <!-- Lines ONLY required for this example to run without building the project -->
-<script>window.cornerstoneWADOImageLoader || document.write('<script src="https://unpkg.com/cornerstone-wado-image-loader">\x3C/script>')</script>
-<script src="../utils/initializeWebWorkers.js"></script>
+<!-- <script>window.cornerstoneWADOImageLoader || document.write('<script src="https://unpkg.com/cornerstone-wado-image-loader">\x3C/script>')</script> -->
+<script>
+    window.cornerstoneWADOImageLoader.webWorkerManager.initialize({
+    maxWebWorkers: 4,
+    startWebWorkersOnDemand: true,
+    webWorkerTaskPaths: [],
+    taskConfiguration: {
+      decodeTask: {
+        decoderPaths: [
+          '/dist/decodeHtj2k.js',
+        // '/dist/allDecoders.js'
+        ],
+      },
+    },
+  });
+</script>
 
 <script>
     cornerstoneWADOImageLoader.external.cornerstone = cornerstone;

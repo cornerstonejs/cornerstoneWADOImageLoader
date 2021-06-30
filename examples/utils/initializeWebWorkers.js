@@ -11,9 +11,10 @@ try {
         usePDFJS: false,
         strict: true,
         decoderPaths: [
-          '/dist/decodeJpeg2000.js',
-          '/dist/decodeJpegLS.js',
-          '/dist/decodeJpegLossless.js',
+          // '/dist/decodeJpeg2000.js',
+          // '/dist/decodeJpegLS.js',
+          // '/dist/decodeJpegLossless.js',
+          '/dist/allDecoders.js',
         ],
       },
     },

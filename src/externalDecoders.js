@@ -1,9 +1,9 @@
 /* global globalThis */
 
 function getExternalDecoders() {
-  // if (decoders) {
-  //   return decoders;
-  // }
+  if (globalThis.allDecoders) {
+    return globalThis.allDecoders.default;
+  }
 
   return {
     decodeJPEG2000: globalThis &&

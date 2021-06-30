@@ -17,7 +17,7 @@ module.exports = {
     decodeJpegLS: './shared/decoders/decodeJPEGLS.js',
     decodeJpegLossless: './shared/decoders/decodeJPEGLossless.js',
     decodeHtj2k: './shared/decoders/decodeHTJ2K.js',
-    // allDecoders: './shared/decoders/allExternalDecoders.js',
+    allDecoders: './shared/decoders/allExternalDecoders.js',
   },
   target: 'web',
   output: {
@@ -37,9 +37,26 @@ module.exports = {
       root: 'dicomParser',
     },
   },
+  devServer: {
+    writeToDisk: true,
+  },
   module: {
     noParse: [/(codecs)/],
     rules: [
+      // {
+      //   test: /\.wasm$/,
+      //   type:
+      //     'javascript/auto' /** this disables webpacks default handling of wasm */,
+      //   use: [
+      //     {
+      //       loader: 'file-loader',
+      //       options: {
+      //         // name: 'wasm/[name].[ext]',
+      //         // publicPath: '/dist/',
+      //       },
+      //     },
+      //   ],
+      // },
       {
         enforce: 'pre',
         test: /\.js$/,
