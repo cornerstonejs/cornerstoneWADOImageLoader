@@ -1,30 +1,34 @@
-const externalDecoders = {
-  get decoders() {
-    return {
-      decodeJPEG2000: window &&
-        window.decodeJpeg2000 && {
-          decode: window.decodeJpeg2000.default,
-          initialize: window.decodeJpeg2000.initializeJPEG2000,
-        },
-      decodeJPEGLossless: window &&
-        window.decodeJpegLossless && {
-          decode: window.decodeJpegLossless.default,
-        },
-      decodeJPEGLS: window &&
-        window.decodeJpegLS && {
-          decode: window.decodeJpegLS.default,
-          initialize: window.decodeJpegLS.initializeJPEGLS,
-        },
-      decodeJPEGBaseline: window &&
-        window.decodeJpegBaseline && {
-          decode: window.decodeJpegBaseline.default,
-        },
-      decodeHTJ2K: window &&
-        window.decodeHtj2k && {
-          decode: window.decodeHtj2k.default,
-        },
-    };
-  },
-};
+/* global globalThis */
 
-export default externalDecoders;
+function getExternalDecoders() {
+  // if (decoders) {
+  //   return decoders;
+  // }
+
+  return {
+    decodeJPEG2000: globalThis &&
+      globalThis.decodeJpeg2000 && {
+        decode: globalThis.decodeJpeg2000.default,
+        initialize: globalThis.decodeJpeg2000.initializeJPEG2000,
+      },
+    decodeJPEGLossless: globalThis &&
+      globalThis.decodeJpegLossless && {
+        decode: globalThis.decodeJpegLossless.default,
+      },
+    decodeJPEGLS: globalThis &&
+      globalThis.decodeJpegLS && {
+        decode: globalThis.decodeJpegLS.default,
+        initialize: globalThis.decodeJpegLS.initializeJPEGLS,
+      },
+    decodeJPEGBaseline: globalThis &&
+      globalThis.decodeJpegBaseline && {
+        decode: globalThis.decodeJpegBaseline.default,
+      },
+    decodeHTJ2K: globalThis &&
+      globalThis.decodeHtj2k && {
+        decode: globalThis.decodeHtj2k.default,
+      },
+  };
+}
+
+export default getExternalDecoders;

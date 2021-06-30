@@ -9,11 +9,15 @@ try {
       decodeTask: {
         initializeCodecsOnStartup: false,
         usePDFJS: false,
-        strict: true
-      }
-    }
+        strict: true,
+        decoderPaths: [
+          '/dist/decodeJpeg2000.js',
+          '/dist/decodeJpegLS.js',
+          '/dist/decodeJpegLossless.js',
+        ],
+      },
+    },
   });
 } catch (error) {
   throw new Error('cornerstoneWADOImageLoader is not loaded');
 }
-

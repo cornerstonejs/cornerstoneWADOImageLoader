@@ -3,15 +3,7 @@ import decodeLittleEndian from './decoders/decodeLittleEndian.js';
 import decodeBigEndian from './decoders/decodeBigEndian.js';
 import decodeRLE from './decoders/decodeRLE.js';
 import scaleArray from './scaling/scaleArray.js';
-import externalDecoders from '../externalDecoders.js';
-
-const {
-  decodeJPEG2000,
-  decodeJPEGLossless,
-  decodeJPEGLS,
-  decodeJPEGBaseline,
-  decodeHTJ2K,
-} = externalDecoders.decoders;
+import getExternalDecoders from '../externalDecoders.js';
 
 // eslint-disable-next-line complexity
 function decodeImageFrame(
@@ -24,6 +16,14 @@ function decodeImageFrame(
   const start = new Date().getTime();
 
   let imageFramePromise;
+
+  const {
+    decodeJPEG2000,
+    decodeJPEGLossless,
+    decodeJPEGLS,
+    decodeJPEGBaseline,
+    decodeHTJ2K,
+  } = getExternalDecoders();
 
   if (transferSyntax === '1.2.840.10008.1.2') {
     // Implicit VR Little Endian

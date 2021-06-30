@@ -64,7 +64,13 @@ Building on the prior minimal example, you can configure the web worker framewor
         taskConfiguration: {
             'decodeTask' : {
                 initializeCodecsOnStartup: false,
-                usePDFJS: false
+                usePDFJS: false,
+                // Decoder paths are loaded by the worker relative to
+                // `window.location.origin` i.e. the site root
+                decoderPaths: [
+                    '/dist/decodehtj2k.js',
+                    '/dist/decodeJpeg2000.js',
+                ],
             },
             'sleepTask' : {
                 sleepTime: 3000

@@ -5,9 +5,9 @@ import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 // TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
 import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
 import calculateMinMax from '../shared/calculateMinMax.js';
-import externalDecoders from '../externalDecoders.js';
+import getExternalDecoders from '../externalDecoders.js';
 
-const { decodeJPEG2000, decodeJPEGLS } = externalDecoders.decoders;
+const { decodeJPEG2000, decodeJPEGLS } = getExternalDecoders();
 
 let codecsInitialized = false;
 
