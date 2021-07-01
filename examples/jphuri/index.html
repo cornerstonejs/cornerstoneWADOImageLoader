@@ -154,10 +154,6 @@
 <!-- include the dicomParser library as the WADO image loader depends on it -->
 <script src="../dicomParser.min.js"></script>
 
-<!-- include desired codecs -->
-<script src="../../dist/decodeHtj2k.js"></script>
-<!-- <script src="../../dist/allDecoders.js"></script> -->
-
 <!-- include the cornerstoneWADOImageLoader library -->
 <script src="../../dist/cornerstoneWADOImageLoader.js"></script>
 
@@ -165,30 +161,32 @@
 
 <!-- Lines ONLY required for this example to run without building the project -->
 <!-- <script>window.cornerstoneWADOImageLoader || document.write('<script src="https://unpkg.com/cornerstone-wado-image-loader">\x3C/script>')</script> -->
-<script>
-    window.cornerstoneWADOImageLoader.webWorkerManager.initialize({
-    maxWebWorkers: 4,
-    startWebWorkersOnDemand: true,
-    webWorkerTaskPaths: [],
-    taskConfiguration: {
-      decodeTask: {
-        decoderPaths: [
-          '/dist/decodeHtj2k.js',
-        // '/dist/allDecoders.js'
-        ],
-      },
-    },
-  });
-</script>
+<!-- <script src="../utils/initializeWebWorkers.js"></script> -->
 
 <script>
     cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 
     cornerstoneWADOImageLoader.configure({
-        useWebWorkers: true,
+        useWebWorkers: false,
+        webWorkerConfig: {
+            maxWebWorkers: 4,
+            startWebWorkersOnDemand: true,
+            webWorkerTaskPaths: [],
+            taskConfiguration: {
+                decodeTask: {
+                    initializeCodecsOnStartup: false,
+                },
+            },
+        },
         beforeSend: function(xhr) {
             // Add custom headers here (e.g. auth tokens)
             //xhr.setRequestHeader('APIKEY', 'my auth token');
+        },
+        decodeConfig: {
+            decoderPaths: [
+                '/dist/decodeHtj2k.js',
+            ],
+            autoLoadCodecs: true,
         }
     });
 

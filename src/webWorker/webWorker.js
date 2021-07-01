@@ -31,20 +31,23 @@ function initialize(data) {
     }
   }
 
-  // initialize each task handler
-  Object.keys(taskHandlers).forEach(function(key) {
-    taskHandlers[key].initialize(config.taskConfiguration);
-  });
+  // initialize each task handler. The initialize function returns a promise for
+  // async operations, i.e. loading codecs in the case of decodeTask
+  Promise.all(
+    Object.keys(taskHandlers).map(function(key) {
+      return taskHandlers[key].initialize(config.taskConfiguration);
+    })
+  ).then(() => {
+    // tell main ui thread that we have completed initialization
+    self.postMessage({
+      taskType: 'initialize',
+      status: 'success',
+      result: {},
+      workerIndex: data.workerIndex,
+    });
 
-  // tell main ui thread that we have completed initialization
-  self.postMessage({
-    taskType: 'initialize',
-    status: 'success',
-    result: {},
-    workerIndex: data.workerIndex,
+    initialized = true;
   });
-
-  initialized = true;
 }
 
 /**

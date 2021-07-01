@@ -37,7 +37,7 @@ module.exports = {
     },
   },
   devServer: {
-    writeToDisk: true,
+    writeToDisk: false,
   },
   module: {
     noParse: [/(codecs)/],

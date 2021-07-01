@@ -5,9 +5,7 @@ import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 // TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
 import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
 import calculateMinMax from '../shared/calculateMinMax.js';
-import getExternalDecoders from '../externalDecoders.js';
-
-const { decodeJPEG2000, decodeJPEGLS } = getExternalDecoders();
+import { loadDecoders } from '../externalDecoders.js';
 
 let codecsInitialized = false;
 
@@ -20,19 +18,21 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
   const { strict, decodeConfig, useWebWorkers } = loaderOptions;
 
   if (useWebWorkers === false) {
-    if (codecsInitialized === false) {
-      if (decodeJPEG2000) {
-        decodeJPEG2000.initialize(decodeConfig);
-      }
-      if (decodeJPEGLS) {
-        decodeJPEGLS.initialize(decodeConfig);
-      }
+    return loadDecoders()
+      .then(decoders => {
+        const { decodeJPEG2000, decodeJPEGLS } = decoders;
 
-      codecsInitialized = true;
-    }
+        if (codecsInitialized === false) {
+          if (decodeJPEG2000) {
+            decodeJPEG2000.initialize(decodeConfig);
+          }
+          if (decodeJPEGLS) {
+            decodeJPEGLS.initialize(decodeConfig);
+          }
 
-    return new Promise((resolve, reject) => {
-      try {
+          codecsInitialized = true;
+        }
+
         const decodeArguments = [
           imageFrame,
           transferSyntax,
@@ -41,15 +41,13 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
           options,
         ];
 
-        decodeImageFrameHandler(...decodeArguments).then(decodedImageFrame => {
-          calculateMinMax(decodedImageFrame, strict);
+        return decodeImageFrameHandler(...decodeArguments);
+      })
+      .then(decodedImageFrame => {
+        calculateMinMax(decodedImageFrame, strict);
 
-          resolve(decodedImageFrame);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
+        return decodedImageFrame;
+      });
   }
 
   return webWorkerManager.addTask(

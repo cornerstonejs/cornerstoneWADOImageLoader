@@ -1,7 +1,5 @@
 import cornerstoneWADOImageLoaderWebWorker from '../webWorker/index.worker.js';
 
-import { getOptions } from './internal/options.js';
-
 // the taskId to assign to the next task added via addTask()
 let nextTaskId = 0;
 
@@ -10,22 +8,6 @@ const tasks = [];
 
 // array of web workers to dispatch decode tasks to
 const webWorkers = [];
-
-// The options for CornerstoneWADOImageLoader
-const options = getOptions();
-
-const defaultConfig = {
-  maxWebWorkers: navigator.hardwareConcurrency || 1,
-  startWebWorkersOnDemand: true,
-  webWorkerTaskPaths: [],
-  taskConfiguration: {
-    decodeTask: {
-      initializeCodecsOnStartup: false,
-      usePDFJS: false,
-      strict: options.strict,
-    },
-  },
-};
 
 let config;
 
@@ -146,8 +128,6 @@ function spawnWebWorker() {
  * @param configObject
  */
 function initialize(configObject) {
-  configObject = configObject || defaultConfig;
-
   // prevent being initialized more than once
   if (config) {
     throw new Error('WebWorkerManager already initialized');
