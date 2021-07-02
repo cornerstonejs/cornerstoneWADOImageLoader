@@ -135,6 +135,14 @@ function getLoaderForScheme(scheme) {
   }
 }
 
+/**
+ *
+ * @param {string} imageId
+ * @param {object} options
+ * @param {number} options.decodeLevel Default: 0 (full resolution). Allow decoding of subresolution images
+ * @param {string} options.byteRange Set `Range` header on image request. E.g. { byteRange: 'bytes=0-20000' }
+ * @returns
+ */
 function loadImage(imageId, options = {}) {
   const parsedImageId = parseImageId(imageId);
 
@@ -164,7 +172,8 @@ function loadImage(imageId, options = {}) {
   const dataSetPromise = dataSetCacheManager.load(
     parsedImageId.url,
     loader,
-    imageId
+    imageId,
+    options
   );
 
   return loadImageFromPromise(

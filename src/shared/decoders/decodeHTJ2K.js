@@ -7,7 +7,7 @@ function getArrayBuffer(buffer) {
   return b.slice(byteOffset, byteOffset + byteLength);
 }
 
-function jph2raw(encodedFileBuffer, iterations = 1) {
+function jph2raw(encodedFileBuffer, decodeLevel = 0, iterations = 1) {
   return new Promise(resolve => {
     // eslint-disable-next-line no-undef
     Module().then(openjphjs => {
@@ -20,7 +20,8 @@ function jph2raw(encodedFileBuffer, iterations = 1) {
       //   const beginDecode = process.hrtime();
 
       for (let i = 0; i < iterations; i++) {
-        decoder.decode();
+        decoder.decodeSubResolution(decodeLevel);
+        // decoder.decode();
       }
       //   const decodeDuration = process.hrtime(beginDecode); // hrtime returns seconds/nanoseconds tuple
       //   const decodeDurationInSeconds =
@@ -51,10 +52,10 @@ function jph2raw(encodedFileBuffer, iterations = 1) {
  * @param {*} pixelData This is the HTJ2K file as an ArrayBuffer
  * @returns
  */
-function decodeHTJ2K(imageFrame, pixelData) {
+function decodeHTJ2K(imageFrame, pixelData, decodeLevel) {
   // imageFrame.pixelData = await jph2raw(Buffer.from(pixelData));
 
-  return jph2raw(pixelData).then(data => {
+  return jph2raw(pixelData, decodeLevel).then(data => {
     imageFrame.pixelData = getArrayBuffer(data);
     // imageFrame.pixelData = data;
 

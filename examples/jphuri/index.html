@@ -197,7 +197,9 @@
 
         try {
             var start = new Date().getTime();
-            cornerstone.loadAndCacheImage(imageId).then(function(image) {
+            cornerstone.loadAndCacheImage(imageId, {
+                byteRange: 'bytes=0-20000'
+            }).then(function(image) {
                 console.log(image);
                 var viewport = cornerstone.getDefaultViewportForImage(element, image);
                 document.getElementById('toggleModalityLUT').checked = (viewport.modalityLUT !== undefined);

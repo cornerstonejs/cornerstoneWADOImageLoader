@@ -28,8 +28,17 @@ function get(uri) {
 }
 
 // loads the dicom dataset from the jphuri sp
-function load(uri, loadRequest = xhrRequest, imageId) {
+function load(uri, loadRequest = xhrRequest, imageId, options = {}) {
   const { cornerstone, dicomParser } = external;
+  const { byteRange } = options;
+
+  let headers;
+
+  if (byteRange) {
+    headers = {
+      Range: byteRange,
+    };
+  }
 
   // if already loaded return it right away
   if (loadedDataSets[uri]) {
@@ -67,7 +76,7 @@ function load(uri, loadRequest = xhrRequest, imageId) {
         return reject(error);
       }
 
-      loadRequest(uri, imageId)
+      loadRequest(uri, imageId, headers)
         // .then(function(jphImageFrameAsArrayBuffer) {
         //   return jph2raw(Buffer.from(jphImageFrameAsArrayBuffer));
         // })

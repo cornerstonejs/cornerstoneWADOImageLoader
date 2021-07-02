@@ -118,7 +118,7 @@ function decodeImageFrame(
         } else if (transferSyntax === 'HTJ2K' && decodeHTJ2K) {
           // High Throughput JPEG 2000
           imageFramePromise = Promise.resolve(
-            decodeHTJ2K.decode(imageFrame, pixelData)
+            decodeHTJ2K.decode(imageFrame, pixelData, options.decodeLevel)
           );
         } else {
           throw new Error(`no decoder for transfer syntax ${transferSyntax}`);
