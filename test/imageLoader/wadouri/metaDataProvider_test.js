@@ -3,30 +3,42 @@ import { expect } from 'chai';
 import external from '../../../src/externalModules.js';
 import { loadImage } from '../../../src/imageLoader/wadouri/loadImage.js';
 import configure from '../../../src/imageLoader/configure.js';
-import webWorkerManager from '../../../src/imageLoader/webWorkerManager.js';
+// import webWorkerManager from '../../../src/imageLoader/webWorkerManager.js';
 
 external.cornerstone = window.cornerstone;
 
 describe('#wadouri > metadataProvider', function() {
   // Initialize the web worker manager
-  const config = {
-    maxWebWorkers: 1,
-    startWebWorkersOnDemand: true,
-    taskConfiguration: {
-      decodeTask: {
-        initializeCodecsOnStartup: true,
-        usePDFJS: false,
-      },
-    },
-  };
+  // const config = {
+  //   maxWebWorkers: 1,
+  //   startWebWorkersOnDemand: true,
+  //   taskConfiguration: {
+  //     decodeTask: {
+  //       initializeCodecsOnStartup: true,
+  //       usePDFJS: false,
+  //     },
+  //   },
+  // };
 
-  webWorkerManager.initialize(config);
+  // webWorkerManager.initialize(config);
 
   configure({
     strict: false,
     useWebWorkers: false,
+    webWorkerConfig: {
+      maxWebWorkers: 1,
+      startWebWorkersOnDemand: true,
+      taskConfiguration: {
+        decodeTask: {
+          initializeCodecsOnStartup: true,
+          // usePDFJS: false,
+        },
+      },
+    },
     decodeConfig: {
       usePDFJS: false,
+      decoderPaths: ['/base/dist/allDecoders.min.js'],
+      autoLoadDecoders: false,
     },
   });
 

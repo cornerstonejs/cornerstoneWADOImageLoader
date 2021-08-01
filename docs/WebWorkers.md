@@ -30,7 +30,7 @@ Configuration
 The web worker framework requires a bit of configuration since web workers require paths to source files.
 Since cornerstone does not enforce a convention for source file location, you must tell the cornerstone
 web worker framework where the web worker files are so it can load them properly.  This is done via the
-cornerstoneWADOImageLoader.webWorkerManager.initialize() function.  You must call this function before
+cornerstoneWADOImageLoader.configure() function.  You must call this function before
 using starting a web worker task (or loading an image with cornerstone) so the web worker
 code is properly loaded.
 
@@ -41,10 +41,16 @@ Here is an example of a minimal configuration object.
 
 ``` javascript
     var config = {
-        maxWebWorkers: navigator.hardwareConcurrency || 1,
-        startWebWorkersOnDemand : true,
+        useWebWorkers: true,
+        webWorkerConfig: {
+            maxWebWorkers: navigator.hardwareConcurrency || 1,
+            startWebWorkersOnDemand : true,
+        },
+        decodeConfig: {
+            decoderPaths: ['./dist/allDecoders.js']
+        }
     };
-    cornerstoneWADOImageLoader.webWorkerManager.initialize(config);
+    cornerstoneWADOImageLoader.configure(config);
 ```
 
 Advanced Configuration
@@ -54,30 +60,30 @@ Building on the prior minimal example, you can configure the web worker framewor
 
 ``` javascript
     var config = {
-        maxWebWorkers: navigator.hardwareConcurrency || 1,
-        startWebWorkersOnDemand : true,
-        webWorkerTaskPaths: [
-            '../examples/customWebWorkerTask/sleepTask.js',
-            '../examples/customWebWorkerTask/sharpenTask.js'
-
-        ],
-        taskConfiguration: {
-            'decodeTask' : {
-                initializeCodecsOnStartup: false,
-                usePDFJS: false,
-                // Decoder paths are loaded by the worker relative to
-                // `window.location.origin` i.e. the site root
-                decoderPaths: [
-                    '/dist/decodehtj2k.js',
-                    '/dist/decodeJpeg2000.js',
-                ],
-            },
-            'sleepTask' : {
-                sleepTime: 3000
+        useWebWorkers: true,
+        webWorkerConfig: {
+            maxWebWorkers: navigator.hardwareConcurrency || 1,
+            startWebWorkersOnDemand : true,
+            webWorkerTaskPaths: [
+                '../examples/customWebWorkerTask/sleepTask.js',
+                '../examples/customWebWorkerTask/sharpenTask.js'
+    
+            ],
+            taskConfiguration: {
+                'decodeTask' : {
+                    initializeCodecsOnStartup: false,
+                },
+                'sleepTask' : {
+                    sleepTime: 3000
+                }
             }
+        },
+        decodeConfig: {
+            decoderPaths: ['./dist/allDecoders.js'],
+            usePDFJS: false,
         }
     };
-    cornerstoneWADOImageLoader.webWorkerManager.initialize(config);
+    cornerstoneWADOImageLoader.configure(config);
 
 ```
 
@@ -99,7 +105,7 @@ the JPEG2000 or JPEG-LS decoders on startup.  Initialization takes even more CPU
 disabled by default.  If you expect to display JPEG-LS or JPEG2000 images frequently, you might want to enable
 this flag.
 
-* taskConfiguration.decodeTask.usePDFJS - By default, the decode task uses the OpenJPEG based codec for
+* taskConfiguration.decodeTask.usePDFJS - **Moved to `decodeConfig.usePDFJS** - By default, the decode task uses the OpenJPEG based codec for
   decoding JPEG2000 images.  Set this to true to use the PDF.JS codec.  The PDF.js codec is faster than the
   OpenJPEG based codec but does not properly decode all images and is therefore not recommended.
 

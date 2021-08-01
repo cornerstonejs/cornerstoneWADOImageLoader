@@ -23,7 +23,7 @@ let options = {
     convertFloatPixelDataToInt: true,
     usePDFJS: false,
     decoderPaths: [],
-    autoLoadCodecs: true,
+    autoLoadDecoders: true,
   },
 };
 

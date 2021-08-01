@@ -54,6 +54,7 @@ describe('Test lossless TransferSyntaxes decoding', function() {
       useWebWorkers: false,
       decodeConfig: {
         usePDFJS: false,
+        decoderPaths: ['/base/dist/allDecoders.min.js'],
       },
     });
 

@@ -1,6 +1,6 @@
 /**
  * This module loads codecs for decoding compressed images, as these are often
- * much larger, so that the delivered bundle size can be optimized. Codecs this
+ * quite large, so that the delivered bundle size can be optimized. Codecs this
  * way can be included piecemeal.
  */
 
@@ -20,13 +20,14 @@ let loadDecodersPromise;
 function loadScript(path) {
   return new Promise(resolve => {
     const script = document.createElement('script');
-
+    document.head.appendChild(script);
     script.onload = function() {
       resolve();
     };
+    script.onerror = function() {
+      console.error(`Script ${path} failed to load.`);
+    };
     script.src = path;
-
-    document.head.appendChild(script);
   });
 }
 
@@ -60,6 +61,9 @@ function loadDecoders(paths) {
   // If no external decoders set, return empty object. Basic inlined decoders
   // will still work, such as little and big endian, RLE
   if (!decoderPaths || decoderPaths.length === 0) {
+    console.warn(
+      'No decoders configured. Only uncompressed or RLE images will be displayed.'
+    );
     return Promise.resolve({});
   }
 

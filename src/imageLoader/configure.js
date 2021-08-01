@@ -5,8 +5,10 @@ import { loadDecoders } from '../externalDecoders.js';
 function configure(options) {
   const newOptions = setOptions(options);
 
-  webWorkerManager.initialize(newOptions.webWorkerConfig);
-  if (newOptions.decodeConfig.autoLoadCodecs) {
+  if (newOptions.useWebWorkers) {
+    webWorkerManager.initialize(newOptions.webWorkerConfig);
+  }
+  if (newOptions.decodeConfig.autoLoadDecoders) {
     loadDecoders();
   }
 

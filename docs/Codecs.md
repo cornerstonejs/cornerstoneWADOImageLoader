@@ -23,6 +23,20 @@ decode the various ways DICOM images are compressed:
 
 ## Loading Codecs
 
+To load codecs, use the `decodeConfig.decoderPaths` option in the configuration.
+To include all codecs (larger bundle size), use `dist/allDecoders.min.js`.
+
+Available codecs:
+
+- Little endian (enabled by default)
+- Big endian (enabled by default)
+- RLE (enabled by default)
+- HTJ2K (`decodeHtj2k.min.js`)
+- JPEG2000 (`decodeJpeg2000.min.js`)
+- JPEG baseline (`decodeJpegBaseline.min.js`)
+- JPEG Lossless (`decodeJpegLossless.min.js`)
+- JPEG LS (`decodeJPEGLS.min.js`)
+
 ## JPEG2000
 
 The OpenJPEG based codec is the default codec for JPEG2000 images. This codec is
