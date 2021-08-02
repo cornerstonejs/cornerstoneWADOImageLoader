@@ -120,6 +120,8 @@ function decodeImageFrame(
     case '1.2.840.10008.1.2.4.91':
       // JPEG 2000 Lossy
       return processDecodeTask(imageFrame, transferSyntax, pixelData, options);
+    case 'HTJ2K':
+      return processDecodeTask(imageFrame, transferSyntax, pixelData, options);
   }
 
   /* Don't know if these work...
@@ -135,9 +137,9 @@ function decodeImageFrame(
    }
    */
 
-  return new Promise((resolve, reject) => {
-    reject(new Error(`No decoder for transfer syntax ${transferSyntax}`));
-  });
+  return Promise.reject(
+    new Error(`No decoder for transfer syntax ${transferSyntax}`)
+  );
 }
 
 export default decodeImageFrame;

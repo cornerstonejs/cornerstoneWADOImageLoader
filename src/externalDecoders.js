@@ -20,6 +20,7 @@ let loadDecodersPromise;
 function loadScript(path) {
   return new Promise(resolve => {
     const script = document.createElement('script');
+
     document.head.appendChild(script);
     script.onload = function() {
       resolve();
@@ -64,6 +65,7 @@ function loadDecoders(paths) {
     console.warn(
       'No decoders configured. Only uncompressed or RLE images will be displayed.'
     );
+
     return Promise.resolve({});
   }
 

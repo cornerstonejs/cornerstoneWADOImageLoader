@@ -140,109 +140,114 @@ function decodeImageFrame(
      }
      */
 
-    const shouldShift =
-      decodedImageFrame.pixelRepresentation !== undefined &&
-      decodedImageFrame.pixelRepresentation === 1;
-    const shift =
-      shouldShift && decodedImageFrame.bitsStored !== undefined
-        ? 32 - decodedImageFrame.bitsStored
-        : undefined;
+        const shouldShift =
+          decodedImageFrame.pixelRepresentation !== undefined &&
+          decodedImageFrame.pixelRepresentation === 1;
+        const shift =
+          shouldShift && decodedImageFrame.bitsStored !== undefined
+            ? 32 - decodedImageFrame.bitsStored
+            : undefined;
 
-    if (shouldShift && shift !== undefined) {
-      for (let i = 0; i < decodedImageFrame.pixelData.length; i++) {
-        decodedImageFrame.pixelData[i] =
-          // eslint-disable-next-line no-bitwise
-          (decodedImageFrame.pixelData[i] << shift) >> shift;
-      }
-    }
+        if (shouldShift && shift !== undefined) {
+          for (let i = 0; i < decodedImageFrame.pixelData.length; i++) {
+            decodedImageFrame.pixelData[i] =
+              // eslint-disable-next-line no-bitwise
+              (decodedImageFrame.pixelData[i] << shift) >> shift;
+          }
+        }
 
-  // Cache the pixelData reference quickly incase we want to set a targetBuffer _and_ scale.
-  let pixelDataArray = decodedImageFrame.pixelData;
+        // Cache the pixelData reference quickly incase we want to set a targetBuffer _and_ scale.
+        let pixelDataArray = decodedImageFrame.pixelData;
 
-  decodedImageFrame.pixelDataLength = decodedImageFrame.pixelData.length;
+        decodedImageFrame.pixelDataLength = decodedImageFrame.pixelData.length;
 
-  if (options.targetBuffer) {
-    let offset, length;
-    // If we have a target buffer, write to that instead. This helps reduce memory duplication.
+        if (options.targetBuffer) {
+          let offset, length;
+          // If we have a target buffer, write to that instead. This helps reduce memory duplication.
 
-    ({ offset, length } = options.targetBuffer);
-    const { arrayBuffer, type } = options.targetBuffer;
+          ({ offset, length } = options.targetBuffer);
+          const { arrayBuffer, type } = options.targetBuffer;
 
-    let TypedArrayConstructor;
+          let TypedArrayConstructor;
 
-    if (offset === null || offset === undefined) {
-      offset = 0;
-    }
+          if (offset === null || offset === undefined) {
+            offset = 0;
+          }
 
-    if ((length === null || length === undefined) && offset !== 0) {
-      length = decodedImageFrame.pixelDataLength - offset;
-    } else if (length === null || length === undefined) {
-      length = decodedImageFrame.pixelDataLength;
-    }
+          if ((length === null || length === undefined) && offset !== 0) {
+            length = decodedImageFrame.pixelDataLength - offset;
+          } else if (length === null || length === undefined) {
+            length = decodedImageFrame.pixelDataLength;
+          }
 
-    switch (type) {
-      case 'Uint8Array':
-        TypedArrayConstructor = Uint8Array;
-        break;
-      case 'Uint16Array':
-        TypedArrayConstructor = Uint16Array;
-        break;
-      case 'Float32Array':
-        TypedArrayConstructor = Float32Array;
-        break;
-      default:
-        throw new Error('target array for image does not have a valid type.');
-    }
+          switch (type) {
+            case 'Uint8Array':
+              TypedArrayConstructor = Uint8Array;
+              break;
+            case 'Uint16Array':
+              TypedArrayConstructor = Uint16Array;
+              break;
+            case 'Float32Array':
+              TypedArrayConstructor = Float32Array;
+              break;
+            default:
+              throw new Error(
+                'target array for image does not have a valid type.'
+              );
+          }
 
-    if (options.preScale) {
-      const { scalingParameters } = options.preScale;
+          const imageFramePixelData = imageFrame.pixelData;
 
-      scaleArray(pixelDataArray, scalingParameters);
-    }
+          if (length !== imageFramePixelData.length) {
+            throw new Error(
+              'target array for image does not have the same length as the decoded image length.'
+            );
+          }
 
-    // TypedArray.Set is api level and ~50x faster than copying elements even for
-    // Arrays of different types, which aren't simply memcpy ops.
-    let typedArray;
+          // TypedArray.Set is api level and ~50x faster than copying elements even for
+          // Arrays of different types, which aren't simply memcpy ops.
+          let typedArray;
 
-    if (arrayBuffer) {
-      typedArray = new TypedArrayConstructor(arrayBuffer, offset, length);
-    } else {
-      typedArray = new TypedArrayConstructor(length);
-    }
+          if (arrayBuffer) {
+            typedArray = new TypedArrayConstructor(arrayBuffer, offset, length);
+          } else {
+            typedArray = new TypedArrayConstructor(length);
+          }
 
-    typedArray.set(imageFramePixelData, 0);
+          typedArray.set(imageFramePixelData, 0);
 
-    // If need to scale, need to scale correct array.
-    pixelDataArray = typedArray;
-  }
+          // If need to scale, need to scale correct array.
+          pixelDataArray = typedArray;
+        }
 
-  if (options.preScale && options.preScale.scalingParameters) {
-    const { scalingParameters } = options.preScale;
-    const { rescaleSlope, rescaleIntercept } = scalingParameters;
+        if (options.preScale && options.preScale.scalingParameters) {
+          const { scalingParameters } = options.preScale;
+          const { rescaleSlope, rescaleIntercept } = scalingParameters;
 
-    if (
-      typeof rescaleSlope === 'number' &&
-      typeof rescaleIntercept === 'number'
-    ) {
-      scaleArray(pixelDataArray, scalingParameters);
-    }
-  }
+          if (
+            typeof rescaleSlope === 'number' &&
+            typeof rescaleIntercept === 'number'
+          ) {
+            scaleArray(pixelDataArray, scalingParameters);
+          }
+        }
 
-  // Handle cases where the targetBuffer is not backed by a SharedArrayBuffer
-  if (
-    options.targetBuffer &&
-    (!options.targetBuffer.arrayBuffer ||
-      options.targetBuffer.arrayBuffer instanceof ArrayBuffer)
-  ) {
-    decodedImageFrame.pixelData = pixelDataArray;
-  }
+        // Handle cases where the targetBuffer is not backed by a SharedArrayBuffer
+        if (
+          options.targetBuffer &&
+          (!options.targetBuffer.arrayBuffer ||
+            options.targetBuffer.arrayBuffer instanceof ArrayBuffer)
+        ) {
+          decodedImageFrame.pixelData = pixelDataArray;
+        }
 
-  const end = new Date().getTime();
+        const end = new Date().getTime();
 
-    decodedImageFrame.decodeTimeInMS = end - start;
+        decodedImageFrame.decodeTimeInMS = end - start;
 
-    return decodedImageFrame;
-  });
+        return decodedImageFrame;
+      })
+  );
 }
 
 export default decodeImageFrame;
