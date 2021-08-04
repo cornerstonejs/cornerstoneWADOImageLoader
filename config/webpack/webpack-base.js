@@ -51,22 +51,6 @@ module.exports = {
         },
       },
       {
-        test: path.join(codecs, 'openJPEG-FixedMemory.js'),
-        use: 'exports-loader?OpenJPEG',
-      },
-      {
-        test: path.join(codecs, 'charLS-FixedMemory-browser.js'),
-        use: 'exports-loader?CharLS',
-      },
-      {
-        test: path.join(codecs, 'jpeg.js'),
-        use: 'exports-loader?JpegImage',
-      },
-      {
-        test: path.join(codecs, 'jpx.min.js'),
-        use: 'exports-loader?JpxImage',
-      },
-      {
         test: /\.js$/,
         exclude: [/(node_modules)/, /(codecs)/],
         use: {
@@ -75,10 +59,10 @@ module.exports = {
       },
     ],
   },
-  plugins: [
+  /*plugins: [
     new CopyPlugin({
       patterns: [{ from: wasm, to: outputPath }],
     }),
-  ],
+  ],*/
   node: { fs: 'empty' },
 };
