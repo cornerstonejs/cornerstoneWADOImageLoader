@@ -1,5 +1,5 @@
 const path = require('path');
-const CopyPlugin = require("copy-webpack-plugin");
+const CopyPlugin = require('copy-webpack-plugin');
 const rootPath = process.cwd();
 const context = path.join(rootPath, 'src');
 const wasm = path.join(rootPath, 'wasm');
@@ -50,16 +50,7 @@ module.exports = {
           options: { inline: true, fallback: false },
         },
       },
-      /*{
-      test: /\.js$/,
-      include: /(codecs)/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          compact: false
-        }
-      },
-    },*/ {
+      {
         test: path.join(codecs, 'openJPEG-FixedMemory.js'),
         use: 'exports-loader?OpenJPEG',
       },
@@ -86,9 +77,7 @@ module.exports = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: [
-        { from: wasm, to: outputPath },
-      ],
+      patterns: [{ from: wasm, to: outputPath }],
     }),
   ],
   node: { fs: 'empty' },
