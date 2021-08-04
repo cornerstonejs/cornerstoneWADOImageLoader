@@ -1,9 +1,10 @@
 const path = require('path');
+const CopyPlugin = require("copy-webpack-plugin");
 const rootPath = process.cwd();
 const context = path.join(rootPath, 'src');
+const wasm = path.join(rootPath, 'wasm');
 const codecs = path.join(rootPath, 'codecs');
-const outputPath = path.join(rootPath, 'dist');
-const bannerPlugin = require('./plugins/banner');
+const outputPath = path.join(rootPath, 'examples', 'dist');
 
 module.exports = {
   mode: 'development',
@@ -33,15 +34,15 @@ module.exports = {
   module: {
     noParse: [/(codecs)/],
     rules: [
-      {
-        enforce: 'pre',
-        test: /\.js$/,
-        exclude: /(node_modules)|(codecs)/,
-        loader: 'eslint-loader',
-        options: {
-          failOnError: true,
-        },
-      },
+      // {
+      //   enforce: 'pre',
+      //   test: /\.js$/,
+      //   exclude: /(node_modules)|(codecs)/,
+      //   loader: 'eslint-loader',
+      //   options: {
+      //     failOnError: false,
+      //   },
+      // },
       {
         test: /\.worker\.js$/,
         use: {
@@ -83,6 +84,12 @@ module.exports = {
       },
     ],
   },
-  plugins: [bannerPlugin()],
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: wasm, to: outputPath },
+      ],
+    }),
+  ],
   node: { fs: 'empty' },
 };

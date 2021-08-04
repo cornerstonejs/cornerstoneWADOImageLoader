@@ -1,5 +1,5 @@
-import { initializeJPEG2000 } from '../../shared/decoders/decodeJPEG2000.js';
-import { initializeJPEGLS } from '../../shared/decoders/decodeJPEGLS.js';
+// import { initializeJPEG2000 } from '../../shared/decoders/decodeJPEG2000.js';
+// import { initializeJPEGLS } from '../../shared/decoders/decodeJPEGLS.js';
 import calculateMinMax from '../../shared/calculateMinMax.js';
 import decodeImageFrame from '../../shared/decodeImageFrame.js';
 
@@ -14,8 +14,8 @@ function loadCodecs(config) {
   // Initialize the codecs
   if (config.decodeTask.initializeCodecsOnStartup) {
     // console.time('initializeCodecs');
-    initializeJPEG2000(config.decodeTask);
-    initializeJPEGLS(config.decodeTask);
+    // initializeJPEG2000(config.decodeTask);
+    // initializeJPEGLS(config.decodeTask);
     // console.timeEnd('initializeCodecs');
   }
 }

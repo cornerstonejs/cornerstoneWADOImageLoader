@@ -5,8 +5,6 @@ import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 // TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
 import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
 import calculateMinMax from '../shared/calculateMinMax.js';
-import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
-import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
 
 let codecsInitialized = false;
 
@@ -19,28 +17,28 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
   const { strict, decodeConfig, useWebWorkers } = loaderOptions;
 
   if (useWebWorkers === false) {
-    if (codecsInitialized === false) {
-      initializeJPEG2000(decodeConfig);
-      initializeJPEGLS(decodeConfig);
-
-      codecsInitialized = true;
-    }
+    codecsInitialized = true;
 
     return new Promise((resolve, reject) => {
       try {
+        const callbackFn = decodedImageFrame => {
+          calculateMinMax(decodedImageFrame, strict);
+          resolve(decodedImageFrame);
+        };
+
         const decodeArguments = [
           imageFrame,
           transferSyntax,
           pixelData,
           decodeConfig,
           options,
+          callbackFn,
         ];
-        const decodedImageFrame = decodeImageFrameHandler(...decodeArguments);
 
-        calculateMinMax(decodedImageFrame, strict);
-
-        resolve(decodedImageFrame);
+        decodeImageFrameHandler(...decodeArguments);
       } catch (error) {
+        console.log(error);
+        console.warn(error);
         reject(error);
       }
     });

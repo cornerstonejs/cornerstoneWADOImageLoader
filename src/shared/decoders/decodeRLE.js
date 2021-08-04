@@ -1,169 +1,130 @@
-function decodeRLE(imageFrame, pixelData) {
-  if (imageFrame.bitsAllocated === 8) {
-    if (imageFrame.planarConfiguration) {
-      return decode8Planar(imageFrame, pixelData);
-    }
+// import regeneratorRuntime from 'regenerator-runtime';
 
-    return decode8(imageFrame, pixelData);
-  } else if (imageFrame.bitsAllocated === 16) {
-    return decode16(imageFrame, pixelData);
-  }
+// import * as wasm from "./../codecs/dicomrle_wasm.js";
+// import { memory } from './../codecs/dicomrle_wasm_bg.js';
 
-  throw new Error('unsupported pixel format for RLE');
-}
+// wasm.initialize();
 
-function decode8(imageFrame, pixelData) {
-  const frameData = pixelData;
-  const frameSize = imageFrame.rows * imageFrame.columns;
-  const outFrame = new ArrayBuffer(frameSize * imageFrame.samplesPerPixel);
-  const header = new DataView(frameData.buffer, frameData.byteOffset);
-  const data = new Int8Array(frameData.buffer, frameData.byteOffset);
-  const out = new Int8Array(outFrame);
+// const local = {
+//   codec: undefined,
+//   decoder: undefined,
+//   encoder: undefined,
+// };
 
-  let outIndex = 0;
-  const numSegments = header.getInt32(0, true);
+// async function initCharls() {
+//   if (local.codec) {
+//     return new Promise(resolve => {
+//       resolve();
+//     });
+//   }
 
-  for (let s = 0; s < numSegments; ++s) {
-    outIndex = s;
+//   const charlsModule = charlsFactory();
 
-    let inIndex = header.getInt32((s + 1) * 4, true);
+//   charlsModule.onRuntimeInitialized = evt => {
+//     console.log('runtime initialized...');
+//     console.log(evt);
+//   };
 
-    let maxIndex = header.getInt32((s + 2) * 4, true);
+//   return new Promise(resolve => {
+//     charlsModule.then(instance => {
+//       local.codec = instance;
+//       local.decoder = new instance.JpegLSDecoder();
+//       local.encoder = new instance.JpegLSEncoder();
+//       resolve();
+//     });
+//   });
+// }
 
-    if (maxIndex === 0) {
-      maxIndex = frameData.length;
-    }
+// // imageFrame.pixelRepresentation === 1 <-- Signed
+// /**
+//  *
+//  * @param {*} compressedImageFrame
+//  * @param {object}  imageInfo
+//  * @param {boolean} imageInfo.signed -
+//  */
+// async function decodeAsync(compressedImageFrame, imageInfo) {
+//   await initCharls();
+//   const decoder = local.decoder;
 
-    const endOfSegment = frameSize * numSegments;
+//   // get pointer to the source/encoded bit stream buffer in WASM memory
+//   // that can hold the encoded bitstream
+//   const encodedBufferInWASM = decoder.getEncodedBuffer(
+//     compressedImageFrame.length
+//   );
 
-    while (inIndex < maxIndex) {
-      const n = data[inIndex++];
+//   // copy the encoded bitstream into WASM memory buffer
+//   encodedBufferInWASM.set(compressedImageFrame);
 
-      if (n >= 0 && n <= 127) {
-        // copy n bytes
-        for (let i = 0; i < n + 1 && outIndex < endOfSegment; ++i) {
-          out[outIndex] = data[inIndex++];
-          outIndex += imageFrame.samplesPerPixel;
-        }
-      } else if (n <= -1 && n >= -127) {
-        const value = data[inIndex++];
-        // run of n bytes
+//   // decode it
+//   decoder.decode();
 
-        for (let j = 0; j < -n + 1 && outIndex < endOfSegment; ++j) {
-          out[outIndex] = value;
-          outIndex += imageFrame.samplesPerPixel;
-        }
-      } /* else if (n === -128) {
+//   // get information about the decoded image
+//   const frameInfo = decoder.getFrameInfo();
+//   const interleaveMode = decoder.getInterleaveMode();
+//   const nearLossless = decoder.getNearLossless();
 
-      } // do nothing */
-    }
-  }
-  imageFrame.pixelData = new Uint8Array(outFrame);
+//   // get the decoded pixels
+//   const decodedPixelsInWASM = decoder.getDecodedBuffer();
+//   const imageFrame = new Uint8Array(decodedPixelsInWASM.length);
 
-  return imageFrame;
-}
+//   imageFrame.set(decodedPixelsInWASM);
 
-function decode8Planar(imageFrame, pixelData) {
-  const frameData = pixelData;
-  const frameSize = imageFrame.rows * imageFrame.columns;
-  const outFrame = new ArrayBuffer(frameSize * imageFrame.samplesPerPixel);
-  const header = new DataView(frameData.buffer, frameData.byteOffset);
-  const data = new Int8Array(frameData.buffer, frameData.byteOffset);
-  const out = new Int8Array(outFrame);
+//   const encodedImageInfo = {
+//     columns: frameInfo.width,
+//     rows: frameInfo.height,
+//     bitsPerPixel: frameInfo.bitsPerSample,
+//     signed: imageInfo.signed,
+//     bytesPerPixel: imageInfo.bytesPerPixel,
+//     componentsPerPixel: frameInfo.componentCount,
+//   };
 
-  let outIndex = 0;
-  const numSegments = header.getInt32(0, true);
+//   // delete the instance.  Note that this frees up memory including the
+//   // encodedBufferInWASM and decodedPixelsInWASM invalidating them.
+//   // Do not use either after calling delete!
+//   // decoder.delete();
 
-  for (let s = 0; s < numSegments; ++s) {
-    outIndex = s * frameSize;
+//   const pixelData = getPixelData(
+//     frameInfo,
+//     decodedPixelsInWASM,
+//     imageInfo.signed
+//   );
+//   const encodeOptions = {
+//     nearLossless,
+//     interleaveMode,
+//     frameInfo,
+//   };
 
-    let inIndex = header.getInt32((s + 1) * 4, true);
+//   return {
+//     ...imageInfo,
+//     // imageFrame,
+//     // shim
+//     pixelData,
+//     // end shim
+//     imageInfo: encodedImageInfo,
+//     encodeOptions,
+//     ...encodeOptions,
+//     ...encodedImageInfo,
+//   };
+// }
 
-    let maxIndex = header.getInt32((s + 2) * 4, true);
+// function getPixelData(frameInfo, decodedBuffer, signed) {
+//   if (frameInfo.bitsPerSample > 8) {
+//     if (signed) {
+//       return new Int16Array(
+//         decodedBuffer.buffer,
+//         decodedBuffer.byteOffset,
+//         decodedBuffer.byteLength / 2
+//       );
+//     }
 
-    if (maxIndex === 0) {
-      maxIndex = frameData.length;
-    }
+//     return new Uint16Array(
+//       decodedBuffer.buffer,
+//       decodedBuffer.byteOffset,
+//       decodedBuffer.byteLength / 2
+//     );
+//   }
 
-    const endOfSegment = frameSize * numSegments;
+//   return decodedBuffer;
+// }
 
-    while (inIndex < maxIndex) {
-      const n = data[inIndex++];
-
-      if (n >= 0 && n <= 127) {
-        // copy n bytes
-        for (let i = 0; i < n + 1 && outIndex < endOfSegment; ++i) {
-          out[outIndex] = data[inIndex++];
-          outIndex++;
-        }
-      } else if (n <= -1 && n >= -127) {
-        const value = data[inIndex++];
-        // run of n bytes
-
-        for (let j = 0; j < -n + 1 && outIndex < endOfSegment; ++j) {
-          out[outIndex] = value;
-          outIndex++;
-        }
-      } /* else if (n === -128) {
-
-      } // do nothing */
-    }
-  }
-  imageFrame.pixelData = new Uint8Array(outFrame);
-
-  return imageFrame;
-}
-
-function decode16(imageFrame, pixelData) {
-  const frameData = pixelData;
-  const frameSize = imageFrame.rows * imageFrame.columns;
-  const outFrame = new ArrayBuffer(frameSize * imageFrame.samplesPerPixel * 2);
-
-  const header = new DataView(frameData.buffer, frameData.byteOffset);
-  const data = new Int8Array(frameData.buffer, frameData.byteOffset);
-  const out = new Int8Array(outFrame);
-
-  const numSegments = header.getInt32(0, true);
-
-  for (let s = 0; s < numSegments; ++s) {
-    let outIndex = 0;
-    const highByte = s === 0 ? 1 : 0;
-
-    let inIndex = header.getInt32((s + 1) * 4, true);
-
-    let maxIndex = header.getInt32((s + 2) * 4, true);
-
-    if (maxIndex === 0) {
-      maxIndex = frameData.length;
-    }
-
-    while (inIndex < maxIndex) {
-      const n = data[inIndex++];
-
-      if (n >= 0 && n <= 127) {
-        for (let i = 0; i < n + 1 && outIndex < frameSize; ++i) {
-          out[outIndex * 2 + highByte] = data[inIndex++];
-          outIndex++;
-        }
-      } else if (n <= -1 && n >= -127) {
-        const value = data[inIndex++];
-
-        for (let j = 0; j < -n + 1 && outIndex < frameSize; ++j) {
-          out[outIndex * 2 + highByte] = value;
-          outIndex++;
-        }
-      } /* else if (n === -128) {
-
-      } // do nothing */
-    }
-  }
-  if (imageFrame.pixelRepresentation === 0) {
-    imageFrame.pixelData = new Uint16Array(outFrame);
-  } else {
-    imageFrame.pixelData = new Int16Array(outFrame);
-  }
-
-  return imageFrame;
-}
-
-export default decodeRLE;
+// export default decodeAsync;

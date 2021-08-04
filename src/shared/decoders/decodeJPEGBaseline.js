@@ -1,27 +1,121 @@
-import JpegImage from '../../../codecs/jpeg.js';
+import regeneratorRuntime from 'regenerator-runtime';
+import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo/dist/libjpegturbojs.js';
 
-function decodeJPEGBaseline(imageFrame, pixelData) {
-  // check to make sure codec is loaded
-  if (typeof JpegImage === 'undefined') {
-    throw new Error('No JPEG Baseline decoder loaded');
+const local = {
+  codec: undefined,
+  decoder: undefined,
+  encoder: undefined,
+};
+
+async function initLibjpegTurbo() {
+  if (local.codec) {
+    return new Promise(resolve => {
+      resolve();
+    });
   }
-  const jpeg = new JpegImage();
 
-  jpeg.parse(pixelData);
+  const libjpegTurboModule = libjpegTurboFactory();
 
-  // Do not use the internal jpeg.js color transformation,
-  // since we will handle this afterwards
-  jpeg.colorTransform = false;
+  libjpegTurboModule.onRuntimeInitialized = evt => {
+    console.log('runtime initialized...');
+    console.log(evt);
+  };
 
-  if (imageFrame.bitsAllocated === 8) {
-    imageFrame.pixelData = jpeg.getData(imageFrame.columns, imageFrame.rows);
-
-    return imageFrame;
-  } else if (imageFrame.bitsAllocated === 16) {
-    imageFrame.pixelData = jpeg.getData16(imageFrame.columns, imageFrame.rows);
-
-    return imageFrame;
-  }
+  return new Promise(resolve => {
+    libjpegTurboModule.then(instance => {
+      local.codec = instance;
+      local.decoder = new instance.JPEGDecoder();
+      local.encoder = new instance.JPEGEncoder();
+      resolve();
+    });
+  });
 }
 
-export default decodeJPEGBaseline;
+// imageFrame.pixelRepresentation === 1 <-- Signed
+/**
+ *
+ * @param {*} compressedImageFrame
+ * @param {object}  imageInfo
+ * @param {boolean} imageInfo.signed -
+ */
+async function decodeAsync(compressedImageFrame, imageInfo) {
+  await initLibjpegTurbo();
+  const decoder = local.decoder;
+
+  // get pointer to the source/encoded bit stream buffer in WASM memory
+  // that can hold the encoded bitstream
+  const encodedBufferInWASM = decoder.getEncodedBuffer(
+    compressedImageFrame.length
+  );
+
+  // copy the encoded bitstream into WASM memory buffer
+  encodedBufferInWASM.set(compressedImageFrame);
+
+  // decode it
+  decoder.decode();
+
+  // get information about the decoded image
+  const frameInfo = decoder.getFrameInfo();
+
+  // get the decoded pixels
+  const decodedPixelsInWASM = decoder.getDecodedBuffer();
+  const imageFrame = new Uint8Array(decodedPixelsInWASM.length);
+
+  imageFrame.set(decodedPixelsInWASM);
+
+  const encodedImageInfo = {
+    columns: frameInfo.width,
+    rows: frameInfo.height,
+    bitsPerPixel: frameInfo.bitsPerSample,
+    signed: imageInfo.signed,
+    bytesPerPixel: imageInfo.bytesPerPixel,
+    componentsPerPixel: frameInfo.componentCount,
+  };
+
+  // delete the instance.  Note that this frees up memory including the
+  // encodedBufferInWASM and decodedPixelsInWASM invalidating them.
+  // Do not use either after calling delete!
+  // decoder.delete();
+
+  const pixelData = getPixelData(
+    frameInfo,
+    decodedPixelsInWASM,
+  );
+  const encodeOptions = {
+    frameInfo,
+  };
+
+  return {
+    ...imageInfo,
+    // imageFrame,
+    // shim
+    pixelData,
+    // end shim
+    imageInfo: encodedImageInfo,
+    encodeOptions,
+    ...encodeOptions,
+    ...encodedImageInfo,
+  };
+}
+
+function getPixelData(frameInfo, decodedBuffer) {
+  if (frameInfo.bitsPerSample > 8) {
+    if (frameInfo.isSigned) {
+      return new Int16Array(
+        decodedBuffer.buffer,
+        decodedBuffer.byteOffset,
+        decodedBuffer.byteLength / 2
+      );
+    }
+
+    return new Uint16Array(
+      decodedBuffer.buffer,
+      decodedBuffer.byteOffset,
+      decodedBuffer.byteLength / 2
+    );
+  }
+
+  return decodedBuffer;
+}
+
+export default decodeAsync;

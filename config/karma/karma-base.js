@@ -29,9 +29,18 @@ module.exports = {
     'node_modules/cornerstone-core/dist/cornerstone.js',
     'node_modules/dicom-parser/dist/dicomParser.js',
     'test/**/*_test.js',
+    // http://localhost:[PORT]/base/test/[MY FILE].wasm
+    {pattern: 'test/*.wasm', watched: false, included: false, served: true, nocache: false},
     {pattern: 'testImages/*', included: false},
     {pattern: 'dist/*', included: false},
   ],
+  mime: {
+    'application/wasm': ['wasm']
+  },
+  proxies: {
+    "/base/test/charljs.wasm": "https://unpkg.com/@cornerstonejs/codec-charls@0.0.4/dist/charlsjs.wasm",
+    "/base/test/imageLoader/wadouri/": "/base/test/"
+  },
 
   plugins: [
     'karma-webpack',
