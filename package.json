@@ -54,6 +54,7 @@
     "chai": "^4.2.0",
     "commitizen": "3.1.x",
     "concat": "^1.0.3",
+    "copy-webpack-plugin": "^6.4.1",
     "cornerstone-core": "^2.3.0",
     "coveralls": "^3.0.5",
     "cross-env": "^6.0.3",
@@ -86,7 +87,7 @@
     "webpack": "^4.38.0",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2",
-    "worker-loader": "^2.0.0"
+    "worker-loader": "^3.0.8"
   },
   "dependencies": {
     "dicom-parser": "^1.8.3",

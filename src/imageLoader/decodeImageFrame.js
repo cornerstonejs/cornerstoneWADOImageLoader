@@ -5,8 +5,7 @@ import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 // TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
 import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
 import calculateMinMax from '../shared/calculateMinMax.js';
-import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
-import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
+import { loadDecoders } from '../externalDecoders.js';
 
 let codecsInitialized = false;
 
@@ -19,15 +18,21 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
   const { strict, decodeConfig, useWebWorkers } = loaderOptions;
 
   if (useWebWorkers === false) {
-    if (codecsInitialized === false) {
-      initializeJPEG2000(decodeConfig);
-      initializeJPEGLS(decodeConfig);
+    return loadDecoders()
+      .then(decoders => {
+        const { decodeJPEG2000, decodeJPEGLS } = decoders;
 
-      codecsInitialized = true;
-    }
+        if (codecsInitialized === false) {
+          if (decodeJPEG2000) {
+            decodeJPEG2000.initialize(decodeConfig);
+          }
+          if (decodeJPEGLS) {
+            decodeJPEGLS.initialize(decodeConfig);
+          }
 
-    return new Promise((resolve, reject) => {
-      try {
+          codecsInitialized = true;
+        }
+
         const decodeArguments = [
           imageFrame,
           transferSyntax,
@@ -35,15 +40,14 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
           decodeConfig,
           options,
         ];
-        const decodedImageFrame = decodeImageFrameHandler(...decodeArguments);
 
+        return decodeImageFrameHandler(...decodeArguments);
+      })
+      .then(decodedImageFrame => {
         calculateMinMax(decodedImageFrame, strict);
 
-        resolve(decodedImageFrame);
-      } catch (error) {
-        reject(error);
-      }
-    });
+        return decodedImageFrame;
+      });
   }
 
   return webWorkerManager.addTask(
@@ -116,6 +120,8 @@ function decodeImageFrame(
     case '1.2.840.10008.1.2.4.91':
       // JPEG 2000 Lossy
       return processDecodeTask(imageFrame, transferSyntax, pixelData, options);
+    case 'HTJ2K':
+      return processDecodeTask(imageFrame, transferSyntax, pixelData, options);
   }
 
   /* Don't know if these work...
@@ -131,9 +137,9 @@ function decodeImageFrame(
    }
    */
 
-  return new Promise((resolve, reject) => {
-    reject(new Error(`No decoder for transfer syntax ${transferSyntax}`));
-  });
+  return Promise.reject(
+    new Error(`No decoder for transfer syntax ${transferSyntax}`)
+  );
 }
 
 export default decodeImageFrame;

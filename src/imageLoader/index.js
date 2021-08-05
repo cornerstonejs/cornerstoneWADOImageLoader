@@ -8,6 +8,7 @@ import {
 
 import { default as wadouri } from './wadouri/index.js';
 import { default as wadors } from './wadors/index.js';
+import { default as jphuri } from './jphuri/index.js';
 import { default as configure } from './configure.js';
 import { default as convertColorSpace } from './convertColorSpace.js';
 import { default as createImage } from './createImage.js';
@@ -31,6 +32,7 @@ const cornerstoneWADOImageLoader = {
   convertPALETTECOLOR,
   wadouri,
   wadors,
+  jphuri,
   configure,
   convertColorSpace,
   createImage,
@@ -55,6 +57,7 @@ export {
   convertPALETTECOLOR,
   wadouri,
   wadors,
+  jphuri,
   configure,
   convertColorSpace,
   createImage,

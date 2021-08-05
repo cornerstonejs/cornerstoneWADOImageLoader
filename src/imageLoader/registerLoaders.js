@@ -1,5 +1,6 @@
 import wadors from './wadors/index.js';
 import wadouri from './wadouri/index.js';
+import jphuri from './jphuri/index.js';
 
 /**
  * Register the WADO-URI and WADO-RS image loaders and metaData providers
@@ -10,6 +11,7 @@ import wadouri from './wadouri/index.js';
 function registerLoaders(cornerstone) {
   wadors.register(cornerstone);
   wadouri.register(cornerstone);
+  jphuri.register(cornerstone);
 }
 
 export default registerLoaders;

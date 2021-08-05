@@ -34,24 +34,25 @@ const url = 'dicomweb://localhost:9876/base/testImages/';
 describe('loadImage', function() {
   before(function() {
     // Initialize the web worker manager
-    const config = {
-      maxWebWorkers: 1,
-      startWebWorkersOnDemand: true,
-      taskConfiguration: {
-        decodeTask: {
-          initializeCodecsOnStartup: true,
-          usePDFJS: false,
-        },
-      },
-    };
+    // const config = {
+    //   maxWebWorkers: 1,
+    //   startWebWorkersOnDemand: true,
+    //   taskConfiguration: {
+    //     decodeTask: {
+    //       initializeCodecsOnStartup: true,
+    //       usePDFJS: false,
+    //     },
+    //   },
+    // };
 
-    webWorkerManager.initialize(config);
+    // webWorkerManager.initialize(config);
 
     configure({
       strict: false,
       useWebWorkers: false,
       decodeConfig: {
         usePDFJS: false,
+        decoderPaths: ['/base/dist/allDecoders.min.js'],
       },
     });
   });

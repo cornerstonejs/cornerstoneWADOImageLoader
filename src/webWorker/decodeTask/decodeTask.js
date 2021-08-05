@@ -1,5 +1,6 @@
-import { initializeJPEG2000 } from '../../shared/decoders/decodeJPEG2000.js';
-import { initializeJPEGLS } from '../../shared/decoders/decodeJPEGLS.js';
+// import { initializeJPEG2000 } from '../../shared/decoders/decodeJPEG2000.js';
+// import { initializeJPEGLS } from '../../shared/decoders/decodeJPEGLS.js';
+import { loadDecoders } from '../../externalDecoders.js';
 import calculateMinMax from '../../shared/calculateMinMax.js';
 import decodeImageFrame from '../../shared/decodeImageFrame.js';
 
@@ -11,13 +12,19 @@ let decodeConfig;
  * @param config
  */
 function loadCodecs(config) {
-  // Initialize the codecs
-  if (config.decodeTask.initializeCodecsOnStartup) {
-    // console.time('initializeCodecs');
-    initializeJPEG2000(config.decodeTask);
-    initializeJPEGLS(config.decodeTask);
-    // console.timeEnd('initializeCodecs');
-  }
+  return loadDecoders(config.decodeTask.decoderPaths).then(decoders => {
+    const { decodeJPEG2000, decodeJPEGLS } = decoders;
+
+    // Initialize the codecs
+    if (config.decodeTask.initializeCodecsOnStartup) {
+      if (decodeJPEG2000) {
+        decodeJPEG2000.initialize(config.decodeTask);
+      }
+      if (decodeJPEGLS) {
+        decodeJPEGLS.initialize(config.decodeTask);
+      }
+    }
+  });
 }
 
 /**
@@ -26,7 +33,7 @@ function loadCodecs(config) {
 function initialize(config) {
   decodeConfig = config;
 
-  loadCodecs(config);
+  return loadCodecs(config);
 }
 
 /**
@@ -34,39 +41,39 @@ function initialize(config) {
  */
 function handler(data, doneCallback) {
   // Load the codecs if they aren't already loaded
-  loadCodecs(decodeConfig);
+  loadCodecs(decodeConfig).then(() => {
+    const strict =
+      decodeConfig && decodeConfig.decodeTask && decodeConfig.decodeTask.strict;
+    const imageFrame = data.data.imageFrame;
 
-  const strict =
-    decodeConfig && decodeConfig.decodeTask && decodeConfig.decodeTask.strict;
-  const imageFrame = data.data.imageFrame;
+    // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
+    // not typed arrays
+    const pixelData = new Uint8Array(data.data.pixelData);
 
-  // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
-  // not typed arrays
-  const pixelData = new Uint8Array(data.data.pixelData);
+    decodeImageFrame(
+      imageFrame,
+      data.data.transferSyntax,
+      pixelData,
+      decodeConfig.decodeTask,
+      data.data.options
+    ).then(decodedImageFrame => {
+      if (!decodedImageFrame.pixelData) {
+        throw new Error(
+          'decodeTask: imageFrame.pixelData is undefined after decoding'
+        );
+      }
 
-  decodeImageFrame(
-    imageFrame,
-    data.data.transferSyntax,
-    pixelData,
-    decodeConfig.decodeTask,
-    data.data.options
-  );
+      calculateMinMax(decodedImageFrame, strict);
 
-  if (!imageFrame.pixelData) {
-    throw new Error(
-      'decodeTask: imageFrame.pixelData is undefined after decoding'
-    );
-  }
+      // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
+      // typed arrays
+      decodedImageFrame.pixelData = decodedImageFrame.pixelData.buffer;
 
-  calculateMinMax(imageFrame, strict);
-
-  // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
-  // typed arrays
-  imageFrame.pixelData = imageFrame.pixelData.buffer;
-
-  // invoke the callback with our result and pass the pixelData in the transferList to move it to
-  // UI thread without making a copy
-  doneCallback(imageFrame, [imageFrame.pixelData]);
+      // invoke the callback with our result and pass the pixelData in the transferList to move it to
+      // UI thread without making a copy
+      doneCallback(decodedImageFrame, [decodedImageFrame.pixelData]);
+    });
+  });
 }
 
 export default {
