@@ -45,9 +45,7 @@ describe('Test lossy TransferSyntaxes decoding', function() {
       imageCreated(/* image */) {},
       strict: false,
       useWebWorkers: false,
-      decodeConfig: {
-        usePDFJS: false,
-      },
+      decodeConfig: {},
     });
 
     dataSetCacheManager
@@ -121,17 +119,17 @@ describe('Test lossy TransferSyntaxes decoding', function() {
                   );
 
                   if (differenceModality > threshold) {
-                    const message = `difference: ${difference} 
-                        differenceModality: ${differenceModality}, 
+                    const message = `difference: ${difference}
+                        differenceModality: ${differenceModality},
                         curPixelData: ${curPixelData[i]}
                         uncompressedImagePixelData: ${uncompressedImagePixelData[i]}
-                        i: ${i}, 
-                        transferSyntaxName: ${name}, 
+                        i: ${i},
+                        transferSyntaxName: ${name},
                         transferSyntax: ${transferSyntaxUid}
-                        transferSyntaxFromDicom: ${curTransferSyntax}, 
+                        transferSyntaxFromDicom: ${curTransferSyntax},
                         rescaleIntercept: ${rescaleIntercept}
                         rescaleUncompressed: ${rescaleInterceptUncompressed}
-                        curModalityPixelValue: ${modalityPixelValue} 
+                        curModalityPixelValue: ${modalityPixelValue}
                         uncompressedModalityPixelValue: ${uncompressedModalityPixelValue}`;
 
                     differenceModality.should(message).lessThan(threshold);

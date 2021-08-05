@@ -40,7 +40,6 @@ describe('loadImage', function() {
       taskConfiguration: {
         decodeTask: {
           initializeCodecsOnStartup: true,
-          usePDFJS: false,
         },
       },
     };
@@ -50,9 +49,7 @@ describe('loadImage', function() {
     configure({
       strict: false,
       useWebWorkers: false,
-      decodeConfig: {
-        usePDFJS: false,
-      },
+      decodeConfig: {},
     });
   });
 

@@ -149,7 +149,7 @@
         const element = document.getElementById('dicomImage');
         try {
             const start = new Date().getTime();
-            cornerstone.loadAndCacheImage(imageId, {usePDFJS: false}).then(function(image) {
+            cornerstone.loadAndCacheImage(imageId).then(function(image) {
                 console.log(image);
                 loadedImage = image;
                 updateStatistics();

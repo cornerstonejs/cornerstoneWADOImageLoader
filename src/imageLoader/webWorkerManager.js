@@ -21,7 +21,6 @@ const defaultConfig = {
   taskConfiguration: {
     decodeTask: {
       initializeCodecsOnStartup: false,
-      usePDFJS: false,
       strict: options.strict,
     },
   },

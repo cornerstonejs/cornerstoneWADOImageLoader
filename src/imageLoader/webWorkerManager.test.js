@@ -6,7 +6,6 @@ const config = {
   taskConfiguration: {
     decodeTask: {
       initializeCodecsOnStartup: false,
-      usePDFJS: false,
     },
   },
 };

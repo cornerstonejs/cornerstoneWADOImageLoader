@@ -52,9 +52,7 @@ describe('Test lossless TransferSyntaxes decoding', function() {
       imageCreated(/* image */) {},
       strict: false,
       useWebWorkers: false,
-      decodeConfig: {
-        usePDFJS: false,
-      },
+      decodeConfig: {},
     });
 
     dataSetCacheManager

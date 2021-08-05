@@ -8,12 +8,10 @@ try {
     taskConfiguration: {
       decodeTask: {
         initializeCodecsOnStartup: false,
-        usePDFJS: false,
-        strict: true
-      }
-    }
+        strict: true,
+      },
+    },
   });
 } catch (error) {
   throw new Error('cornerstoneWADOImageLoader is not loaded');
 }
-

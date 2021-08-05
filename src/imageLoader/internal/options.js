@@ -11,7 +11,6 @@ let options = {
   useWebWorkers: true,
   decodeConfig: {
     convertFloatPixelDataToInt: true,
-    usePDFJS: false,
   },
 };
 

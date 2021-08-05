@@ -15,7 +15,6 @@ describe('#wadouri > metadataProvider', function() {
     taskConfiguration: {
       decodeTask: {
         initializeCodecsOnStartup: true,
-        usePDFJS: false,
       },
     },
   };
@@ -25,9 +24,7 @@ describe('#wadouri > metadataProvider', function() {
   configure({
     strict: false,
     useWebWorkers: false,
-    decodeConfig: {
-      usePDFJS: false,
-    },
+    decodeConfig: {},
   });
 
   const imageId =

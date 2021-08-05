@@ -31,6 +31,12 @@ module.exports = {
       root: 'dicomParser',
     },
   },
+  resolve: {
+    fallback: {
+      fs: false,
+      path: false,
+    },
+  },
   module: {
     noParse: [/(codecs)/],
     rules: [
@@ -47,7 +53,7 @@ module.exports = {
         test: /\.worker\.js$/,
         use: {
           loader: 'worker-loader',
-          options: { inline: true, fallback: false },
+          options: { inline: 'fallback' },
         },
       },
       {
@@ -64,5 +70,4 @@ module.exports = {
       patterns: [{ from: wasm, to: outputPath }],
     }),
   ],*/
-  node: { fs: 'empty' },
 };
