@@ -2,9 +2,10 @@
 import decodeLittleEndian from './decoders/decodeLittleEndian.js';
 import decodeBigEndian from './decoders/decodeBigEndian.js';
 import decodeRLE from './decoders/decodeRLE.js';
-import decodeJPEGBaseline from './decoders/decodeJPEGBaseline.js';
+import decodeJPEGBaseline8Bit from './decoders/decodeJPEGBaseline8Bit.js';
+import decodeJPEGBaseline16Bit from './decoders/decodeJPEGBaseline16Bit.js';
 import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
-import decodeJPEGLSAsync from './decoders/decodeJPEGLS.js';
+import decodeJPEGLS from './decoders/decodeJPEGLS.js';
 import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
 import scaleArray from './scaling/scaleArray.js';
 
@@ -21,6 +22,7 @@ function decodeImageFrame(
 
   console.log(`Decoding transferSyntax: ${transferSyntax}`);
 
+<<<<<<< HEAD
   switch (transferSyntax) {
     case '1.2.840.10008.1.2':
       // Implicit VR Little Endian

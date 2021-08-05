@@ -1,5 +1,5 @@
 import regeneratorRuntime from 'regenerator-runtime';
-import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo/dist/libjpegturbojs.js';
+import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo-8bit/dist/libjpegturbojs.js';
 
 const local = {
   codec: undefined,
@@ -96,14 +96,14 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
 function getPixelData(frameInfo, decodedBuffer) {
   if (frameInfo.bitsPerSample > 8) {
     if (frameInfo.isSigned) {
-      return new Int16Array(
+      return new Int8Array(
         decodedBuffer.buffer,
         decodedBuffer.byteOffset,
         decodedBuffer.byteLength / 2
       );
     }
 
-    return new Uint16Array(
+    return new Uint8Array(
       decodedBuffer.buffer,
       decodedBuffer.byteOffset,
       decodedBuffer.byteLength / 2

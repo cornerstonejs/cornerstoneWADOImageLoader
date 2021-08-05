@@ -18,7 +18,7 @@ const transferSyntaxes = {
   // '1.2.840.10008.1.2.4.53': 'JPEGProcess6_8TransferSyntax',
   // '1.2.840.10008.1.2.4.55': 'JPEGProcess10_12TransferSyntax',
 
-  '1.2.840.10008.1.2.4.51': 'JPEGProcess2_4TransferSyntax',
+  //'1.2.840.10008.1.2.4.51': 'JPEGProcess2_4TransferSyntax', // currently broken due to libjpeg-turbo naming
   '1.2.840.10008.1.2.4.57': 'JPEGProcess14TransferSyntax',
   '1.2.840.10008.1.2.4.70': 'JPEGProcess14SV1TransferSyntax',
   '1.2.840.10008.1.2.4.80': 'JPEGLSLosslessTransferSyntax',

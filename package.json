@@ -95,9 +95,10 @@
     "worker-loader": "^2.0.0"
   },
   "dependencies": {
-    "@cornerstonejs/codec-charls": "^0.0.4",
-    "@cornerstonejs/codec-libjpeg-turbo": "0.0.4",
-    "@cornerstonejs/codec-openjpeg": "0.0.4",
+    "@cornerstonejs/codec-charls": "^0.0.5",
+    "@cornerstonejs/codec-libjpeg-turbo-8bit": "^0.0.6",
+    "@cornerstonejs/codec-libjpeg-turbo-16bit": "^0.0.6",
+    "@cornerstonejs/codec-openjpeg": "^0.0.5",
     "dicom-parser": "^1.8.3",
     "pako": "^1.0.10"
   },

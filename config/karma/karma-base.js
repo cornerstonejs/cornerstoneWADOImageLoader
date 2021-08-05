@@ -17,8 +17,8 @@ webpackConfig.module.rules.push({
   include: path.resolve('./src/'),
   loader: 'istanbul-instrumenter-loader',
   query: {
-    esModules: true
-  }
+    esModules: true,
+  },
 });
 
 module.exports = {
@@ -30,16 +30,49 @@ module.exports = {
     'node_modules/dicom-parser/dist/dicomParser.js',
     'test/**/*_test.js',
     // http://localhost:[PORT]/base/test/[MY FILE].wasm
-    {pattern: 'test/*.wasm', watched: false, included: false, served: true, nocache: false},
-    {pattern: 'testImages/*', included: false},
-    {pattern: 'dist/*', included: false},
+    {
+      pattern: 'node_modules/@cornerstonejs/codec-charls/dist/*',
+      watched: false,
+      included: false,
+      served: true,
+      nocache: false,
+    },
+    {
+      pattern: 'node_modules/@cornerstonejs/codec-openjpeg/dist/*',
+      watched: false,
+      included: false,
+      served: true,
+      nocache: false,
+    },
+    {
+      pattern: 'node_modules/@cornerstonejs/codec-libjpeg-turbo-8bit/dist/*',
+      watched: false,
+      included: false,
+      served: true,
+      nocache: false,
+    },
+    {
+      pattern: 'node_modules/@cornerstonejs/codec-libjpeg-turbo-16bit/dist/*',
+      watched: false,
+      included: false,
+      served: true,
+      nocache: false,
+    },
+    { pattern: 'testImages/*', included: false },
+    { pattern: 'dist/*', included: false },
   ],
   mime: {
-    'application/wasm': ['wasm']
+    'application/wasm': ['wasm'],
   },
   proxies: {
-    "/base/test/charljs.wasm": "https://unpkg.com/@cornerstonejs/codec-charls@0.0.4/dist/charlsjs.wasm",
-    "/base/test/imageLoader/wadouri/": "/base/test/"
+    '/base/test/charlswasm.wasm':
+      '/base/node_modules/@cornerstonejs/codec-charls/dist/charlswasm.wasm',
+    '/base/test/openjpegwasm.wasm':
+      '/base/node_modules/@cornerstonejs/codec-openjpeg/dist/openjpegwasm.wasm',
+    // TODO: what about 16? do we need unique names here?
+    'base/test/libjpegturbojs.js.mem':
+      '/base/node_modules/@cornerstonejs/codec-libjpeg-turbo-8bit/dist/libjpegturbojs.js.mem',
+    '/base/test/imageLoader/wadouri/': '/base/test/',
   },
 
   plugins: [
@@ -48,12 +81,12 @@ module.exports = {
     'karma-chrome-launcher',
     'karma-firefox-launcher',
     'karma-coverage',
-    'karma-spec-reporter'
+    'karma-spec-reporter',
   ],
 
   preprocessors: {
     'src/**/*.js': ['webpack'],
-    'test/**/*_test.js': ['webpack']
+    'test/**/*_test.js': ['webpack'],
   },
 
   webpack: webpackConfig,
@@ -63,8 +96,8 @@ module.exports = {
     stats: {
       chunks: false,
       timings: false,
-      errorDetails: true
-    }
+      errorDetails: true,
+    },
   },
 
   coverageReporter: {
@@ -73,8 +106,8 @@ module.exports = {
       { type: 'html', subdir: 'html' },
       { type: 'lcov', subdir: '.' },
       { type: 'text', subdir: '.', file: 'text.txt' },
-      { type: 'text-summary', subdir: '.', file: 'text-summary.txt' }
-    ]
+      { type: 'text-summary', subdir: '.', file: 'text-summary.txt' },
+    ],
   },
 
   client: {
@@ -84,6 +117,6 @@ module.exports = {
   browserConsoleLogOptions: {
     level: 'log',
     format: '%b %T: %m',
-    terminal: true
-  }
+    terminal: true,
+  },
 };
