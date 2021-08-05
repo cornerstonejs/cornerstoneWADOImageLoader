@@ -9,9 +9,7 @@ const local = {
 
 async function initCharls() {
   if (local.codec) {
-    return new Promise(resolve => {
-      resolve();
-    });
+    return Promise.resolve();
   }
 
   const charlsModule = charlsFactory();
@@ -21,22 +19,21 @@ async function initCharls() {
     console.log(evt);
   };
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     charlsModule.then(instance => {
       local.codec = instance;
       local.decoder = new instance.JpegLSDecoder();
       local.encoder = new instance.JpegLSEncoder();
       resolve();
-    });
+    }, reject);
   });
 }
 
-// imageFrame.pixelRepresentation === 1 <-- Signed
 /**
  *
  * @param {*} compressedImageFrame
  * @param {object}  imageInfo
- * @param {boolean} imageInfo.signed -
+ * @param {boolean} imageInfo.signed - (pixelRepresentation === 1)
  */
 async function decodeAsync(compressedImageFrame, imageInfo) {
   await initCharls();

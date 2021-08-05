@@ -134,9 +134,9 @@ function decodeImageFrame(
       .catch(err => {
         console.warn('~~ ERR');
         console.warn(err);
-    });
+      });
   } else {
-    callbackFn(doStuff(imageFrame, options, start))
+    callbackFn(doStuff(imageFrame, options, start));
   }
 }
 

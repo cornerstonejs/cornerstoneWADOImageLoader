@@ -9,9 +9,7 @@ const local = {
 
 async function initLibjpegTurbo() {
   if (local.codec) {
-    return new Promise(resolve => {
-      resolve();
-    });
+    return Promise.resolve();
   }
 
   const libjpegTurboModule = libjpegTurboFactory();
@@ -21,13 +19,13 @@ async function initLibjpegTurbo() {
     console.log(evt);
   };
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     libjpegTurboModule.then(instance => {
       local.codec = instance;
       local.decoder = new instance.JPEGDecoder();
       local.encoder = new instance.JPEGEncoder();
       resolve();
-    });
+    }, reject);
   });
 }
 
@@ -77,10 +75,7 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
   // Do not use either after calling delete!
   // decoder.delete();
 
-  const pixelData = getPixelData(
-    frameInfo,
-    decodedPixelsInWASM,
-  );
+  const pixelData = getPixelData(frameInfo, decodedPixelsInWASM);
   const encodeOptions = {
     frameInfo,
   };

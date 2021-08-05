@@ -37,8 +37,7 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
 
         decodeImageFrameHandler(...decodeArguments);
       } catch (error) {
-        console.log(error);
-        console.warn(error);
+        console.error(error);
         reject(error);
       }
     });

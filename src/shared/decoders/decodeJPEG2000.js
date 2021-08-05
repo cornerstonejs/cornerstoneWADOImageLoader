@@ -9,9 +9,7 @@ const local = {
 
 async function initOpenJpeg() {
   if (local.codec) {
-    return new Promise(resolve => {
-      resolve();
-    });
+    return Promise.resolve();
   }
 
   const openJpegModule = openJpegFactory();
@@ -21,13 +19,13 @@ async function initOpenJpeg() {
     console.log(evt);
   };
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     openJpegModule.then(instance => {
       local.codec = instance;
       local.decoder = new instance.J2KDecoder();
       local.encoder = new instance.J2KEncoder();
       resolve();
-    });
+    }, reject);
   });
 }
 
@@ -58,14 +56,24 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
 
   imageFrame.set(decodedBufferInWASM);
 
-  const imageOffset = `x: ${decoder.getImageOffset().x}, y: ${decoder.getImageOffset().y}`;
+  const imageOffset = `x: ${decoder.getImageOffset().x}, y: ${
+    decoder.getImageOffset().y
+  }`;
   const numDecompositions = decoder.getNumDecompositions();
   const numLayers = decoder.getNumLayers();
-  const progessionOrder = ['unknown', 'LRCP', 'RLCP', 'RPCL', 'PCRL', 'CPRL'][decoder.getProgressionOrder()+1];
+  const progessionOrder = ['unknown', 'LRCP', 'RLCP', 'RPCL', 'PCRL', 'CPRL'][
+    decoder.getProgressionOrder() + 1
+  ];
   const reversible = decoder.getIsReversible();
-  const blockDimensions = `${decoder.getBlockDimensions().width} x ${decoder.getBlockDimensions().height}`;
-  const tileSize = `${decoder.getTileSize().width} x ${decoder.getTileSize().height}`;
-  const tileOffset = `${decoder.getTileOffset().x}, ${decoder.getTileOffset().y}`;
+  const blockDimensions = `${decoder.getBlockDimensions().width} x ${
+    decoder.getBlockDimensions().height
+  }`;
+  const tileSize = `${decoder.getTileSize().width} x ${
+    decoder.getTileSize().height
+  }`;
+  const tileOffset = `${decoder.getTileOffset().x}, ${
+    decoder.getTileOffset().y
+  }`;
   const colorTransform = decoder.getColorSpace();
 
   // ~~ Not part of this codec's API?
