@@ -1,4 +1,3 @@
-// import regeneratorRuntime from 'regenerator-runtime';
 import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo-8bit/dist/libjpegturbojs.js';
 
 // Webpack asset/resource copies this to our output folder

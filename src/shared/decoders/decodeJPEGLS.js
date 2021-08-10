@@ -1,4 +1,3 @@
-// import regeneratorRuntime from 'regenerator-runtime';
 import charlsFactory from '@cornerstonejs/codec-charls/dist/charlswasm.js';
 
 // Webpack asset/resource copies this to our output folder
