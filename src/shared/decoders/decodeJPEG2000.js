@@ -1,6 +1,9 @@
 // https://emscripten.org/docs/api_reference/module.html
 import openJpegFactory from '@cornerstonejs/codec-openjpeg/dist/openjpegwasm.js';
 
+// Webpack asset/resource copies this to our output folder
+import openjpegWasm from '@cornerstonejs/codec-openjpeg/dist/openjpegwasm.wasm';
+
 const local = {
   codec: undefined,
   decoder: undefined,
@@ -12,7 +15,15 @@ async function initOpenJpeg() {
     return Promise.resolve();
   }
 
-  const openJpegModule = openJpegFactory();
+  const openJpegModule = openJpegFactory({
+    locateFile: f => {
+      if (f.endsWith('.wasm')) {
+        return openjpegWasm;
+      }
+
+      return f;
+    },
+  });
 
   openJpegModule.onRuntimeInitialized = evt => {
     console.log('runtime initialized...');

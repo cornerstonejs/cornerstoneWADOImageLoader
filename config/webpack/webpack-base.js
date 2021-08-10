@@ -3,21 +3,9 @@ const webpack = require('webpack');
 const rootPath = process.cwd();
 const context = path.join(rootPath, 'src');
 const outputPath = path.join(rootPath, 'examples', 'dist');
-const CopyPlugin = require('copy-webpack-plugin');
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin;
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-
-const charLSWasm = path.join(
-  rootPath,
-  'node_modules',
-  '@cornerstonejs/codec-charls',
-  'dist',
-  '*.wasm'
-);
-
-console.log(path.resolve(charLSWasm));
 
 module.exports = {
   mode: 'development',
@@ -36,7 +24,6 @@ module.exports = {
     libraryTarget: 'umd',
     globalObject: 'this',
     path: outputPath,
-    //publicPath: outputPath,
   },
   devtool: 'source-map',
   externals: {
@@ -70,6 +57,13 @@ module.exports = {
         type: 'asset/resource',
       },
       {
+        test: /\.worker\.js$/,
+        use: {
+          loader: 'worker-loader',
+          options: { inline: 'no-fallback' },
+        },
+      },
+      {
         test: /\.js$/,
         exclude: [/(node_modules)/, /(codecs)/],
         use: {
@@ -79,12 +73,8 @@ module.exports = {
     ],
   },
   plugins: [
-    //new CleanWebpackPlugin(),
     new webpack.ProgressPlugin(),
     //new BundleAnalyzerPlugin(),
-    /*new CopyPlugin({
-      patterns: [{ from: charLSWasm, to: outputPath }],
-    }),*/
   ],
   /*optimization: {
     splitChunks: {

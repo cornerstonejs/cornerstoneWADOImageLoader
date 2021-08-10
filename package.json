@@ -34,7 +34,7 @@
     "start:dev": "webpack-dev-server --config ./config/webpack/webpack-dev",
     "test": "npm run test:chrome",
     "test:all": "npm run test && npm run test:chrome && npm run test:firefox",
-    "test:chrome": "karma start config/karma/karma-chrome.js",
+    "test:chrome": "karma start config/karma/karma-base.js",
     "test:firefox": "karma start config/karma/karma-firefox.js",
     "test:watch": "karma start config/karma/karma-watch.js",
     "version": "node -p -e \"'export default \\'' + require('./package.json').version + '\\';'\" > src/version.js",
@@ -48,6 +48,7 @@
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.14.7",
+    "@babel/plugin-transform-runtime": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "@webpack-cli/serve": "^1.5.1",
     "babel-eslint": "^10.1.0",
@@ -94,9 +95,11 @@
     "worker-loader": "^3.0.8"
   },
   "dependencies": {
+    "@babel/runtime": "^7.14.8",
+    "@babel/runtime-corejs3": "^7.14.9",
     "@cornerstonejs/codec-charls": "^0.0.5",
-    "@cornerstonejs/codec-libjpeg-turbo-8bit": "^0.0.6",
     "@cornerstonejs/codec-libjpeg-turbo-16bit": "^0.0.6",
+    "@cornerstonejs/codec-libjpeg-turbo-8bit": "^0.0.6",
     "@cornerstonejs/codec-openjpeg": "^0.0.5",
     "dicom-parser": "^1.8.7",
     "pako": "^1.0.10"

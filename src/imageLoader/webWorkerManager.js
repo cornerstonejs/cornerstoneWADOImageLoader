@@ -1,6 +1,4 @@
-const cornerstoneWADOImageLoaderWebWorker = new Worker(
-  new URL('../webWorker/index.worker.js', import.meta.url)
-);
+import cornerstoneWADOImageLoaderWebWorker from '../webWorker/index.worker.js';
 
 import { getOptions } from './internal/options.js';
 

@@ -1,5 +1,6 @@
 const path = require('path');
 const webpackConfig = require('../webpack');
+const os = require('os');
 
 /* eslint no-process-env:0 */
 process.env.CHROME_BIN = require('puppeteer').executablePath();
@@ -23,102 +24,102 @@ webpackConfig.module.rules.push({
   },
 });
 
-module.exports = {
-  basePath: '../../',
-  frameworks: ['mocha', 'webpack'],
-  reporters: ['progress', 'coverage', 'spec'],
-  files: [
-    'node_modules/cornerstone-core/dist/cornerstone.js',
-    'node_modules/dicom-parser/dist/dicomParser.js',
-    'test/**/*_test.js',
-    // http://localhost:[PORT]/base/test/[MY FILE].wasm
-    {
-      pattern: 'node_modules/@cornerstonejs/codec-charls/dist/*',
-      watched: false,
-      included: false,
-      served: true,
-      nocache: false,
-    },
-    {
-      pattern: 'node_modules/@cornerstonejs/codec-openjpeg/dist/*',
-      watched: false,
-      included: false,
-      served: true,
-      nocache: false,
-    },
-    {
-      pattern: 'node_modules/@cornerstonejs/codec-libjpeg-turbo-8bit/dist/*',
-      watched: false,
-      included: false,
-      served: true,
-      nocache: false,
-    },
-    {
-      pattern: 'node_modules/@cornerstonejs/codec-libjpeg-turbo-16bit/dist/*',
-      watched: false,
-      included: false,
-      served: true,
-      nocache: false,
-    },
-    { pattern: 'testImages/*', included: false },
-    { pattern: 'dist/*', included: false },
-  ],
-  mime: {
-    'application/wasm': ['wasm'],
-  },
-  proxies: {
-    '/charlswasm.wasm':
-      '/base/node_modules/@cornerstonejs/codec-charls/dist/charlswasm.wasm',
-    '/openjpegwasm.wasm':
-      '/base/node_modules/@cornerstonejs/codec-openjpeg/dist/openjpegwasm.wasm',
-    // TODO: what about 16? do we need unique names here?
-    '/libjpegturbojs.js.mem':
-      '/base/node_modules/@cornerstonejs/codec-libjpeg-turbo-8bit/dist/libjpegturbojs.js.mem',
-    '/base/test/imageLoader/wadouri/': '/base/test/',
-  },
+// https://github.com/ryanclark/karma-webpack/issues/498
+const output = {
+  path:
+    path.join(os.tmpdir(), '_karma_webpack_') +
+    Math.floor(Math.random() * 1000000),
+};
 
-  plugins: [
-    'karma-webpack',
-    'karma-mocha',
-    'karma-chrome-launcher',
-    'karma-firefox-launcher',
-    'karma-coverage',
-    'karma-spec-reporter',
-  ],
-
-  preprocessors: {
-    'src/**/*.js': ['webpack'],
-    'test/**/*_test.js': ['webpack'],
-  },
-
-  webpack: webpackConfig,
-
-  webpackMiddleware: {
-    noInfo: false,
-    stats: {
-      chunks: false,
-      timings: false,
-      errorDetails: true,
-    },
-  },
-
-  coverageReporter: {
-    dir: './coverage',
-    reporters: [
-      { type: 'html', subdir: 'html' },
-      { type: 'lcov', subdir: '.' },
-      { type: 'text', subdir: '.', file: 'text.txt' },
-      { type: 'text-summary', subdir: '.', file: 'text-summary.txt' },
+module.exports = function(config) {
+  config.set({
+    basePath: '../../',
+    frameworks: ['mocha', 'webpack'],
+    reporters: ['progress', 'coverage', 'spec'],
+    files: [
+      'node_modules/cornerstone-core/dist/cornerstone.js',
+      {
+        pattern: 'node_modules/cornerstone-core/dist/cornerstone.js.map',
+        included: false,
+      },
+      'node_modules/dicom-parser/dist/dicomParser.js',
+      {
+        pattern: 'node_modules/dicom-parser/dist/dicomParser.js.map',
+        included: false,
+      },
+      'test/**/*_test.js',
+      {
+        pattern: `${output.path}/**/*`,
+        watched: false,
+        included: false,
+      },
+      // http://localhost:[PORT]/base/test/[MY FILE].wasm
+      { pattern: 'testImages/*', included: false },
+      { pattern: 'dist/*', included: false },
     ],
-  },
+    mime: {
+      'application/wasm': ['wasm'],
+    },
+    proxies: {
+      '/base/test/imageLoader/wadouri/': '/base/test/',
+    },
 
-  client: {
-    captureConsole: true,
-  },
+    plugins: [
+      'karma-webpack',
+      'karma-mocha',
+      'karma-chrome-launcher',
+      'karma-firefox-launcher',
+      'karma-coverage',
+      'karma-spec-reporter',
+    ],
 
-  browserConsoleLogOptions: {
-    level: 'log',
-    format: '%b %T: %m',
-    terminal: true,
-  },
+    preprocessors: {
+      'src/**/*.js': ['webpack'],
+      'test/**/*_test.js': ['webpack'],
+    },
+
+    webpack: { ...webpackConfig, output },
+
+    webpackMiddleware: {
+      noInfo: false,
+      stats: {
+        chunks: false,
+        timings: false,
+        errorDetails: true,
+      },
+    },
+
+    coverageReporter: {
+      dir: './coverage',
+      reporters: [
+        { type: 'html', subdir: 'html' },
+        { type: 'lcov', subdir: '.' },
+        { type: 'text', subdir: '.', file: 'text.txt' },
+        { type: 'text-summary', subdir: '.', file: 'text-summary.txt' },
+      ],
+    },
+
+    client: {
+      captureConsole: true,
+    },
+
+    browserConsoleLogOptions: {
+      level: 'log',
+      format: '%b %T: %m',
+      terminal: true,
+    },
+
+    /// FROM KARMA-CHROME
+    singleRun: false,
+    browsers: ['Chrome'],
+    // singleRun: true,
+    // browsers: ['ChromeHeadlessNoSandbox'],
+    reporters: ['spec'],
+    // customLaunchers: {
+    //   ChromeHeadlessNoSandbox: {
+    //     base: 'ChromeHeadless',
+    //     flags: ['--no-sandbox']
+    //   }
+    // }
+  });
 };

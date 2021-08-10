@@ -1,5 +1,8 @@
-import regeneratorRuntime from 'regenerator-runtime';
+// import regeneratorRuntime from 'regenerator-runtime';
 import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo-8bit/dist/libjpegturbojs.js';
+
+// Webpack asset/resource copies this to our output folder
+import libjpegTurboWasm from '@cornerstonejs/codec-libjpeg-turbo-8bit/dist/libjpegturbowasm.wasm';
 
 const local = {
   codec: undefined,
@@ -12,7 +15,15 @@ async function initLibjpegTurbo() {
     return Promise.resolve();
   }
 
-  const libjpegTurboModule = libjpegTurboFactory();
+  const libjpegTurboModule = libjpegTurboFactory({
+    locateFile: f => {
+      if (f.endsWith('.wasm')) {
+        return libjpegTurboWasm;
+      }
+
+      return f;
+    },
+  });
 
   libjpegTurboModule.onRuntimeInitialized = evt => {
     console.log('runtime initialized...');

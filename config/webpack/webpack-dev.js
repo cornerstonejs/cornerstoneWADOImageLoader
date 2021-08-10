@@ -18,7 +18,6 @@ const devConfig = {
     // Static content
     static: path.resolve(path.join(__dirname, './../../examples')),
     port: 3000,
-    //historyApiFallback: true,
     headers: {
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Opener-Policy': 'same-origin',
