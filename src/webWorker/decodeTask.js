@@ -1,7 +1,7 @@
 // import { initializeJPEG2000 } from '../../shared/decoders/decodeJPEG2000.js';
 // import { initializeJPEGLS } from '../../shared/decoders/decodeJPEGLS.js';
-import calculateMinMax from '../../shared/calculateMinMax.js';
-import decodeImageFrame from '../../shared/decodeImageFrame.js';
+import calculateMinMax from '../shared/calculateMinMax.js';
+import decodeImageFrame from '../shared/decodeImageFrame.js';
 
 // the configuration object for the decodeTask
 let decodeConfig;

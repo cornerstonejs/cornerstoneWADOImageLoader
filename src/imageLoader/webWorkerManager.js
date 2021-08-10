@@ -1,4 +1,6 @@
-import cornerstoneWADOImageLoaderWebWorker from '../webWorker/index.worker.js';
+const cornerstoneWADOImageLoaderWebWorker = new Worker(
+  new URL('../webWorker/index.worker.js', import.meta.url)
+);
 
 import { getOptions } from './internal/options.js';
 
@@ -149,7 +151,7 @@ function initialize(configObject) {
 
   // prevent being initialized more than once
   if (config) {
-    throw new Error('WebWorkerManager already initialized');
+    // throw new Error('WebWorkerManager already initialized');
   }
 
   config = configObject;

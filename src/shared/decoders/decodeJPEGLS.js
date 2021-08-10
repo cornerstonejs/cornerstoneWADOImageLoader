@@ -1,6 +1,9 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import charlsFactory from '@cornerstonejs/codec-charls/dist/charlswasm.js';
 
+// Webpack asset/resource copies this to our output folder
+import charlsWasm from '@cornerstonejs/codec-charls/dist/charlswasm.wasm';
+
 const local = {
   codec: undefined,
   decoder: undefined,
@@ -12,7 +15,15 @@ async function initCharls() {
     return Promise.resolve();
   }
 
-  const charlsModule = charlsFactory();
+  const charlsModule = charlsFactory({
+    locateFile: f => {
+      if (f.endsWith('.wasm')) {
+        return charlsWasm;
+      }
+
+      return f;
+    },
+  });
 
   charlsModule.onRuntimeInitialized = evt => {
     console.log('runtime initialized...');

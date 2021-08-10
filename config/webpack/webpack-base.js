@@ -1,10 +1,23 @@
 const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 const rootPath = process.cwd();
 const context = path.join(rootPath, 'src');
-const wasm = path.join(rootPath, 'wasm');
-const codecs = path.join(rootPath, 'codecs');
 const outputPath = path.join(rootPath, 'examples', 'dist');
+const CopyPlugin = require('copy-webpack-plugin');
+
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin;
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+const charLSWasm = path.join(
+  rootPath,
+  'node_modules',
+  '@cornerstonejs/codec-charls',
+  'dist',
+  '*.wasm'
+);
+
+console.log(path.resolve(charLSWasm));
 
 module.exports = {
   mode: 'development',
@@ -15,12 +28,15 @@ module.exports = {
   },
   target: 'web',
   output: {
-    filename: '[name].js',
-    library: '[name]',
+    library: {
+      name: '[name]',
+      type: 'umd',
+      umdNamedDefine: true,
+    },
     libraryTarget: 'umd',
     globalObject: 'this',
     path: outputPath,
-    umdNamedDefine: true,
+    //publicPath: outputPath,
   },
   devtool: 'source-map',
   externals: {
@@ -50,11 +66,8 @@ module.exports = {
       //   },
       // },
       {
-        test: /\.worker\.js$/,
-        use: {
-          loader: 'worker-loader',
-          options: { inline: 'fallback' },
-        },
+        test: /\.wasm/,
+        type: 'asset/resource',
       },
       {
         test: /\.js$/,
@@ -65,9 +78,19 @@ module.exports = {
       },
     ],
   },
-  /*plugins: [
-    new CopyPlugin({
-      patterns: [{ from: wasm, to: outputPath }],
-    }),
-  ],*/
+  plugins: [
+    //new CleanWebpackPlugin(),
+    new webpack.ProgressPlugin(),
+    //new BundleAnalyzerPlugin(),
+    /*new CopyPlugin({
+      patterns: [{ from: charLSWasm, to: outputPath }],
+    }),*/
+  ],
+  /*optimization: {
+    splitChunks: {
+      // include all types of chunks
+      chunks: 'all',
+    },
+  },*/
+  //experiments: { asyncWebAssembly: true },
 };

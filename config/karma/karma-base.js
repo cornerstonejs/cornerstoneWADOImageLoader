@@ -6,7 +6,9 @@ process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 // Deleting output.library to avoid "Uncaught SyntaxError: Unexpected token /" error
 // when running testes (var test/foo_test.js = ...)
-delete webpackConfig.output.library;
+delete webpackConfig.output;
+
+delete webpackConfig.devMiddleware;
 
 // Karma will build the dependecy tree by itself
 delete webpackConfig.entry;
@@ -16,14 +18,14 @@ webpackConfig.module.rules.push({
   test: /\.js$/,
   include: path.resolve('./src/'),
   loader: 'istanbul-instrumenter-loader',
-  query: {
+  options: {
     esModules: true,
   },
 });
 
 module.exports = {
   basePath: '../../',
-  frameworks: ['mocha'],
+  frameworks: ['mocha', 'webpack'],
   reporters: ['progress', 'coverage', 'spec'],
   files: [
     'node_modules/cornerstone-core/dist/cornerstone.js',
@@ -65,12 +67,12 @@ module.exports = {
     'application/wasm': ['wasm'],
   },
   proxies: {
-    '/base/test/charlswasm.wasm':
+    '/charlswasm.wasm':
       '/base/node_modules/@cornerstonejs/codec-charls/dist/charlswasm.wasm',
-    '/base/test/openjpegwasm.wasm':
+    '/openjpegwasm.wasm':
       '/base/node_modules/@cornerstonejs/codec-openjpeg/dist/openjpegwasm.wasm',
     // TODO: what about 16? do we need unique names here?
-    'base/test/libjpegturbojs.js.mem':
+    '/libjpegturbojs.js.mem':
       '/base/node_modules/@cornerstonejs/codec-libjpeg-turbo-8bit/dist/libjpegturbojs.js.mem',
     '/base/test/imageLoader/wadouri/': '/base/test/',
   },

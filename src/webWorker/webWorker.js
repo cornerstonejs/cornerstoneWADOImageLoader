@@ -81,6 +81,19 @@ function loadWebWorkerTask(data) {
  * @param msg
  */
 self.onmessage = function(msg) {
+  if (
+    msg.data.type &&
+    (msg.data.type === 'webpackOk' || msg.data.type === 'webpackClose')
+  ) {
+    console.log('handling webpack dev server message...');
+    return;
+  }
+
+  if (!msg.data.taskType) {
+    console.log(msg.data);
+    return;
+  }
+
   // console.log('web worker onmessage', msg.data);
 
   // handle initialize message
@@ -130,6 +143,7 @@ self.onmessage = function(msg) {
   // not task handler registered - send a failure message back to ui thread
   console.log('no task handler for ', msg.data.taskType);
   console.log(taskHandlers);
+
   self.postMessage({
     taskType: msg.data.taskType,
     status: 'failed - no task handler registered',
