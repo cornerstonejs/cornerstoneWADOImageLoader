@@ -19,11 +19,15 @@ module.exports = {
     library: {
       name: '[name]',
       type: 'umd',
+      //type: 'module',
       umdNamedDefine: true,
     },
     libraryTarget: 'umd',
+    //libraryTarget: 'module',
     globalObject: 'this',
     path: outputPath,
+    //chunkFormat: 'module',
+    clean: true,
   },
   devtool: 'source-map',
   externals: {
@@ -73,12 +77,14 @@ module.exports = {
     ],
   },
   plugins: [new webpack.ProgressPlugin()], //, new BundleAnalyzerPlugin()],
-  /*optimization: {
-    splitChunks: {
+  optimization: {
+    /*splitChunks: {
       // include all types of chunks
       chunks: 'all',
     },
-    runtimeChunk: 'single',
-  },*/
+    runtimeChunk: 'single',*/
+    //concatenateModules: false,
+  },
+  //experiments: { outputModule: true },
   //experiments: { asyncWebAssembly: true },
 };

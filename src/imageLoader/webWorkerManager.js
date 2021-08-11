@@ -1,5 +1,11 @@
 import cornerstoneWADOImageLoaderWebWorker from 'worker-loader!../webWorker/index.js';
 
+// https://github.com/webpack/webpack/issues/13899
+
+/*const cornerstoneWADOImageLoaderWebWorker = new Worker(
+  new URL('../webWorker/index.js', import.meta.url)
+);*/
+
 import { getOptions } from './internal/options.js';
 
 // the taskId to assign to the next task added via addTask()
