@@ -1,4 +1,4 @@
-import cornerstoneWADOImageLoaderWebWorker from '../webWorker/index.worker.js';
+import cornerstoneWADOImageLoaderWebWorker from 'worker-loader!../webWorker/index.js';
 
 import { getOptions } from './internal/options.js';
 

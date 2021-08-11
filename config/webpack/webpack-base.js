@@ -12,7 +12,7 @@ module.exports = {
   context,
   entry: {
     cornerstoneWADOImageLoader: './imageLoader/index.js',
-    cornerstoneWADOImageLoaderWebWorker: './webWorker/index.worker.js',
+    //cornerstoneWADOImageLoaderWebWorker: './webWorker/index.js',
   },
   target: 'web',
   output: {
@@ -72,15 +72,13 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    new webpack.ProgressPlugin(),
-    //new BundleAnalyzerPlugin(),
-  ],
+  plugins: [new webpack.ProgressPlugin(), new BundleAnalyzerPlugin()],
   /*optimization: {
     splitChunks: {
       // include all types of chunks
       chunks: 'all',
     },
+    runtimeChunk: 'single',
   },*/
   //experiments: { asyncWebAssembly: true },
 };
