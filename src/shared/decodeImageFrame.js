@@ -22,7 +22,8 @@ function decodeImageFrame(
 
   console.log(`Decoding transferSyntax: ${transferSyntax}`);
 
-<<<<<<< HEAD
+  let opts;
+
   switch (transferSyntax) {
     case '1.2.840.10008.1.2':
       // Implicit VR Little Endian
@@ -46,19 +47,19 @@ function decodeImageFrame(
       break;
     case '1.2.840.10008.1.2.4.50':
       // JPEG Baseline lossy process 1 (8 bit)
-      const opts = {
+      opts = {
         ...imageFrame,
       };
 
-      imageFrame = decodeJPEGBaseline(pixelData, opts);
+      decodePromise = decodeJPEGBaseline8Bit(pixelData, opts);
       break;
     case '1.2.840.10008.1.2.4.51':
       // JPEG Baseline lossy process 2 & 4 (12 bit)
-      const opts = {
+      opts = {
         ...imageFrame,
       };
 
-      imageFrame = decodeJPEGBaseline(pixelData, opts);
+      decodePromise = decodeJPEGBaseline16Bit(pixelData, opts);
       break;
     case '1.2.840.10008.1.2.4.57':
       // JPEG Lossless, Nonhierarchical (Processes 14)
@@ -70,7 +71,7 @@ function decodeImageFrame(
       break;
     case '1.2.840.10008.1.2.4.80':
       // JPEG-LS Lossless Image Compression
-      const opts = {
+      opts = {
         signed: imageFrame.pixelRepresentation === 1, // imageFrame.signed,
         // shouldn't need...
         bytesPerPixel: imageFrame.bitsAllocated <= 8 ? 1 : 2,
@@ -81,7 +82,7 @@ function decodeImageFrame(
       break;
     case '1.2.840.10008.1.2.4.81':
       // JPEG-LS Lossy (Near-Lossless) Image Compression
-      const opts = {
+      opts = {
         signed: false, // imageFrame.signed,
         // shouldn't need...
         bytesPerPixel: imageFrame.bitsAllocated <= 8 ? 1 : 2,
@@ -91,7 +92,7 @@ function decodeImageFrame(
       decodePromise = decodeJPEGLS(pixelData, opts);
       break;
     case '1.2.840.10008.1.2.4.90':
-      const opts = {
+      opts = {
         ...imageFrame,
       };
 
@@ -101,7 +102,7 @@ function decodeImageFrame(
       break;
     case '1.2.840.10008.1.2.4.91':
       // JPEG 2000 Lossy
-      const opts = {
+      opts = {
         ...imageFrame,
       };
 

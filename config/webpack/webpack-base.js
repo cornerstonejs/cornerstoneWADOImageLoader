@@ -72,7 +72,7 @@ module.exports = {
       },
     ],
   },
-  plugins: [new webpack.ProgressPlugin(), new BundleAnalyzerPlugin()],
+  plugins: [new webpack.ProgressPlugin()], //, new BundleAnalyzerPlugin()],
   /*optimization: {
     splitChunks: {
       // include all types of chunks
