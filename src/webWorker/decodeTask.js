@@ -34,6 +34,7 @@ function initialize(config) {
  */
 function handler(data, doneCallback) {
   // Load the codecs if they aren't already loaded
+  console.debug('loadCodecs');
   loadCodecs(decodeConfig);
 
   const strict =
@@ -44,29 +45,34 @@ function handler(data, doneCallback) {
   // not typed arrays
   const pixelData = new Uint8Array(data.data.pixelData);
 
+  // TODO switch to promise
+  const finishedCallback = () => {
+    if (!imageFrame.pixelData) {
+      throw new Error(
+        'decodeTask: imageFrame.pixelData is undefined after decoding'
+      );
+    }
+
+    calculateMinMax(imageFrame, strict);
+
+    // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
+    // typed arrays
+    imageFrame.pixelData = imageFrame.pixelData.buffer;
+
+    // invoke the callback with our result and pass the pixelData in the transferList to move it to
+    // UI thread without making a copy
+    doneCallback(imageFrame, [imageFrame.pixelData]);
+  };
+
+  console.debug('decodeImageFrame');
   decodeImageFrame(
     imageFrame,
     data.data.transferSyntax,
     pixelData,
     decodeConfig.decodeTask,
-    data.data.options
+    data.data.options,
+    finishedCallback
   );
-
-  if (!imageFrame.pixelData) {
-    throw new Error(
-      'decodeTask: imageFrame.pixelData is undefined after decoding'
-    );
-  }
-
-  calculateMinMax(imageFrame, strict);
-
-  // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
-  // typed arrays
-  imageFrame.pixelData = imageFrame.pixelData.buffer;
-
-  // invoke the callback with our result and pass the pixelData in the transferList to move it to
-  // UI thread without making a copy
-  doneCallback(imageFrame, [imageFrame.pixelData]);
 }
 
 export default {

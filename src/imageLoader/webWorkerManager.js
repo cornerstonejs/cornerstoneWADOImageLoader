@@ -1,9 +1,11 @@
 import cornerstoneWADOImageLoaderWebWorker from 'worker-loader!../webWorker/index.js';
 
+// This is for the Webpack 5 approch but it's currently broken
+// so we will continue relying on worker-loader for now
 // https://github.com/webpack/webpack/issues/13899
-
-/*const cornerstoneWADOImageLoaderWebWorker = new Worker(
-  new URL('../webWorker/index.js', import.meta.url)
+/*const cornerstoneWADOImageLoaderWebWorkerPath = new URL(
+  '../webWorker/index.js',
+  import.meta.url
 );*/
 
 import { getOptions } from './internal/options.js';
@@ -133,6 +135,12 @@ function spawnWebWorker() {
 
   // spawn the webworker
   const worker = new cornerstoneWADOImageLoaderWebWorker();
+
+  // This is for the Webpack 5 approch but it's currently broken
+  /*const worker = new Worker(cornerstoneWADOImageLoaderWebWorkerPath, {
+    name: `cornerstoneWADOImageLoaderWebWorkerPath-${webWorkers.length + 1}`,
+    type: 'module',
+  });*/
 
   webWorkers.push({
     worker,

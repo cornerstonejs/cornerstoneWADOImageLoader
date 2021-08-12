@@ -8,11 +8,14 @@ const outputPath = path.join(rootPath, 'dist');
 const prodConfig = {
   mode: 'production',
   output: {
+    library: {
+      name: '[name]',
+    },
     path: outputPath,
     filename: '[name].min.js',
   },
   optimization: {
-    //minimize: false,
+    // minimize: false,
     minimizer: [
       new TerserPlugin({
         parallel: true,

@@ -2,12 +2,12 @@ const path = require('path');
 const webpack = require('webpack');
 const rootPath = process.cwd();
 const context = path.join(rootPath, 'src');
-const outputPath = path.join(rootPath, 'examples', 'dist');
+const outputPath = path.join(rootPath, 'dist');
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin;
 
-module.exports = {
+const config = {
   mode: 'development',
   context,
   entry: {
@@ -15,17 +15,16 @@ module.exports = {
   },
   target: 'web',
   output: {
-    library: {
-      name: '[name]',
-      type: 'umd',
-      umdNamedDefine: true,
-    },
-    libraryTarget: 'umd',
-    globalObject: 'this',
     path: outputPath,
-    clean: true,
+    filename: '[name].mjs',
+    library: {
+      type: 'module',
+    },
+    module: true,
+    //libraryTarget: 'module',
+    //globalObject: 'this',
+    //chunkFormat: 'module',
   },
-  devtool: 'source-map',
   externals: {
     'dicom-parser': {
       commonjs: 'dicom-parser',
@@ -57,13 +56,6 @@ module.exports = {
         type: 'asset/resource',
       },
       {
-        test: /\.worker\.js$/,
-        use: {
-          loader: 'worker-loader',
-          options: { inline: 'no-fallback' },
-        },
-      },
-      {
         test: /\.js$/,
         exclude: [/(node_modules)/, /(codecs)/],
         use: {
@@ -73,4 +65,25 @@ module.exports = {
     ],
   },
   plugins: [new webpack.ProgressPlugin()], //, new BundleAnalyzerPlugin()],
+  optimization: {
+    //minimize: false,
+    /*minimizer: [
+      new TerserPlugin({
+        parallel: true,
+      }),
+    ],*/
+    /*splitChunks: {
+      // include all types of chunks
+      chunks: 'all',
+    },*/
+    //runtimeChunk: 'single',
+    usedExports: true,
+    concatenateModules: true,
+  },
+  experiments: {
+    outputModule: true,
+    // asyncWebAssembly: true
+  },
 };
+
+module.exports = config;
