@@ -1,4 +1,4 @@
-import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo-16bit/dist/libjpegturbojs.js';
+import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo-16bit/dist/libjpegturbowasm.js';
 
 // Webpack asset/resource copies this to our output folder
 import libjpegTurboWasm from '@cornerstonejs/codec-libjpeg-turbo-8bit/dist/libjpegturbowasm.wasm';
