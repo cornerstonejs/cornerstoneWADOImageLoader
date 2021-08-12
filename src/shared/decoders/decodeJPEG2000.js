@@ -2,6 +2,10 @@
 import openJpegFactory from '@cornerstonejs/codec-openjpeg/dist/openjpegwasm.js';
 
 // Webpack asset/resource copies this to our output folder
+
+// TODO: At some point maybe we can use this instead.
+// This is closer to what Webpack 5 wants but it doesn't seem to work now
+// const wasm = new URL('./blah.wasm', import.meta.url)
 import openjpegWasm from '@cornerstonejs/codec-openjpeg/dist/openjpegwasm.wasm';
 
 const local = {

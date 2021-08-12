@@ -39,14 +39,13 @@ function handler(data, doneCallback) {
 
   const strict =
     decodeConfig && decodeConfig.decodeTask && decodeConfig.decodeTask.strict;
-  const imageFrame = data.data.imageFrame;
 
   // convert pixel data from ArrayBuffer to Uint8Array since web workers support passing ArrayBuffers but
   // not typed arrays
   const pixelData = new Uint8Array(data.data.pixelData);
 
   // TODO switch to promise
-  const finishedCallback = () => {
+  function finishedCallback(imageFrame) {
     if (!imageFrame.pixelData) {
       throw new Error(
         'decodeTask: imageFrame.pixelData is undefined after decoding'
@@ -62,11 +61,10 @@ function handler(data, doneCallback) {
     // invoke the callback with our result and pass the pixelData in the transferList to move it to
     // UI thread without making a copy
     doneCallback(imageFrame, [imageFrame.pixelData]);
-  };
+  }
 
-  console.debug('decodeImageFrame');
   decodeImageFrame(
-    imageFrame,
+    data.data.imageFrame,
     data.data.transferSyntax,
     pixelData,
     decodeConfig.decodeTask,

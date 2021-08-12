@@ -127,16 +127,13 @@ function decodeImageFrame(
    }
    */
 
-  console.warn('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-
   if (decodePromise) {
     decodePromise
       .then(imageFrame => {
         callbackFn(doStuff(imageFrame, options, start));
       })
       .catch(err => {
-        console.warn('~~ ERR');
-        console.warn(err);
+        throw err;
       });
   } else {
     callbackFn(doStuff(imageFrame, options, start));

@@ -43,7 +43,8 @@
     "dev": "npm run webpack:dev",
     "webpack:dev": "webpack serve --progress --config ./config/webpack/webpack-dev.js",
     "webpack:prod": "webpack --progress --config ./config/webpack/webpack-prod",
-    "webpack:watch": "webpack --progress --debug --watch  --config ./config/webpack",
+    "webpack:prod:watch": "webpack --progress --watch --config ./config/webpack/webpack-prod",
+    "webpack:watch": "webpack --progress --watch  --config ./config/webpack",
     "prepublishOnly": "npm run build && npm run test && npm run doc:generate"
   },
   "devDependencies": {
