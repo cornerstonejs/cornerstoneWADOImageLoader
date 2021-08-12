@@ -1,23 +1,35 @@
-import webWorkerManager from './webWorkerManager.js';
+import { getOptions } from './internal/options.js';
 import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 
-function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
-  const priority = options.priority || undefined;
-  const transferList = options.transferPixelData
-    ? [pixelData.buffer]
-    : undefined;
+import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
+import calculateMinMax from '../shared/calculateMinMax.js';
 
-  return webWorkerManager.addTask(
-    'decodeTask',
-    {
-      imageFrame,
-      transferSyntax,
-      pixelData,
-      options,
-    },
-    priority,
-    transferList
-  ).promise;
+function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
+  const loaderOptions = getOptions();
+  const { strict, decodeConfig } = loaderOptions;
+
+  return new Promise((resolve, reject) => {
+    try {
+      const callbackFn = decodedImageFrame => {
+        calculateMinMax(decodedImageFrame, strict);
+        resolve(decodedImageFrame);
+      };
+
+      const decodeArguments = [
+        imageFrame,
+        transferSyntax,
+        pixelData,
+        decodeConfig,
+        options,
+        callbackFn,
+      ];
+
+      decodeImageFrameHandler(...decodeArguments);
+    } catch (error) {
+      console.error(error);
+      reject(error);
+    }
+  });
 }
 
 function decodeImageFrame(
@@ -92,9 +104,9 @@ function decodeImageFrame(
    }
    */
 
-  return new Promise((resolve, reject) => {
-    reject(new Error(`No decoder for transfer syntax ${transferSyntax}`));
-  });
+  return Promise.reject(
+    new Error(`No decoder for transfer syntax ${transferSyntax}`)
+  );
 }
 
 export default decodeImageFrame;

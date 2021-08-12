@@ -70,6 +70,11 @@
         CTImage.dcm_JPEG2000TransferSyntax_1.2.840.10008.1.2.4.91.dcm
     </button>
 
+    <h2>Deflate</h2>
+    <button class="imgbtn">
+        CTImage.dcm_DeflatedExplicitVRLittleEndianTransferSyntax_1.2.840.10008.1.2.1.99.dcm
+    </button>
+
     <div class="row">
         <form id="form" class="form-horizontal">
             <div class="form-group">
@@ -164,7 +169,6 @@
             // Add custom headers here (e.g. auth tokens)
             //xhr.setRequestHeader('APIKEY', 'my auth token');
         },
-        useWebWorkers: false,
     });
 
     var loaded = false;
@@ -247,11 +251,11 @@
                 document.getElementById('decodeTime').textContent = image.decodeTimeInMS + "ms";
 
             }, function(err) {
-                alert(err);
+                throw err;
             });
         }
         catch(err) {
-            alert(err);
+            throw err;
         }
     }
 

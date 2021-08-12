@@ -51,7 +51,6 @@ describe('Test lossless TransferSyntaxes decoding', function() {
       // callback allowing modification of newly created image objects
       imageCreated(/* image */) {},
       strict: false,
-      useWebWorkers: false,
       decodeConfig: {},
     });
 

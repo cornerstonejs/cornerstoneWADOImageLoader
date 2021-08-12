@@ -21,7 +21,6 @@ Where options can have the following properties:
   - `request` - The `XMLHttpRequest` object.
   - `response` - The `response`, if any.
   - `status` - The HTTP `status` code.
-- useWebWorkers - Whether to decode in web workers.
 - imageCreated - Callback allowing modification of newly created image objects.
 - decodeConfig - The configuration for the decoder
 - strict - Whether strict mode for image decoding is on.

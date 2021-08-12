@@ -48,7 +48,6 @@ describe('loadImage', function() {
 
     configure({
       strict: false,
-      useWebWorkers: false,
       decodeConfig: {},
     });
   });

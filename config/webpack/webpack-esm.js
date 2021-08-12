@@ -1,3 +1,4 @@
+// Not used for now due to issues with experimental output modules
 const path = require('path');
 const webpack = require('webpack');
 const rootPath = process.cwd();

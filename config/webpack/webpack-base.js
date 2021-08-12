@@ -12,6 +12,8 @@ module.exports = {
   context,
   entry: {
     cornerstoneWADOImageLoader: './imageLoader/index.js',
+    cornerstoneWADOImageLoaderNoWebWorkers: './imageLoader/index-noWorkers.js',
+    cornerstoneWADOImageLoaderWebWorker: './webWorker/index.js',
   },
   target: 'web',
   output: {
@@ -72,5 +74,6 @@ module.exports = {
       },
     ],
   },
-  plugins: [new webpack.ProgressPlugin()], //, new BundleAnalyzerPlugin()],
+  plugins: [new webpack.ProgressPlugin()],
+  // plugins: [new webpack.ProgressPlugin(), new BundleAnalyzerPlugin()],
 };
