@@ -13,7 +13,7 @@ module.exports = {
   entry: {
     cornerstoneWADOImageLoader: './imageLoader/index.js',
     cornerstoneWADOImageLoaderNoWebWorkers: './imageLoader/index-noWorkers.js',
-    cornerstoneWADOImageLoaderWebWorker: './webWorker/index.js',
+    cornerstoneWADOImageLoaderWebWorker: './webWorker/index.worker.js',
   },
   target: 'web',
   output: {
@@ -45,26 +45,31 @@ module.exports = {
   module: {
     noParse: [/(codecs)/],
     rules: [
-      // {
-      //   enforce: 'pre',
-      //   test: /\.js$/,
-      //   exclude: /(node_modules)|(codecs)/,
-      //   loader: 'eslint-loader',
-      //   options: {
-      //     failOnError: false,
-      //   },
-      // },
+      {
+        enforce: 'pre',
+        test: /\.js$/,
+        exclude: /(node_modules)|(codecs)/,
+        loader: 'eslint-loader',
+        options: {
+          failOnError: false,
+        },
+      },
       {
         test: /\.wasm/,
         type: 'asset/resource',
       },
-      {
+      /*{
         test: /\.worker\.js$/,
-        use: {
-          loader: 'worker-loader',
-          options: { inline: 'no-fallback' },
-        },
-      },
+        use: [
+          {
+            loader: 'worker-loader',
+            options: { inline: 'no-fallback' },
+          },
+          /*{
+            loader: 'babel-loader',
+          },
+        ],
+      },*/
       {
         test: /\.js$/,
         exclude: [/(node_modules)/, /(codecs)/],

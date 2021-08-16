@@ -1,9 +1,11 @@
-import cornerstoneWADOImageLoaderWebWorker from 'worker-loader!../webWorker/index.js';
+// Not sure why but webpack isn't splitting this out unless we explicitly use worker-loader!
+// eslint-disable-next-line
+import cornerstoneWADOImageLoaderWebWorker from 'worker-loader!../webWorker/index.worker.js';
 
 // This is for the Webpack 5 approch but it's currently broken
 // so we will continue relying on worker-loader for now
 // https://github.com/webpack/webpack/issues/13899
-/*const cornerstoneWADOImageLoaderWebWorkerPath = new URL(
+/* const cornerstoneWADOImageLoaderWebWorkerPath = new URL(
   '../webWorker/index.js',
   import.meta.url
 );*/
@@ -137,7 +139,7 @@ function spawnWebWorker() {
   const worker = new cornerstoneWADOImageLoaderWebWorker();
 
   // This is for the Webpack 5 approch but it's currently broken
-  /*const worker = new Worker(cornerstoneWADOImageLoaderWebWorkerPath, {
+  /* const worker = new Worker(cornerstoneWADOImageLoaderWebWorkerPath, {
     name: `cornerstoneWADOImageLoaderWebWorkerPath-${webWorkers.length + 1}`,
     type: 'module',
   });*/

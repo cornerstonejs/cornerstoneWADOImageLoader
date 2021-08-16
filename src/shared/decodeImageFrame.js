@@ -18,6 +18,7 @@ function decodeImageFrame(
   callbackFn
 ) {
   const start = new Date().getTime();
+
   let decodePromise = null;
 
   console.log(`Decoding transferSyntax: ${transferSyntax}`);

@@ -6,17 +6,29 @@ const cases = [
   [null, '1.2.840.10008.1.2'],
   ['', '1.2.840.10008.1.2'],
   ['multipart/related; type="application/octet-stream"', '1.2.840.10008.1.2'],
-  ['multipart/related; type="application/octet-stream"; transfer-syntax= ', '1.2.840.10008.1.2'],
+  [
+    'multipart/related; type="application/octet-stream"; transfer-syntax= ',
+    '1.2.840.10008.1.2',
+  ],
   // Test TS extraction
-  ['multipart/related; type=image/dicom+jpeg; transfer-syntax=1.2.840.10008.1.2.4.70', '1.2.840.10008.1.2.4.70'],
-  ['multipart/related; image/dicom+jpx; transfer-syntax=1.2.840.10008.1.2.4.93', '1.2.840.10008.1.2.4.93'],
-  ['multipart/related; video/mpeg; transfer-syntax=1.2.840.10008.1.2.4.100', '1.2.840.10008.1.2.4.100'],
+  [
+    'multipart/related; type=image/dicom+jpeg; transfer-syntax=1.2.840.10008.1.2.4.70',
+    '1.2.840.10008.1.2.4.70',
+  ],
+  [
+    'multipart/related; image/dicom+jpx; transfer-syntax=1.2.840.10008.1.2.4.93',
+    '1.2.840.10008.1.2.4.93',
+  ],
+  [
+    'multipart/related; video/mpeg; transfer-syntax=1.2.840.10008.1.2.4.100',
+    '1.2.840.10008.1.2.4.100',
+  ],
   // Test case where transfer-syntax is not explicitly provided
   ['multipart/related; type="image/jpeg"', '1.2.840.10008.1.2.4.70'],
   ['multipart/related; type="image/x-jls"', '1.2.840.10008.1.2.4.80'],
   ['multipart/related; type="image/x-dicom-rle"', '1.2.840.10008.1.2.5'],
   ['multipart/related; type="image/jp2"', '1.2.840.10008.1.2.4.90'],
-  ['multipart/related; type="image/jpx"', '1.2.840.10008.1.2.4.92']
+  ['multipart/related; type="image/jpx"', '1.2.840.10008.1.2.4.92'],
 ];
 
 describe('#getTransferSyntaxForContentType', () => {

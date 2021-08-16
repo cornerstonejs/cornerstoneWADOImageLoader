@@ -14,7 +14,7 @@ const local = {
   encoder: undefined,
 };
 
-async function initOpenJpeg() {
+function initOpenJpeg() {
   if (local.codec) {
     return Promise.resolve();
   }
@@ -91,12 +91,10 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
   }`;
   const colorTransform = decoder.getColorSpace();
 
-  // ~~ Not part of this codec's API?
-  // const interleaveMode = decoder.getInterleaveMode();
-  // const nearLossless = decoder.getNearLossless();
-
   const decodedSize = `${decodedBufferInWASM.length.toLocaleString()} bytes`;
-  // const compressionRatio = `${(decodedBufferInWASM.length /encodedBitStream.length).toFixed(2)}:1`;
+  const compressionRatio = `${(
+    decodedBufferInWASM.length / encodedBufferInWASM.length
+  ).toFixed(2)}:1`;
 
   const encodedImageInfo = {
     columns: frameInfo.width,
@@ -106,23 +104,32 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
     bytesPerPixel: imageInfo.bytesPerPixel,
     componentsPerPixel: frameInfo.componentCount,
   };
-  const pixelData = getPixelData(frameInfo, decodedBufferInWASM);
+  const wasmPixelData = getPixelData(frameInfo, decodedBufferInWASM);
 
-  const encodeOptions = {};
+  // Create an equivalent TypedArray (e.g. Int16Array)
+  const pixelData = new wasmPixelData.constructor(wasmPixelData.length);
 
-  // We're returning a promise that resolves...
-  // return {
-  //   imageFrame,
-  //   imageInfo,
-  //   encodeOptions: {},
-  // };
+  // Copy the pixels from the WebAssembly.Memory-backed TypedArray
+  // to the new one
+  pixelData.set(wasmPixelData);
+
+  const encodeOptions = {
+    imageOffset,
+    numDecompositions,
+    numLayers,
+    progessionOrder,
+    reversible,
+    blockDimensions,
+    tileSize,
+    tileOffset,
+    colorTransform,
+    decodedSize,
+    compressionRatio,
+  };
 
   return {
     ...imageInfo,
-    // imageFrame,
-    // shim
     pixelData,
-    // end shim
     imageInfo: encodedImageInfo,
     encodeOptions,
     ...encodeOptions,
@@ -147,7 +154,19 @@ function getPixelData(frameInfo, decodedBuffer) {
     );
   }
 
-  return decodedBuffer;
+  if (frameInfo.isSigned) {
+    return new Int8Array(
+      decodedBuffer.buffer,
+      decodedBuffer.byteOffset,
+      decodedBuffer.byteLength
+    );
+  }
+
+  return new Uint8Array(
+    decodedBuffer.buffer,
+    decodedBuffer.byteOffset,
+    decodedBuffer.byteLength
+  );
 }
 
 export default decodeAsync;

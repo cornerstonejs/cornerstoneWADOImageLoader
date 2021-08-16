@@ -87,11 +87,13 @@ self.onmessage = function(msg) {
     (msg.data.type === 'webpackOk' || msg.data.type === 'webpackClose')
   ) {
     console.log('handling webpack dev server message...');
+
     return;
   }
 
   if (!msg.data.taskType) {
     console.log(msg.data);
+
     return;
   }
 

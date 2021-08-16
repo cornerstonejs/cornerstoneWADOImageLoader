@@ -1,6 +1,13 @@
 import webWorkerManager from './webWorkerManager.js';
 import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 
+// dicomParser requires pako for browser-side decoding of deflate transfer syntax
+// We only need one function though, so lets import that so we don't make our bundle
+// too large.
+import { inflateRaw } from 'pako/lib/inflate.js';
+
+window.pako = { inflateRaw };
+
 function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
   const priority = options.priority || undefined;
   const transferList = options.transferPixelData
@@ -92,9 +99,9 @@ function decodeImageFrame(
    }
    */
 
-  return new Promise((resolve, reject) => {
-    reject(new Error(`No decoder for transfer syntax ${transferSyntax}`));
-  });
+  return Promise.reject(
+    new Error(`No decoder for transfer syntax ${transferSyntax}`)
+  );
 }
 
 export default decodeImageFrame;

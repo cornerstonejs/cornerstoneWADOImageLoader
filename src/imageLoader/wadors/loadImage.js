@@ -65,8 +65,8 @@ function loadImage(imageId, options) {
     // TODO: load bulk data items that we might need
 
     // Uncomment this on to test jpegls codec in OHIF
-    //const mediaType = 'multipart/related; type="image/x-jls"';
-    /*const mediaType =
+    // const mediaType = 'multipart/related; type="image/x-jls"';
+    /* const mediaType =
       'multipart/related; type="application/octet-stream"; transfer-syntax="image/x-jls"'; // 'image/dicom+jp2';*/
     const mediaType =
       'multipart/related; type="application/octet-stream"; transfer-syntax=*';

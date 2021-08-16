@@ -9,7 +9,7 @@ const local = {
   encoder: undefined,
 };
 
-async function initLibjpegTurbo() {
+function initLibjpegTurbo() {
   if (local.codec) {
     return Promise.resolve();
   }
@@ -67,9 +67,6 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
 
   // get the decoded pixels
   const decodedPixelsInWASM = decoder.getDecodedBuffer();
-  const imageFrame = new Uint8Array(decodedPixelsInWASM.length);
-
-  imageFrame.set(decodedPixelsInWASM);
 
   const encodedImageInfo = {
     columns: frameInfo.width,
@@ -80,22 +77,27 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
     componentsPerPixel: frameInfo.componentCount,
   };
 
+  const wasmPixelData = getPixelData(frameInfo, decodedPixelsInWASM);
+
+  // Create an equivalent TypedArray (e.g. Int16Array)
+  const pixelData = new wasmPixelData.constructor(wasmPixelData.length);
+
+  // Copy the pixels from the WebAssembly.Memory-backed TypedArray
+  // to the new one
+  pixelData.set(wasmPixelData);
+
   // delete the instance.  Note that this frees up memory including the
   // encodedBufferInWASM and decodedPixelsInWASM invalidating them.
   // Do not use either after calling delete!
-  // decoder.delete();
+  decoder.delete();
 
-  const pixelData = getPixelData(frameInfo, decodedPixelsInWASM);
   const encodeOptions = {
     frameInfo,
   };
 
   return {
     ...imageInfo,
-    // imageFrame,
-    // shim
     pixelData,
-    // end shim
     imageInfo: encodedImageInfo,
     encodeOptions,
     ...encodeOptions,
@@ -104,23 +106,19 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
 }
 
 function getPixelData(frameInfo, decodedBuffer) {
-  if (frameInfo.bitsPerSample > 8) {
-    if (frameInfo.isSigned) {
-      return new Int8Array(
-        decodedBuffer.buffer,
-        decodedBuffer.byteOffset,
-        decodedBuffer.byteLength / 2
-      );
-    }
-
-    return new Uint8Array(
+  if (frameInfo.isSigned) {
+    return new Int8Array(
       decodedBuffer.buffer,
       decodedBuffer.byteOffset,
-      decodedBuffer.byteLength / 2
+      decodedBuffer.byteLength
     );
   }
 
-  return decodedBuffer;
+  return new Uint8Array(
+    decodedBuffer.buffer,
+    decodedBuffer.byteOffset,
+    decodedBuffer.byteLength
+  );
 }
 
 export default decodeAsync;

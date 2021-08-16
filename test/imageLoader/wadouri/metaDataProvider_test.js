@@ -23,7 +23,6 @@ describe('#wadouri > metadataProvider', function() {
 
   configure({
     strict: false,
-    useWebWorkers: false,
     decodeConfig: {},
   });
 

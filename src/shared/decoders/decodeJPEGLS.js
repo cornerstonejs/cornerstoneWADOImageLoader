@@ -9,7 +9,7 @@ const local = {
   encoder: undefined,
 };
 
-async function initCharls() {
+function initCharls() {
   if (local.codec) {
     return Promise.resolve();
   }
@@ -109,9 +109,7 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
 
   return {
     ...imageInfo,
-    // shim
     pixelData,
-    // end shim
     imageInfo: encodedImageInfo,
     encodeOptions,
     ...encodeOptions,
@@ -127,13 +125,13 @@ function getPixelData(frameInfo, decodedBuffer, signed) {
         decodedBuffer.byteOffset,
         decodedBuffer.byteLength / 2
       );
-    } else {
-      return new Uint16Array(
-        decodedBuffer.buffer,
-        decodedBuffer.byteOffset,
-        decodedBuffer.byteLength / 2
-      );
     }
+
+    return new Uint16Array(
+      decodedBuffer.buffer,
+      decodedBuffer.byteOffset,
+      decodedBuffer.byteLength / 2
+    );
   }
 
   if (signed) {
@@ -142,13 +140,13 @@ function getPixelData(frameInfo, decodedBuffer, signed) {
       decodedBuffer.byteOffset,
       decodedBuffer.byteLength
     );
-  } else {
-    return new Uint8Array(
-      decodedBuffer.buffer,
-      decodedBuffer.byteOffset,
-      decodedBuffer.byteLength
-    );
   }
+
+  return new Uint8Array(
+    decodedBuffer.buffer,
+    decodedBuffer.byteOffset,
+    decodedBuffer.byteLength
+  );
 }
 
 export default decodeAsync;
