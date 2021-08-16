@@ -99,7 +99,9 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
   // delete the instance.  Note that this frees up memory including the
   // encodedBufferInWASM and decodedPixelsInWASM invalidating them.
   // Do not use either after calling delete!
-  decoder.delete();
+
+  // TODO: Why does this break the tests?
+  // decoder.delete();
 
   const encodeOptions = {
     nearLossless,

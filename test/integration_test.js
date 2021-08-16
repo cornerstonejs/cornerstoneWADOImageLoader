@@ -4,21 +4,20 @@ import { loadImage } from '../src/imageLoader/wadouri/loadImage.js';
 import configure from '../src/imageLoader/configure.js';
 import webWorkerManager from '../src/imageLoader/webWorkerManager.js';
 
+// See https://www.dicomlibrary.com/dicom/transfer-syntax/
 const transferSyntaxes = {
   '1.2.840.10008.1.2': 'LittleEndianImplicitTransferSyntax',
   '1.2.840.10008.1.2.1': 'LittleEndianExplicitTransferSyntax',
+  '1.2.840.10008.1.2.1.99': 'DeflatedExplicitVRLittleEndianTransferSyntax',
+  '1.2.840.10008.1.2.2': 'BigEndianExplicitTransferSyntax',
 
-  // TODO: dicomParser is failing with this.module in parseDicom
-  // '1.2.840.10008.1.2.1.99': 'DeflatedExplicitVRLittleEndianTransferSyntax',
+  '1.2.840.10008.1.2.4.50': 'JPEGProcess1TransferSyntax',
+  // '1.2.840.10008.1.2.4.51': 'JPEGProcess2_4TransferSyntax', // broken
 
-  '1.2.840.10008.1.2.2': 'BigEndianExplicitTransferSyntax', // Retired
-
-  // TODO: These three are failing
-  // '1.2.840.10008.1.2.4.50': 'JPEGProcess1TransferSyntax',
+  // Retired, not tested at all and not implemented...
   // '1.2.840.10008.1.2.4.53': 'JPEGProcess6_8TransferSyntax',
   // '1.2.840.10008.1.2.4.55': 'JPEGProcess10_12TransferSyntax',
 
-  //'1.2.840.10008.1.2.4.51': 'JPEGProcess2_4TransferSyntax', // currently broken due to libjpeg-turbo naming
   '1.2.840.10008.1.2.4.57': 'JPEGProcess14TransferSyntax',
   '1.2.840.10008.1.2.4.70': 'JPEGProcess14SV1TransferSyntax',
   '1.2.840.10008.1.2.4.80': 'JPEGLSLosslessTransferSyntax',
