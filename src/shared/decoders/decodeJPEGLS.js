@@ -1,15 +1,23 @@
-import charlsFactory from '@cornerstonejs/codec-charls/dist/charlswasm.js';
+import charlsFactory from '@cornerstonejs/codec-charls/dist/charlswasm_decode.js';
+// import charlsFactory from '@cornerstonejs/codec-charls/dist/debug/charlswasm.js';
 
 // Webpack asset/resource copies this to our output folder
-import charlsWasm from '@cornerstonejs/codec-charls/dist/charlswasm.wasm';
+import charlsWasm from '@cornerstonejs/codec-charls/dist/charlswasm_decode.wasm';
+// import charlsWasm from '@cornerstonejs/codec-charls/dist/debug/charlswasm.wasm';
 
 const local = {
   codec: undefined,
   decoder: undefined,
-  encoder: undefined,
 };
 
-function initCharls() {
+function getExceptionMessage(exception) {
+  return typeof exception === 'number'
+    ? local.codec.getExceptionMessage(exception)
+    : exception;
+}
+
+export function initCharls() {
+  // console.time('initCharLS');
   if (local.codec) {
     return Promise.resolve();
   }
@@ -33,7 +41,7 @@ function initCharls() {
     charlsModule.then(instance => {
       local.codec = instance;
       local.decoder = new instance.JpegLSDecoder();
-      local.encoder = new instance.JpegLSEncoder();
+      // console.timeEnd('initCharLS');
       resolve();
     }, reject);
   });
@@ -46,77 +54,67 @@ function initCharls() {
  * @param {boolean} imageInfo.signed - (pixelRepresentation === 1)
  */
 async function decodeAsync(compressedImageFrame, imageInfo) {
-  await initCharls();
-  const decoder = local.decoder;
+  try {
+    await initCharls();
+    const decoder = local.decoder;
 
-  // get pointer to the source/encoded bit stream buffer in WASM memory
-  // that can hold the encoded bitstream
-  const encodedBufferInWASM = decoder.getEncodedBuffer(
-    compressedImageFrame.length
-  );
+    // get pointer to the source/encoded bit stream buffer in WASM memory
+    // that can hold the encoded bitstream
+    const encodedBufferInWASM = decoder.getEncodedBuffer(
+      compressedImageFrame.length
+    );
 
-  // copy the encoded bitstream into WASM memory buffer
-  encodedBufferInWASM.set(compressedImageFrame);
+    // copy the encoded bitstream into WASM memory buffer
+    encodedBufferInWASM.set(compressedImageFrame);
 
-  // decode it
-  decoder.decode();
+    // decode it
+    decoder.decode();
 
-  // get information about the decoded image
-  const frameInfo = decoder.getFrameInfo();
-  const interleaveMode = decoder.getInterleaveMode();
-  const nearLossless = decoder.getNearLossless();
+    // get information about the decoded image
+    const frameInfo = decoder.getFrameInfo();
+    const interleaveMode = decoder.getInterleaveMode();
+    const nearLossless = decoder.getNearLossless();
 
-  // get the decoded pixels
-  const decodedPixelsInWASM = decoder.getDecodedBuffer();
+    // get the decoded pixels
+    const decodedPixelsInWASM = decoder.getDecodedBuffer();
 
-  const encodedImageInfo = {
-    columns: frameInfo.width,
-    rows: frameInfo.height,
-    bitsPerPixel: frameInfo.bitsPerSample,
-    signed: imageInfo.signed,
-    bytesPerPixel: imageInfo.bytesPerPixel,
-    componentsPerPixel: frameInfo.componentCount,
-  };
+    const encodedImageInfo = {
+      columns: frameInfo.width,
+      rows: frameInfo.height,
+      bitsPerPixel: frameInfo.bitsPerSample,
+      signed: imageInfo.signed,
+      bytesPerPixel: imageInfo.bytesPerPixel,
+      componentsPerPixel: frameInfo.componentCount,
+    };
 
-  // The returned TypedArray here
-  // has a view on the WebAssembly.Memory
-  // itself. This cannot be copied back from the Worker
-  // to the main thread. We must create another TypedArray
-  // and copy it there before sending it back.
-  const wasmPixelData = getPixelData(
-    frameInfo,
-    decodedPixelsInWASM,
-    imageInfo.signed
-  );
+    const pixelData = getPixelData(
+      frameInfo,
+      decodedPixelsInWASM,
+      imageInfo.signed
+    );
 
-  // Create an equivalent TypedArray (e.g. Int16Array)
-  const pixelData = new wasmPixelData.constructor(wasmPixelData.length);
+    const encodeOptions = {
+      nearLossless,
+      interleaveMode,
+      frameInfo,
+    };
 
-  // Copy the pixels from the WebAssembly.Memory-backed TypedArray
-  // to the new one
-  pixelData.set(wasmPixelData);
+    // local.codec.doLeakCheck();
 
-  // delete the instance.  Note that this frees up memory including the
-  // encodedBufferInWASM and decodedPixelsInWASM invalidating them.
-  // Do not use either after calling delete!
-
-  // TODO: Why does this break the tests?
-  // decoder.delete();
-
-  const encodeOptions = {
-    nearLossless,
-    interleaveMode,
-    frameInfo,
-  };
-
-  return {
-    ...imageInfo,
-    pixelData,
-    imageInfo: encodedImageInfo,
-    encodeOptions,
-    ...encodeOptions,
-    ...encodedImageInfo,
-  };
+    return {
+      ...imageInfo,
+      pixelData,
+      imageInfo: encodedImageInfo,
+      encodeOptions,
+      ...encodeOptions,
+      ...encodedImageInfo,
+    };
+  } catch (error) {
+    // Handle cases where WASM throws an error internally, and it only gives JS a number
+    // See https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
+    // TODO: Copy to other codecs as well
+    throw getExceptionMessage(error);
+  }
 }
 
 function getPixelData(frameInfo, decodedBuffer, signed) {

@@ -1,17 +1,16 @@
 // https://emscripten.org/docs/api_reference/module.html
-import openJpegFactory from '@cornerstonejs/codec-openjpeg/dist/openjpegwasm.js';
+import openJpegFactory from '@cornerstonejs/codec-openjpeg/dist/openjpegwasm_decode.js';
 
 // Webpack asset/resource copies this to our output folder
 
 // TODO: At some point maybe we can use this instead.
 // This is closer to what Webpack 5 wants but it doesn't seem to work now
 // const wasm = new URL('./blah.wasm', import.meta.url)
-import openjpegWasm from '@cornerstonejs/codec-openjpeg/dist/openjpegwasm.wasm';
+import openjpegWasm from '@cornerstonejs/codec-openjpeg/dist/openjpegwasm_decode.wasm';
 
 const local = {
   codec: undefined,
   decoder: undefined,
-  encoder: undefined,
 };
 
 function initOpenJpeg() {
@@ -38,7 +37,6 @@ function initOpenJpeg() {
     openJpegModule.then(instance => {
       local.codec = instance;
       local.decoder = new instance.J2KDecoder();
-      local.encoder = new instance.J2KEncoder();
       resolve();
     }, reject);
   });
@@ -104,14 +102,7 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
     bytesPerPixel: imageInfo.bytesPerPixel,
     componentsPerPixel: frameInfo.componentCount,
   };
-  const wasmPixelData = getPixelData(frameInfo, decodedBufferInWASM);
-
-  // Create an equivalent TypedArray (e.g. Int16Array)
-  const pixelData = new wasmPixelData.constructor(wasmPixelData.length);
-
-  // Copy the pixels from the WebAssembly.Memory-backed TypedArray
-  // to the new one
-  pixelData.set(wasmPixelData);
+  const pixelData = getPixelData(frameInfo, decodedBufferInWASM);
 
   const encodeOptions = {
     imageOffset,

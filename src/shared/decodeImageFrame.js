@@ -3,7 +3,7 @@ import decodeLittleEndian from './decoders/decodeLittleEndian.js';
 import decodeBigEndian from './decoders/decodeBigEndian.js';
 import decodeRLE from './decoders/decodeRLE.js';
 import decodeJPEGBaseline8Bit from './decoders/decodeJPEGBaseline8Bit.js';
-import decodeJPEGBaseline16Bit from './decoders/decodeJPEGBaseline16Bit.js';
+// import decodeJPEGBaseline12Bit from './decoders/decodeJPEGBaseline12Bit.js';
 import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
 import decodeJPEGLS from './decoders/decodeJPEGLS.js';
 import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
@@ -59,9 +59,9 @@ function decodeImageFrame(
       opts = {
         ...imageFrame,
       };
-
-      decodePromise = decodeJPEGBaseline16Bit(pixelData, opts);
-      break;
+      // decodePromise = decodeJPEGBaseline12Bit(pixelData, opts);
+      // break;
+      throw new Error('Currently unsupported: 1.2.840.10008.1.2.4.51');
     case '1.2.840.10008.1.2.4.57':
       // JPEG Lossless, Nonhierarchical (Processes 14)
       imageFrame = decodeJPEGLossless(imageFrame, pixelData);

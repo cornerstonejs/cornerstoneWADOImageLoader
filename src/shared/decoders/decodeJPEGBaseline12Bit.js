@@ -1,7 +1,7 @@
-import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo-16bit/dist/libjpegturbowasm.js';
+import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo-12bit/dist/libjpegturbowasm.js';
 
 // Webpack asset/resource copies this to our output folder
-import libjpegTurboWasm from '@cornerstonejs/codec-libjpeg-turbo-8bit/dist/libjpegturbowasm.wasm';
+import libjpegTurboWasm from '@cornerstonejs/codec-libjpeg-turbo-12bit/dist/libjpegturbowasm.wasm';
 
 const local = {
   codec: undefined,
@@ -77,19 +77,7 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
     componentsPerPixel: frameInfo.componentCount,
   };
 
-  const wasmPixelData = getPixelData(frameInfo, decodedPixelsInWASM);
-
-  // Create an equivalent TypedArray (e.g. Int16Array)
-  const pixelData = new wasmPixelData.constructor(wasmPixelData.length);
-
-  // Copy the pixels from the WebAssembly.Memory-backed TypedArray
-  // to the new one
-  pixelData.set(wasmPixelData);
-
-  // delete the instance.  Note that this frees up memory including the
-  // encodedBufferInWASM and decodedPixelsInWASM invalidating them.
-  // Do not use either after calling delete!
-  decoder.delete();
+  const pixelData = getPixelData(frameInfo, decodedPixelsInWASM);
 
   const encodeOptions = {
     frameInfo,
