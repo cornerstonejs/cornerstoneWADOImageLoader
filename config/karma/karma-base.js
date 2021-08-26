@@ -111,15 +111,15 @@ module.exports = function(config) {
 
     /// FROM KARMA-CHROME
     singleRun: false,
-    browsers: ['Chrome'],
+    //browsers: ['Chrome'],
     // singleRun: true,
-    // browsers: ['ChromeHeadlessNoSandbox'],
+    browsers: ['ChromeHeadlessNoSandbox'],
     reporters: ['spec'],
-    // customLaunchers: {
-    //   ChromeHeadlessNoSandbox: {
-    //     base: 'ChromeHeadless',
-    //     flags: ['--no-sandbox']
-    //   }
-    // }
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
+    },
   });
 };
