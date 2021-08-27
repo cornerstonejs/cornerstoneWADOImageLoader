@@ -1,12 +1,11 @@
-import libjpegTurboFactory from '@cornerstonejs/codec-libjpeg-turbo-12bit/dist/libjpegturbowasm.js';
+import libjpegTurbo12Factory from '@cornerstonejs/codec-libjpeg-turbo-12bit/dist/libjpegturbo12wasm.js';
 
 // Webpack asset/resource copies this to our output folder
-import libjpegTurboWasm from '@cornerstonejs/codec-libjpeg-turbo-12bit/dist/libjpegturbowasm.wasm';
+import libjpegTurbo12Wasm from '@cornerstonejs/codec-libjpeg-turbo-12bit/dist/libjpegturbo12wasm.wasm';
 
 const local = {
   codec: undefined,
   decoder: undefined,
-  encoder: undefined,
 };
 
 function initLibjpegTurbo() {
@@ -14,10 +13,10 @@ function initLibjpegTurbo() {
     return Promise.resolve();
   }
 
-  const libjpegTurboModule = libjpegTurboFactory({
+  const libjpegTurboModule = libjpegTurbo12Factory({
     locateFile: f => {
       if (f.endsWith('.wasm')) {
-        return libjpegTurboWasm;
+        return libjpegTurbo12Wasm;
       }
 
       return f;
@@ -33,7 +32,6 @@ function initLibjpegTurbo() {
     libjpegTurboModule.then(instance => {
       local.codec = instance;
       local.decoder = new instance.JPEGDecoder();
-      local.encoder = new instance.JPEGEncoder();
       resolve();
     }, reject);
   });

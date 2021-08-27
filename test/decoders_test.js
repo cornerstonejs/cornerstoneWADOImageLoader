@@ -12,14 +12,17 @@ should();
 const transferSyntaxes = {
   '1.2.840.10008.1.2': 'LittleEndianImplicitTransferSyntax',
   '1.2.840.10008.1.2.1': 'LittleEndianExplicitTransferSyntax',
-  //  TODO: dicomParser is failing with this.module in parseDicom
-  // '1.2.840.10008.1.2.1.99': 'DeflatedExplicitVRLittleEndianTransferSyntax',
+  '1.2.840.10008.1.2.1.99': 'DeflatedExplicitVRLittleEndianTransferSyntax',
 
   '1.2.840.10008.1.2.2': 'BigEndianExplicitTransferSyntax',
 
-  // TODO: These are failing
+  // TODO: Not sure why this is failing
   // '1.2.840.10008.1.2.4.50': 'JPEGProcess1TransferSyntax',
+
+  // TODO: libjpeg-turbo 12 bit support not working yet
   // '1.2.840.10008.1.2.4.51': 'JPEGProcess2_4TransferSyntax',
+
+  // retired? Do we care?
   // '1.2.840.10008.1.2.4.53': 'JPEGProcess6_8TransferSyntax',
   // '1.2.840.10008.1.2.4.55': 'JPEGProcess10_12TransferSyntax',
 
