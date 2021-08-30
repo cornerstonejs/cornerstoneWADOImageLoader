@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import webWorkerManager from './webWorkerManager.js';
 
 const config = {

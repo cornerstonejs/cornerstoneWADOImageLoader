@@ -129,6 +129,7 @@ export function getInfo() {
 function purge() {
   loadedDataSets = {};
   promises = {};
+  cacheSizeInBytes = 0;
 }
 
 export default {

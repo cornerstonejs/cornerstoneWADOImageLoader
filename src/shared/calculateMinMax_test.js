@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import calculateMinMax from './calculateMinMax.js';
 
 describe('#calculateMinMax', () => {
@@ -16,8 +17,8 @@ describe('#calculateMinMax', () => {
 
     calculateMinMax(imageFrame, strict);
 
-    expect(imageFrame.smallestPixelValue).toEqual(1);
-    expect(imageFrame.largestPixelValue).toEqual(9);
+    expect(imageFrame.smallestPixelValue).to.be.equal(1);
+    expect(imageFrame.largestPixelValue).to.be.equal(9);
   });
 
   it('should not update the smallest and largest pixel values if strict is true', () => {
@@ -25,8 +26,8 @@ describe('#calculateMinMax', () => {
 
     calculateMinMax(imageFrame, strict);
 
-    expect(imageFrame.smallestPixelValue).toEqual(-1);
-    expect(imageFrame.largestPixelValue).toEqual(10);
+    expect(imageFrame.smallestPixelValue).to.be.equal(-1);
+    expect(imageFrame.largestPixelValue).to.be.equal(10);
   });
 
   it('should update the smallest and largest pixel values regardless of strict value', () => {
@@ -39,8 +40,8 @@ describe('#calculateMinMax', () => {
     calculateMinMax(imageFrame, strict);
 
     // ASSERT
-    expect(imageFrame.smallestPixelValue).toEqual(1);
-    expect(imageFrame.largestPixelValue).toEqual(9);
+    expect(imageFrame.smallestPixelValue).to.be.equal(1);
+    expect(imageFrame.largestPixelValue).to.be.equal(9);
 
     strict = true;
 
@@ -51,7 +52,7 @@ describe('#calculateMinMax', () => {
     calculateMinMax(imageFrame, strict);
 
     // ASSERT
-    expect(imageFrame.smallestPixelValue).toEqual(1);
-    expect(imageFrame.largestPixelValue).toEqual(9);
+    expect(imageFrame.smallestPixelValue).to.be.equal(1);
+    expect(imageFrame.largestPixelValue).to.be.equal(9);
   });
 });

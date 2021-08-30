@@ -53,6 +53,12 @@ module.exports = function(config) {
         watched: false,
         included: false,
       },
+      'src/**/*_test.js',
+      {
+        pattern: `${output.path}/**/*`,
+        watched: false,
+        included: false,
+      },
       // http://localhost:[PORT]/base/test/[MY FILE].wasm
       { pattern: 'testImages/*', included: false },
       { pattern: 'dist/*', included: false },

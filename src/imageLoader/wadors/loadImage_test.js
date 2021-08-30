@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { getTransferSyntaxForContentType } from './loadImage.js';
 
 const cases = [
@@ -31,13 +32,18 @@ const cases = [
   ['multipart/related; type="image/jpx"', '1.2.840.10008.1.2.4.92'],
 ];
 
-describe('#getTransferSyntaxForContentType', () => {
-  test.each(cases)(
-    'given a content type of %p, returns %p',
-    (contentType, expectedTransferSyntax) => {
+describe('#getTransferSyntaxForContentType', function() {
+  cases.forEach(function(testCase) {
+    const contentType = testCase[0];
+    const expectedTransferSyntax = testCase[1];
+
+    it(`given a content type of ${contentType}, should return ${expectedTransferSyntax}`, () => {
       const transferSyntax = getTransferSyntaxForContentType(contentType);
 
-      expect(transferSyntax).toEqual(expectedTransferSyntax);
-    }
-  );
+      console.log(transferSyntax);
+      console.log(expectedTransferSyntax);
+
+      expect(transferSyntax).to.be.equal(expectedTransferSyntax);
+    });
+  });
 });
