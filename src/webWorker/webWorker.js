@@ -81,16 +81,6 @@ function loadWebWorkerTask(data) {
  * @param msg
  */
 self.onmessage = function(msg) {
-  console.debug(msg);
-  if (
-    msg.data.type &&
-    (msg.data.type === 'webpackOk' || msg.data.type === 'webpackClose')
-  ) {
-    console.log('handling webpack dev server message...');
-
-    return;
-  }
-
   if (!msg.data.taskType) {
     console.log(msg.data);
 
