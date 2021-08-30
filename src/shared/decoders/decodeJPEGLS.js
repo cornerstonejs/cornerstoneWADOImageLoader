@@ -8,6 +8,7 @@ import charlsWasm from '@cornerstonejs/codec-charls/dist/charlswasm_decode.wasm'
 const local = {
   codec: undefined,
   decoder: undefined,
+  decodeConfig: {},
 };
 
 function getExceptionMessage(exception) {
@@ -16,8 +17,9 @@ function getExceptionMessage(exception) {
     : exception;
 }
 
-export function initCharls() {
-  // console.time('initCharLS');
+export function initialize(decodeConfig) {
+  local.decodeConfig = decodeConfig;
+
   if (local.codec) {
     return Promise.resolve();
   }
@@ -36,7 +38,6 @@ export function initCharls() {
     charlsModule.then(instance => {
       local.codec = instance;
       local.decoder = new instance.JpegLSDecoder();
-      // console.timeEnd('initCharLS');
       resolve();
     }, reject);
   });
@@ -50,7 +51,7 @@ export function initCharls() {
  */
 async function decodeAsync(compressedImageFrame, imageInfo) {
   try {
-    await initCharls();
+    await initialize();
     const decoder = local.decoder;
 
     // get pointer to the source/encoded bit stream buffer in WASM memory

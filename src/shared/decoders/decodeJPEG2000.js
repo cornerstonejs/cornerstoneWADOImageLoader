@@ -11,9 +11,12 @@ import openjpegWasm from '@cornerstonejs/codec-openjpeg/dist/openjpegwasm_decode
 const local = {
   codec: undefined,
   decoder: undefined,
+  decodeConfig: {},
 };
 
-function initOpenJpeg() {
+export function initialize(decodeConfig) {
+  local.decodeConfig = decodeConfig;
+
   if (local.codec) {
     return Promise.resolve();
   }
@@ -39,7 +42,7 @@ function initOpenJpeg() {
 
 // https://github.com/chafey/openjpegjs/blob/master/test/browser/index.html
 async function decodeAsync(compressedImageFrame, imageInfo) {
-  await initOpenJpeg();
+  await initialize();
   const decoder = local.decoder;
 
   // get pointer to the source/encoded bit stream buffer in WASM memory
