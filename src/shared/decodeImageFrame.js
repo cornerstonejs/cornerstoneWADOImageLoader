@@ -21,8 +21,6 @@ function decodeImageFrame(
 
   let decodePromise = null;
 
-  console.log(`Decoding transferSyntax: ${transferSyntax}`);
-
   let opts;
 
   switch (transferSyntax) {
@@ -131,17 +129,17 @@ function decodeImageFrame(
   if (decodePromise) {
     decodePromise
       .then(imageFrame => {
-        callbackFn(doStuff(imageFrame, options, start));
+        callbackFn(postProcessDecodedPixels(imageFrame, options, start));
       })
       .catch(err => {
         throw err;
       });
   } else {
-    callbackFn(doStuff(imageFrame, options, start));
+    callbackFn(postProcessDecodedPixels(imageFrame, options, start));
   }
 }
 
-function doStuff(imageFrame, options, start) {
+function postProcessDecodedPixels(imageFrame, options, start) {
   const shouldShift =
     imageFrame.pixelRepresentation !== undefined &&
     imageFrame.pixelRepresentation === 1;

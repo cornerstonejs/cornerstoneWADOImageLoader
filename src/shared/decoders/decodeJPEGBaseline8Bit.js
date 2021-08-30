@@ -23,11 +23,6 @@ function initLibjpegTurbo() {
     },
   });
 
-  libjpegTurboModule.onRuntimeInitialized = evt => {
-    console.log('runtime initialized...');
-    console.log(evt);
-  };
-
   return new Promise((resolve, reject) => {
     libjpegTurboModule.then(instance => {
       local.codec = instance;

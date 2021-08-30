@@ -32,11 +32,6 @@ export function initCharls() {
     },
   });
 
-  charlsModule.onRuntimeInitialized = evt => {
-    console.log('runtime initialized...');
-    console.log(evt);
-  };
-
   return new Promise((resolve, reject) => {
     charlsModule.then(instance => {
       local.codec = instance;

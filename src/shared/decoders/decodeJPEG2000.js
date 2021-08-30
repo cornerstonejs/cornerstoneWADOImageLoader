@@ -28,11 +28,6 @@ function initOpenJpeg() {
     },
   });
 
-  openJpegModule.onRuntimeInitialized = evt => {
-    console.log('runtime initialized...');
-    console.log(evt);
-  };
-
   return new Promise((resolve, reject) => {
     openJpegModule.then(instance => {
       local.codec = instance;
