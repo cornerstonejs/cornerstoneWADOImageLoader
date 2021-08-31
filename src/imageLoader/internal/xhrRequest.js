@@ -1,7 +1,7 @@
 import external from '../../externalModules.js';
 import { getOptions } from './options.js';
 
-function xhrRequest(url, imageId, headers = {}, params = {}) {
+function xhrRequest(url, imageId, defaultHeaders = {}, params = {}) {
   const { cornerstone } = external;
   const options = getOptions();
 
@@ -22,7 +22,14 @@ function xhrRequest(url, imageId, headers = {}, params = {}) {
 
     xhr.open('get', url, true);
     xhr.responseType = 'arraybuffer';
-    options.beforeSend(xhr, imageId, headers, params);
+    const beforeSendHeaders = options.beforeSend(
+      xhr,
+      imageId,
+      defaultHeaders,
+      params
+    );
+    const headers = Object.assign({}, defaultHeaders, beforeSendHeaders);
+
     Object.keys(headers).forEach(function(key) {
       xhr.setRequestHeader(key, headers[key]);
     });
