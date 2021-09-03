@@ -4,6 +4,7 @@ import decodeBigEndian from './decoders/decodeBigEndian.js';
 import decodeRLE from './decoders/decodeRLE.js';
 import decodeJPEGBaseline8Bit from './decoders/decodeJPEGBaseline8Bit.js';
 // import decodeJPEGBaseline12Bit from './decoders/decodeJPEGBaseline12Bit.js';
+import decodeJPEGBaseline12Bit from './decoders/decodeJPEGBaseline12Bit-js.js';
 import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
 import decodeJPEGLS from './decoders/decodeJPEGLS.js';
 import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
@@ -54,12 +55,13 @@ function decodeImageFrame(
       break;
     case '1.2.840.10008.1.2.4.51':
       // JPEG Baseline lossy process 2 & 4 (12 bit)
-      opts = {
-        ...imageFrame,
-      };
+      // opts = {
+      //   ...imageFrame,
+      // };
       // decodePromise = decodeJPEGBaseline12Bit(pixelData, opts);
-      // break;
-      throw new Error('Currently unsupported: 1.2.840.10008.1.2.4.51');
+      //throw new Error('Currently unsupported: 1.2.840.10008.1.2.4.51');
+      imageFrame = decodeJPEGBaseline12Bit(imageFrame, pixelData);
+      break;
     case '1.2.840.10008.1.2.4.57':
       // JPEG Lossless, Nonhierarchical (Processes 14)
       imageFrame = decodeJPEGLossless(imageFrame, pixelData);

@@ -6,7 +6,7 @@ try {
     webWorkerTaskPaths: [],
     taskConfiguration: {
       decodeTask: {
-        initializeCodecsOnStartup: false,
+        initializeCodecsOnStartup: true,
         strict: true,
       },
     },

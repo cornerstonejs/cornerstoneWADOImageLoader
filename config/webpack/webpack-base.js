@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const rootPath = process.cwd();
 const context = path.join(rootPath, 'src');
+const codecs = path.join(rootPath, 'codecs');
 const outputPath = path.join(rootPath, 'examples', 'dist');
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
@@ -22,7 +23,6 @@ module.exports = {
       type: 'umd',
       umdNamedDefine: true,
     },
-    libraryTarget: 'umd',
     globalObject: 'this',
     path: outputPath,
     clean: true,
@@ -76,6 +76,10 @@ module.exports = {
         use: {
           loader: 'babel-loader',
         },
+      },
+      {
+        test: path.join(codecs, 'jpeg.js'),
+        use: 'exports-loader?JpegImage',
       },
     ],
   },

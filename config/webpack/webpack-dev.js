@@ -6,15 +6,12 @@ const baseConfig = require('./webpack-base');
 const devConfig = {
   output: {
     publicPath: '/dist/',
+    filename: '[name].min.js',
   },
   devServer: {
     hot: true,
     open: true,
     // Bundles; takes precedence over contentBase
-    devMiddleware: {
-      publicPath: '/dist/',
-      writeToDisk: true,
-    },
     // Static content
     static: path.resolve(path.join(__dirname, './../../examples')),
     port: 3000,

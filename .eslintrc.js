@@ -13,6 +13,7 @@ module.exports = {
   },
   globals: {
     jpeg: true,
+    JpegImage: true,
     SharedArrayBuffer: true,
   },
   rules: {
@@ -83,6 +84,7 @@ module.exports = {
     'no-catch-shadow': 'warn',
     'no-confusing-arrow': 'warn',
     'no-console': 'off',
+    'no-debugger': 'off',
     'no-div-regex': 'warn',
     'no-duplicate-imports': 'warn',
     'no-else-return': 'warn',
@@ -196,7 +198,7 @@ module.exports = {
     'space-in-parens': ['warn', 'never'],
     'space-infix-ops': 'warn',
     'space-unary-ops': 'warn',
-    'spaced-comment': 'warn',
+    'spaced-comment': 'off',
     strict: 'warn',
     'symbol-description': 'warn',
     'template-curly-spacing': 'warn',

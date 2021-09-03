@@ -1,13 +1,11 @@
 /* eslint import/extensions: 0 */
-import { should } from 'chai';
+import { expect } from 'chai';
 import getPixelData from '../src/imageLoader/wadouri/getPixelData.js';
 import xhrRequest from '../src/imageLoader/internal/xhrRequest.js';
 import dataSetCacheManager from '../src/imageLoader/wadouri/dataSetCacheManager.js';
 import parseImageId from '../src/imageLoader/wadouri/parseImageId.js';
 import createImage from '../src/imageLoader/createImage.js';
 import configure from '../src/imageLoader/configure.js';
-
-should();
 
 const transferSyntaxes = {
   '1.2.840.10008.1.2.4.81': {
@@ -17,6 +15,17 @@ const transferSyntaxes = {
   '1.2.840.10008.1.2.4.91': {
     name: 'JPEG2000TransferSyntax',
     threshold: 6,
+  },
+
+  // TODO: Not sure why this is failing
+  '1.2.840.10008.1.2.4.50': {
+    name: 'JPEGProcess1TransferSyntax',
+    threshold: 100, // Might want to re-encode these, since they seem very lossy
+  },
+  // TODO: libjpeg-turbo 12 bit support not working yet, so we rely on jpeg.js
+  '1.2.840.10008.1.2.4.51': {
+    name: 'JPEGProcess2_4TransferSyntax',
+    threshold: 70, // Might want to re-encode these, since they seem very lossy
   },
 };
 
@@ -130,7 +139,10 @@ describe('Test lossy TransferSyntaxes decoding', function() {
                         curModalityPixelValue: ${modalityPixelValue}
                         uncompressedModalityPixelValue: ${uncompressedModalityPixelValue}`;
 
-                    differenceModality.should(message).lessThan(threshold);
+                    expect(differenceModality).to.be.lessThan(
+                      threshold,
+                      message
+                    );
 
                     done();
                   }
