@@ -25,7 +25,7 @@ export function initialize(decodeConfig) {
   }
 
   const charlsModule = charlsFactory({
-    locateFile: f => {
+    locateFile: (f) => {
       if (f.endsWith('.wasm')) {
         return charlsWasm;
       }
@@ -35,7 +35,7 @@ export function initialize(decodeConfig) {
   });
 
   return new Promise((resolve, reject) => {
-    charlsModule.then(instance => {
+    charlsModule.then((instance) => {
       local.codec = instance;
       local.decoder = new instance.JpegLSDecoder();
       resolve();

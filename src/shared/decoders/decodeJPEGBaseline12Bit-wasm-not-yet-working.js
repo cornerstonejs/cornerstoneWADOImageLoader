@@ -14,7 +14,7 @@ function initLibjpegTurbo() {
   }
 
   const libjpegTurboModule = libjpegTurbo12Factory({
-    locateFile: f => {
+    locateFile: (f) => {
       if (f.endsWith('.wasm')) {
         return libjpegTurbo12Wasm;
       }
@@ -24,7 +24,7 @@ function initLibjpegTurbo() {
   });
 
   return new Promise((resolve, reject) => {
-    libjpegTurboModule.then(instance => {
+    libjpegTurboModule.then((instance) => {
       local.codec = instance;
       local.decoder = new instance.JPEGDecoder();
       resolve();

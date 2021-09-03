@@ -11,7 +11,7 @@ const config = {
   },
 };
 
-describe('config', function() {
+describe('config', function () {
   it('should initialize', () => {
     webWorkerManager.initialize(config);
     expect(webWorkerManager.webWorkers.length === 2);

@@ -10,7 +10,7 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
 
   return new Promise((resolve, reject) => {
     try {
-      const callbackFn = decodedImageFrame => {
+      const callbackFn = (decodedImageFrame) => {
         calculateMinMax(decodedImageFrame, strict);
         resolve(decodedImageFrame);
       };

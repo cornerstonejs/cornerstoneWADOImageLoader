@@ -32,8 +32,8 @@ const cases = [
   ['multipart/related; type="image/jpx"', '1.2.840.10008.1.2.4.92'],
 ];
 
-describe('#getTransferSyntaxForContentType', function() {
-  cases.forEach(function(testCase) {
+describe('#getTransferSyntaxForContentType', function () {
+  cases.forEach(function (testCase) {
     const contentType = testCase[0];
     const expectedTransferSyntax = testCase[1];
 

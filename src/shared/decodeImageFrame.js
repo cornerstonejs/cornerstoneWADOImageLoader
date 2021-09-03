@@ -130,10 +130,10 @@ function decodeImageFrame(
 
   if (decodePromise) {
     decodePromise
-      .then(imageFrame => {
+      .then((imageFrame) => {
         callbackFn(postProcessDecodedPixels(imageFrame, options, start));
       })
-      .catch(err => {
+      .catch((err) => {
         throw err;
       });
   } else {

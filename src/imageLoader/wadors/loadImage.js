@@ -17,7 +17,7 @@ export function getTransferSyntaxForContentType(contentType) {
   const parameters = contentType.split(';');
   const params = {};
 
-  parameters.forEach(parameter => {
+  parameters.forEach((parameter) => {
     // Look for a transfer-syntax=XXXX pair
     const parameterValues = parameter.split('=');
 
@@ -73,7 +73,7 @@ function loadImage(imageId, options) {
 
     // get the pixel data from the server
     getPixelData(uri, imageId, mediaType)
-      .then(result => {
+      .then((result) => {
         const transferSyntax = getTransferSyntaxForContentType(
           result.contentType
         );
@@ -85,7 +85,7 @@ function loadImage(imageId, options) {
           options
         );
 
-        imagePromise.then(image => {
+        imagePromise.then((image) => {
           // add the loadTimeInMS property
           const end = new Date().getTime();
 
@@ -93,7 +93,7 @@ function loadImage(imageId, options) {
           resolve(image);
         }, reject);
       }, reject)
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });

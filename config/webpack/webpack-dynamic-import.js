@@ -7,12 +7,15 @@ const outputPath = path.join(rootPath, 'dist');
 
 const prodConfig = {
   mode: 'production',
+  stats: {
+    children: true,
+  },
   output: {
     library: {
       name: '[name]',
     },
     path: outputPath,
-    filename: '[name].min.js',
+    filename: '[name].dynamic-import.min.js',
   },
   optimization: {
     // minimize: false,

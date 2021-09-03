@@ -22,7 +22,7 @@ export function initialize(decodeConfig) {
   }
 
   const openJpegModule = openJpegFactory({
-    locateFile: f => {
+    locateFile: (f) => {
       if (f.endsWith('.wasm')) {
         return openjpegWasm;
       }
@@ -32,7 +32,7 @@ export function initialize(decodeConfig) {
   });
 
   return new Promise((resolve, reject) => {
-    openJpegModule.then(instance => {
+    openJpegModule.then((instance) => {
       local.codec = instance;
       local.decoder = new instance.J2KDecoder();
       resolve();

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import dataSetCacheManager from './dataSetCacheManager.js';
 
 describe('#getInfo', () => {
-  it('should return cache info for an empty cache', function() {
+  it('should return cache info for an empty cache', function () {
     dataSetCacheManager.purge();
 
     const cacheInfo = dataSetCacheManager.getInfo();
