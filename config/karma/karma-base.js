@@ -31,7 +31,7 @@ const output = {
     Math.floor(Math.random() * 1000000),
 };
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     basePath: '../../',
     frameworks: ['mocha', 'webpack'],

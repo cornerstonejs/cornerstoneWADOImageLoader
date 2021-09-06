@@ -5,15 +5,14 @@ const context = path.join(rootPath, 'src');
 const codecs = path.join(rootPath, 'codecs');
 const outputPath = path.join(rootPath, 'dist');
 
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-  .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   mode: 'development',
   context,
   entry: {
     cornerstoneWADOImageLoader: './imageLoader/index.js',
-    cornerstoneWADOImageLoaderWebWorker: './webWorker/index.worker.js',
   },
   target: 'web',
   output: {
@@ -61,11 +60,10 @@ module.exports = {
         use: [
           {
             loader: 'worker-loader',
-            options: { inline: 'fallback' },
           },
-          {
-            loader: 'babel-loader',
-          },
+          // {
+          //   loader: 'babel-loader',
+          // },
         ],
       },
       {
@@ -85,6 +83,9 @@ module.exports = {
       },
     ],
   },
+  // experiments: {
+  //   asyncWebAssembly: true,
+  // },
   plugins: [new webpack.ProgressPlugin()],
   // plugins: [new webpack.ProgressPlugin(), new BundleAnalyzerPlugin()],
 };

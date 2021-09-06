@@ -1,4 +1,4 @@
-import JpegImage from '../../../codecs/jpeg.js';
+import { JpegImage } from '../../../codecs/jpeg.js';
 
 function decodeJPEGBaseline12Bit(imageFrame, pixelData) {
   // check to make sure codec is loaded

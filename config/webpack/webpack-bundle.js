@@ -6,8 +6,8 @@ const codecs = path.join(rootPath, 'codecs');
 const outputPath = path.join(rootPath, 'dist');
 const TerserPlugin = require('terser-webpack-plugin');
 
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-  .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 // The big difference between this and the dynamic-import version is that
 // the dynamic import version does not bundle the WASM modules into the WebWorker file
@@ -16,7 +16,6 @@ module.exports = {
   context,
   entry: {
     cornerstoneWADOImageLoader: './imageLoader/index.js',
-    cornerstoneWADOImageLoaderWebWorker: './webWorker/index.worker.js',
     cornerstoneWADOImageLoaderNoWebWorkers: './imageLoader/index-noWorkers.js',
   },
   target: 'web',
@@ -58,7 +57,7 @@ module.exports = {
       },
       {
         test: /\.wasm/,
-        type: 'asset/resource',
+        type: 'asset/inline',
       },
       {
         test: /\.worker\.js$/,
