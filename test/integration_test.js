@@ -30,8 +30,8 @@ const transferSyntaxes = {
 const base = 'CTImage.dcm';
 const url = 'dicomweb://localhost:9876/base/testImages/';
 
-describe('loadImage', function() {
-  before(function() {
+describe('loadImage', function () {
+  before(function () {
     // Initialize the web worker manager
     const config = {
       maxWebWorkers: 1,
@@ -51,11 +51,11 @@ describe('loadImage', function() {
     });
   });
 
-  Object.keys(transferSyntaxes).forEach(transferSyntaxUid => {
+  Object.keys(transferSyntaxes).forEach((transferSyntaxUid) => {
     const name = transferSyntaxes[transferSyntaxUid];
     const filename = `${base}_${name}_${transferSyntaxUid}.dcm`;
 
-    it(`should properly load ${name}`, function(done) {
+    it(`should properly load ${name}`, function (done) {
       this.timeout(5000);
       const imageId = `${url}${filename}`;
 
@@ -70,20 +70,20 @@ describe('loadImage', function() {
       }
 
       loadObject.promise.then(
-        image => {
+        (image) => {
           console.timeEnd(name);
           // TODO: Compare against known correct pixel data
           expect(image).to.be.an('object');
           done();
         },
-        error => {
+        (error) => {
           done(error.error);
         }
       );
     });
   });
 
-  it('should result in an error when the DICOM file has no pixelData', done => {
+  it('should result in an error when the DICOM file has no pixelData', (done) => {
     this.timeout(5000);
     const imageId = `${url}no-pixel-data.dcm`;
 
@@ -99,7 +99,7 @@ describe('loadImage', function() {
       () => {
         done(new Error('Should not have succeeded'));
       },
-      error => {
+      (error) => {
         expect(error.error.message === 'The file does not contain image data.');
         done();
       }

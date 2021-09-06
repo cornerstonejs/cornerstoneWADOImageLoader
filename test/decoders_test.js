@@ -31,12 +31,12 @@ const transferSyntaxes = {
 const base = 'CTImage.dcm';
 const url = 'dicomweb://localhost:9876/base/testImages/';
 
-describe('Test lossless TransferSyntaxes decoding', function() {
+describe('Test lossless TransferSyntaxes decoding', function () {
   let uncompressedPixelData = null;
 
   let uncompressedImage = null;
 
-  before(function(done) {
+  before(function (done) {
     this.timeout(5000);
     // loads uncompressed study (the original one)
     const imageId = `${url}${base}`;
@@ -53,13 +53,13 @@ describe('Test lossless TransferSyntaxes decoding', function() {
 
     dataSetCacheManager
       .load(parsedImageId.url, xhrRequest, imageId)
-      .then(dataSet => {
+      .then((dataSet) => {
         const transferSyntax = dataSet.string('x00020010');
 
         uncompressedPixelData = getPixelData(dataSet);
 
         createImage(imageId, uncompressedPixelData, transferSyntax, {}).then(
-          image => {
+          (image) => {
             uncompressedImage = image;
           }
         );
@@ -69,15 +69,15 @@ describe('Test lossless TransferSyntaxes decoding', function() {
       .catch(done);
   });
 
-  after(function() {
+  after(function () {
     dataSetCacheManager.purge();
   });
 
-  Object.keys(transferSyntaxes).forEach(transferSyntaxUid => {
+  Object.keys(transferSyntaxes).forEach((transferSyntaxUid) => {
     const name = transferSyntaxes[transferSyntaxUid];
     const filename = `${base}_${name}_${transferSyntaxUid}.dcm`;
 
-    it(`should properly decode ${name}`, function(done) {
+    it(`should properly decode ${name}`, function (done) {
       this.timeout(5000);
       const imageId = `${url}${filename}`;
       const parsedImageId = parseImageId(imageId);
@@ -87,7 +87,7 @@ describe('Test lossless TransferSyntaxes decoding', function() {
         imageId
       );
 
-      dataSetPromise.then(dataSet => {
+      dataSetPromise.then((dataSet) => {
         try {
           const pixelData = getPixelData(dataSet);
           const curTransferSyntax = dataSet.string('x00020010');
@@ -95,8 +95,9 @@ describe('Test lossless TransferSyntaxes decoding', function() {
           curTransferSyntax.should.to.be.equals(transferSyntaxUid);
 
           createImage(imageId, pixelData, curTransferSyntax, {})
-            .then(image => {
-              const uncompressedImagePixelData = uncompressedImage.getPixelData();
+            .then((image) => {
+              const uncompressedImagePixelData =
+                uncompressedImage.getPixelData();
               const curPixelData = image.getPixelData();
 
               uncompressedImagePixelData.length.should.to.be.equals(

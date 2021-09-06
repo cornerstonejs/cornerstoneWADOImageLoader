@@ -32,7 +32,7 @@ const transferSyntaxes = {
 const base = 'CTImage.dcm';
 const url = 'dicomweb://localhost:9876/base/testImages/';
 
-describe('Test lossy TransferSyntaxes decoding', function() {
+describe('Test lossy TransferSyntaxes decoding', function () {
   let uncompressedPixelData = null;
 
   let uncompressedImage = null;
@@ -41,7 +41,7 @@ describe('Test lossy TransferSyntaxes decoding', function() {
 
   let rescaleSlopeUncompressed = null;
 
-  before(function(done) {
+  before(function (done) {
     // loads uncompressed study (the original one)
     this.timeout(5000);
     const imageId = `${url}${base}`;
@@ -58,7 +58,7 @@ describe('Test lossy TransferSyntaxes decoding', function() {
 
     dataSetCacheManager
       .load(parsedImageId.url, xhrRequest, imageId)
-      .then(dataSet => {
+      .then((dataSet) => {
         const transferSyntax = dataSet.string('x00020010');
 
         rescaleInterceptUncompressed = dataSet.floatString('x00281052');
@@ -66,7 +66,7 @@ describe('Test lossy TransferSyntaxes decoding', function() {
         uncompressedPixelData = getPixelData(dataSet);
 
         createImage(imageId, uncompressedPixelData, transferSyntax, {})
-          .then(image => {
+          .then((image) => {
             uncompressedImage = image;
           })
           .catch(done);
@@ -76,16 +76,16 @@ describe('Test lossy TransferSyntaxes decoding', function() {
       .catch(done);
   });
 
-  after(function() {
+  after(function () {
     dataSetCacheManager.purge();
   });
 
-  Object.keys(transferSyntaxes).forEach(transferSyntaxUid => {
+  Object.keys(transferSyntaxes).forEach((transferSyntaxUid) => {
     const testsData = transferSyntaxes[transferSyntaxUid];
     const name = testsData.name;
     const filename = `${base}_${name}_${transferSyntaxUid}.dcm`;
 
-    it(`should properly decode ${name}`, function(done) {
+    it(`should properly decode ${name}`, function (done) {
       const imageId = `${url}${filename}`;
       const parsedImageId = parseImageId(imageId);
       const dataSetPromise = dataSetCacheManager.load(
@@ -94,7 +94,7 @@ describe('Test lossy TransferSyntaxes decoding', function() {
         imageId
       );
 
-      dataSetPromise.then(dataSet => {
+      dataSetPromise.then((dataSet) => {
         try {
           const pixelData = getPixelData(dataSet);
           const curTransferSyntax = dataSet.string('x00020010');
@@ -104,8 +104,9 @@ describe('Test lossy TransferSyntaxes decoding', function() {
           curTransferSyntax.should.to.be.equals(transferSyntaxUid);
 
           createImage(imageId, pixelData, curTransferSyntax, {})
-            .then(image => {
-              const uncompressedImagePixelData = uncompressedImage.getPixelData();
+            .then((image) => {
+              const uncompressedImagePixelData =
+                uncompressedImage.getPixelData();
               const curPixelData = image.getPixelData();
 
               for (let i = 0; i < curPixelData.length - 1; i++) {
