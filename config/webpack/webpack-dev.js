@@ -6,7 +6,7 @@ const baseConfig = require('./webpack-base');
 const devConfig = {
   output: {
     publicPath: '/dist/',
-    filename: '[name].min.js',
+    filename: '[name].bundle.min.js',
   },
   devServer: {
     hot: true,
