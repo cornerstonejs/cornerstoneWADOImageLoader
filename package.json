@@ -47,7 +47,7 @@
     "webpack:bundle": "webpack --progress --config ./config/webpack/webpack-bundle",
     "webpack:dynamic-import:watch": "webpack --progress --watch --config ./config/webpack/webpack-dynamic-import",
     "webpack:watch": "webpack --progress --watch  --config ./config/webpack",
-    "prepublishOnly": "npm run build && npm run test && npm run doc:generate"
+    "prepublishOnly": "npm run build && npm run test:ci && npm run doc:generate"
   },
   "devDependencies": {
     "@babel/core": "^7.15.4",
