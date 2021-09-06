@@ -21,6 +21,7 @@ module.exports = {
   target: 'web',
   output: {
     library: {
+      name: 'cornerstoneWADOImageLoader',
       type: 'umd',
       umdNamedDefine: true,
     },
