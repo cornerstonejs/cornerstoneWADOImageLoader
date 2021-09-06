@@ -1,3 +1,4 @@
+import external from '../../externalModules.js';
 import getPixelData from './getPixelData.js';
 import createImage from '../createImage.js';
 
@@ -57,9 +58,14 @@ export function getTransferSyntaxForContentType(contentType) {
   return defaultTransferSyntax;
 }
 
+function getImageRetrievalPool() {
+  return external.cornerstone.imageRetrievalPoolManager;
+}
+
 function loadImage(imageId, options) {
+  const imageRetrievalPool = getImageRetrievalPool();
+
   const start = new Date().getTime();
-  const uri = imageId.substring(7);
 
   const promise = new Promise((resolve, reject) => {
     // TODO: load bulk data items that we might need
@@ -71,31 +77,42 @@ function loadImage(imageId, options) {
     const mediaType =
       'multipart/related; type="application/octet-stream"; transfer-syntax=*';
 
-    // get the pixel data from the server
-    getPixelData(uri, imageId, mediaType)
-      .then((result) => {
-        const transferSyntax = getTransferSyntaxForContentType(
-          result.contentType
-        );
-        const pixelData = result.imageFrame.pixelData;
-        const imagePromise = createImage(
-          imageId,
-          pixelData,
-          transferSyntax,
-          options
-        );
+    function sendXHR(imageURI, imageId, mediaType) {
+      console.debug(imageRetrievalPool.getRequestPool());
+      // get the pixel data from the server
+      return getPixelData(imageURI, imageId, mediaType)
+        .then((result) => {
+          const transferSyntax = getTransferSyntaxForContentType(
+            result.contentType
+          );
+          const pixelData = result.imageFrame.pixelData;
+          const imagePromise = createImage(
+            imageId,
+            pixelData,
+            transferSyntax,
+            options
+          );
 
-        imagePromise.then((image) => {
-          // add the loadTimeInMS property
-          const end = new Date().getTime();
+          imagePromise.then((image) => {
+            // add the loadTimeInMS property
+            const end = new Date().getTime();
 
-          image.loadTimeInMS = end - start;
-          resolve(image);
-        }, reject);
-      }, reject)
-      .catch((error) => {
-        reject(error);
-      });
+            image.loadTimeInMS = end - start;
+            resolve(image);
+          }, reject);
+        }, reject)
+        .catch((error) => {
+          reject(error);
+        });
+    }
+
+    const uri = imageId.substring(7);
+    imageRetrievalPool.addRequest(
+      sendXHR.bind(this, uri, imageId, mediaType),
+      options.requestType,
+      options.additionalDetails,
+      options.priority
+    );
   });
 
   return {

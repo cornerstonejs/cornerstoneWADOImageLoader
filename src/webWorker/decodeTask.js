@@ -59,7 +59,11 @@ function handler(data, doneCallback) {
 
     // invoke the callback with our result and pass the pixelData in the transferList to move it to
     // UI thread without making a copy
+
+    // ONLY USING setTIMEOUT for TESTING>.. REMOVE THIS
+    // setTimeout(() => {
     doneCallback(imageFrame, [imageFrame.pixelData]);
+    // }, 100);
   }
 
   decodeImageFrame(

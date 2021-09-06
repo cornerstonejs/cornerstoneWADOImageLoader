@@ -11,10 +11,12 @@ const prodConfig = {
     children: true,
   },
   output: {
-    library: {
-      name: '[name]',
-    },
+    /*library: {
+      //name: '[name]',
+    },*/
     path: outputPath,
+    libraryTarget: 'umd',
+    globalObject: 'this',
     filename: '[name].min.js',
   },
   optimization: {
