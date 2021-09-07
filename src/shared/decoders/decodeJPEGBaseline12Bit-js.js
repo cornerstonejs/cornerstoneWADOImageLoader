@@ -1,11 +1,30 @@
-import { JpegImage } from '../../../codecs/jpeg.js';
+const local = {
+  JpegImage: undefined,
+  decodeConfig: {},
+};
 
-function decodeJPEGBaseline12Bit(imageFrame, pixelData) {
+export function initialize(decodeConfig) {
+  local.decodeConfig = decodeConfig;
+
+  if (local.JpegImage) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    import('../../../codecs/jpeg.js').then(({ JpegImage }) => {
+      local.JpegImage = JpegImage;
+      resolve();
+    }, reject);
+  });
+}
+
+async function decodeJPEGBaseline12BitAsync(imageFrame, pixelData) {
   // check to make sure codec is loaded
-  if (typeof JpegImage === 'undefined') {
+  await initialize();
+  if (typeof local.JpegImage === 'undefined') {
     throw new Error('No JPEG Baseline decoder loaded');
   }
-  const jpeg = new JpegImage();
+  const jpeg = new local.JpegImage();
 
   jpeg.parse(pixelData);
 
@@ -24,4 +43,4 @@ function decodeJPEGBaseline12Bit(imageFrame, pixelData) {
   }
 }
 
-export default decodeJPEGBaseline12Bit;
+export default decodeJPEGBaseline12BitAsync;

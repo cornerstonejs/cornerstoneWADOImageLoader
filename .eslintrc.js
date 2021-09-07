@@ -186,7 +186,7 @@ module.exports = {
     'quote-props': ['warn', 'as-needed'],
     quotes: ['warn', 'single'],
     radix: 'warn',
-    'require-await': 'warn',
+    'require-await': 'off',
     // 'require-jsdoc': 'warn',
     'rest-spread-spacing': 'warn',
     semi: 'warn',

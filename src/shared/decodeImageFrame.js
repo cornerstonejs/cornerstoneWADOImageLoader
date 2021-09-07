@@ -27,23 +27,23 @@ function decodeImageFrame(
   switch (transferSyntax) {
     case '1.2.840.10008.1.2':
       // Implicit VR Little Endian
-      imageFrame = decodeLittleEndian(imageFrame, pixelData);
+      decodePromise = decodeLittleEndian(imageFrame, pixelData);
       break;
     case '1.2.840.10008.1.2.1':
       // Explicit VR Little Endian
-      imageFrame = decodeLittleEndian(imageFrame, pixelData);
+      decodePromise = decodeLittleEndian(imageFrame, pixelData);
       break;
     case '1.2.840.10008.1.2.2':
       // Explicit VR Big Endian (retired)
-      imageFrame = decodeBigEndian(imageFrame, pixelData);
+      decodePromise = decodeBigEndian(imageFrame, pixelData);
       break;
     case '1.2.840.10008.1.2.1.99':
       // Deflate transfer syntax (deflated by dicomParser)
-      imageFrame = decodeLittleEndian(imageFrame, pixelData);
+      decodePromise = decodeLittleEndian(imageFrame, pixelData);
       break;
     case '1.2.840.10008.1.2.5':
       // RLE Lossless
-      imageFrame = decodeRLE(imageFrame, pixelData);
+      decodePromise = decodeRLE(imageFrame, pixelData);
       break;
     case '1.2.840.10008.1.2.4.50':
       // JPEG Baseline lossy process 1 (8 bit)
@@ -60,15 +60,15 @@ function decodeImageFrame(
       // };
       // decodePromise = decodeJPEGBaseline12Bit(pixelData, opts);
       //throw new Error('Currently unsupported: 1.2.840.10008.1.2.4.51');
-      imageFrame = decodeJPEGBaseline12Bit(imageFrame, pixelData);
+      decodePromise = decodeJPEGBaseline12Bit(imageFrame, pixelData);
       break;
     case '1.2.840.10008.1.2.4.57':
       // JPEG Lossless, Nonhierarchical (Processes 14)
-      imageFrame = decodeJPEGLossless(imageFrame, pixelData);
+      decodePromise = decodeJPEGLossless(imageFrame, pixelData);
       break;
     case '1.2.840.10008.1.2.4.70':
       // JPEG Lossless, Nonhierarchical (Processes 14 [Selection 1])
-      imageFrame = decodeJPEGLossless(imageFrame, pixelData);
+      decodePromise = decodeJPEGLossless(imageFrame, pixelData);
       break;
     case '1.2.840.10008.1.2.4.80':
       // JPEG-LS Lossless Image Compression
@@ -128,17 +128,17 @@ function decodeImageFrame(
    }
    */
 
-  if (decodePromise) {
-    decodePromise
-      .then((imageFrame) => {
-        callbackFn(postProcessDecodedPixels(imageFrame, options, start));
-      })
-      .catch((err) => {
-        throw err;
-      });
-  } else {
-    callbackFn(postProcessDecodedPixels(imageFrame, options, start));
+  if (!decodePromise) {
+    throw new Error('decodePromise not defined');
   }
+
+  decodePromise
+    .then((imageFrame) => {
+      callbackFn(postProcessDecodedPixels(imageFrame, options, start));
+    })
+    .catch((err) => {
+      throw err;
+    });
 }
 
 function postProcessDecodedPixels(imageFrame, options, start) {
