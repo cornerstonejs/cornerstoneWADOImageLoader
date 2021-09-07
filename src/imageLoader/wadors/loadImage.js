@@ -62,7 +62,7 @@ function getImageRetrievalPool() {
   return external.cornerstone.imageRetrievalPoolManager;
 }
 
-function loadImage(imageId, options) {
+function loadImage(imageId, options = {}) {
   const imageRetrievalPool = getImageRetrievalPool();
 
   const start = new Date().getTime();
@@ -78,7 +78,8 @@ function loadImage(imageId, options) {
       'multipart/related; type="application/octet-stream"; transfer-syntax=*';
 
     function sendXHR(imageURI, imageId, mediaType) {
-      console.debug(imageRetrievalPool.getRequestPool());
+      console.warn(imageRetrievalPool.numRequests.interaction);
+
       // get the pixel data from the server
       return getPixelData(imageURI, imageId, mediaType)
         .then((result) => {
@@ -106,12 +107,16 @@ function loadImage(imageId, options) {
         });
     }
 
+    const requestType = options.requestType || 'interaction';
+    const additionalDetails = options.additionalDetails || { imageId };
+    const priority = options.priority === undefined ? 5 : options.priority;
     const uri = imageId.substring(7);
+
     imageRetrievalPool.addRequest(
       sendXHR.bind(this, uri, imageId, mediaType),
-      options.requestType,
-      options.additionalDetails,
-      options.priority
+      requestType,
+      additionalDetails,
+      priority
     );
   });
 
