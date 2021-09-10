@@ -78,8 +78,6 @@ function loadImage(imageId, options = {}) {
       'multipart/related; type="application/octet-stream"; transfer-syntax=*';
 
     function sendXHR(imageURI, imageId, mediaType) {
-      console.warn(imageRetrievalPool.numRequests.interaction);
-
       // get the pixel data from the server
       return getPixelData(imageURI, imageId, mediaType)
         .then((result) => {

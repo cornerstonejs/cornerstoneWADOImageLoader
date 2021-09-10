@@ -140,7 +140,7 @@ function xhrRequest(url, imageId, defaultHeaders = {}, params = {}) {
 
       cornerstone.triggerEvent(
         cornerstone.events,
-        'cornerstoneimageloadprogress',
+        cornerstone.EVENTS.IMAGE_LOAD_PROGRESS,
         eventData
       );
     };
