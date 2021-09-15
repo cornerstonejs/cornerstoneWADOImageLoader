@@ -1,6 +1,6 @@
 {
   "name": "cornerstone-wado-image-loader",
-  "version": "4.0.0-rc3",
+  "version": "0.0.0-semantically-released",
   "description": "Cornerstone Image Loader for DICOM WADO-URI and WADO-RS",
   "keywords": [
     "DICOM",
@@ -48,6 +48,9 @@
     "webpack:watch": "webpack --progress --watch  --config ./config/webpack",
     "prepublishOnly": "npm run build && npm run test:ci && npm run doc:generate"
   },
+  "peerDependencies": {
+    "cornerstone-core": "^2.5.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.15.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.14.7",
@@ -63,7 +66,7 @@
     "concat": "^1.0.3",
     "copy-webpack-plugin": "9.0.1",
     "core-js": "^3.17.2",
-    "cornerstone-core": "^2.3.0",
+    "cornerstone-core": "^2.5.0",
     "coveralls": "^3.1.1",
     "cross-env": "^7.0.3",
     "docdash": "^1.2.0",
