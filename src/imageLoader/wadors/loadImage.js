@@ -1,4 +1,4 @@
-import metaDataManager from './metaDataManager.js';
+import external from '../../externalModules.js';
 import getPixelData from './getPixelData.js';
 import createImage from '../createImage.js';
 
@@ -18,7 +18,7 @@ export function getTransferSyntaxForContentType(contentType) {
   const parameters = contentType.split(';');
   const params = {};
 
-  parameters.forEach(parameter => {
+  parameters.forEach((parameter) => {
     // Look for a transfer-syntax=XXXX pair
     const parameterValues = parameter.split('=');
 
@@ -35,9 +35,11 @@ export function getTransferSyntaxForContentType(contentType) {
   // in the content type.
   // http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_6.html#table_6.1.1.8-3b
   const defaultTransferSyntaxByType = {
-    'image/jpeg': '1.2.840.10008.1.2.4.70',
+    'image/jpeg': '1.2.840.10008.1.2.4.50',
     'image/x-dicom-rle': '1.2.840.10008.1.2.5',
     'image/x-jls': '1.2.840.10008.1.2.4.80',
+    'image/jls': '1.2.840.10008.1.2.4.80',
+    'image/jll': '1.2.840.10008.1.2.4.70',
     'image/jp2': '1.2.840.10008.1.2.4.90',
     'image/jpx': '1.2.840.10008.1.2.4.92',
   };
@@ -58,39 +60,67 @@ export function getTransferSyntaxForContentType(contentType) {
   return defaultTransferSyntax;
 }
 
-function loadImage(imageId, options) {
+function getImageRetrievalPool() {
+  return external.cornerstone.imageRetrievalPoolManager;
+}
+
+function loadImage(imageId, options = {}) {
+  const imageRetrievalPool = getImageRetrievalPool();
+
   const start = new Date().getTime();
-  const uri = imageId.substring(7);
 
   const promise = new Promise((resolve, reject) => {
     // TODO: load bulk data items that we might need
-    const mediaType = 'multipart/related; type="application/octet-stream"'; // 'image/dicom+jp2';
 
-    // get the pixel data from the server
-    getPixelData(uri, imageId, mediaType)
-      .then(result => {
-        const transferSyntax = getTransferSyntaxForContentType(
-          result.contentType
-        );
-        const pixelData = result.imageFrame.pixelData;
-        const imagePromise = createImage(
-          imageId,
-          pixelData,
-          transferSyntax,
-          options
-        );
+    // Uncomment this on to test jpegls codec in OHIF
+    // const mediaType = 'multipart/related; type="image/x-jls"';
+    // const mediaType = 'multipart/related; type="application/octet-stream"; transfer-syntax="image/x-jls"';
+    const mediaType =
+      'multipart/related; type=application/octet-stream; transfer-syntax=*';
+    // const mediaType =
+    //   'multipart/related; type="image/jpeg"; transfer-syntax=1.2.840.10008.1.2.4.50';
 
-        imagePromise.then(image => {
-          // add the loadTimeInMS property
-          const end = new Date().getTime();
+    function sendXHR(imageURI, imageId, mediaType) {
+      // get the pixel data from the server
+      return getPixelData(imageURI, imageId, mediaType)
+        .then((result) => {
+          const transferSyntax = getTransferSyntaxForContentType(
+            result.contentType
+          );
+          const pixelData = result.imageFrame.pixelData;
+          const imagePromise = createImage(
+            imageId,
+            pixelData,
+            transferSyntax,
+            options
+          );
 
-          image.loadTimeInMS = end - start;
-          resolve(image);
-        }, reject);
-      }, reject)
-      .catch(error => {
-        reject(error);
-      });
+          imagePromise.then((image) => {
+            // add the loadTimeInMS property
+            const end = new Date().getTime();
+
+            image.loadTimeInMS = end - start;
+            resolve(image);
+          }, reject);
+        }, reject)
+        .catch((error) => {
+          reject(error);
+        });
+    }
+
+    const requestType = options.requestType || 'interaction';
+    const additionalDetails = options.additionalDetails || { imageId };
+    const priority = options.priority === undefined ? 5 : options.priority;
+    const addToBeginning = options.addToBeginning || false;
+    const uri = imageId.substring(7);
+
+    imageRetrievalPool.addRequest(
+      sendXHR.bind(this, uri, imageId, mediaType),
+      requestType,
+      additionalDetails,
+      priority,
+      addToBeginning
+    );
   });
 
   return {

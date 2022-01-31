@@ -1,1 +1,1 @@
-export default '3.0.7';
+export default '0.0.0-semantically-released';
