@@ -16,14 +16,21 @@ function convertLUTto8Bit(lut, shift) {
  *
  * @param {ImageFrame} imageFrame
  * @param {Uint8ClampedArray} rgbaBuffer
- * @returns {void}
+ * @returns {rgbaBuffer} as async function
  */
-export default function (imageFrame, rgbaBuffer) {
+export default async function (imageFrame, rgbaBuffer) {
   const numPixels = imageFrame.columns * imageFrame.rows;
   const pixelData = imageFrame.pixelData;
-  const rData = imageFrame.redPaletteColorLookupTableData;
-  const gData = imageFrame.greenPaletteColorLookupTableData;
-  const bData = imageFrame.bluePaletteColorLookupTableData;
+  const [rData, gData, bData] = await Promise.all([
+    imageFrame.redPaletteColorLookupTableData,
+    imageFrame.greenPaletteColorLookupTableData,
+    imageFrame.bluePaletteColorLookupTableData,
+  ]);
+
+  if (!rData || !gData || !bData) {
+    throw new Error(`Palette data not found in ${imageFrame}`);
+  }
+
   const len = imageFrame.redPaletteColorLookupTableData.length;
 
   let palIndex = 0;
@@ -54,4 +61,6 @@ export default function (imageFrame, rgbaBuffer) {
     rgbaBuffer[rgbaIndex++] = bDataCleaned[value];
     rgbaBuffer[rgbaIndex++] = 255;
   }
+
+  return rgbaBuffer;
 }

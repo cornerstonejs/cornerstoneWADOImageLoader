@@ -34,7 +34,7 @@ export default function convertColorSpace(imageFrame, imageData) {
   } else if (imageFrame.photometricInterpretation === 'YBR_ICT') {
     convertRGB(imageFrame, rgbaBuffer);
   } else if (imageFrame.photometricInterpretation === 'PALETTE COLOR') {
-    convertPALETTECOLOR(imageFrame, rgbaBuffer);
+    return convertPALETTECOLOR(imageFrame, rgbaBuffer);
   } else if (imageFrame.photometricInterpretation === 'YBR_FULL_422') {
     convertYBRFull422ByPixel(imageFrame.pixelData, rgbaBuffer);
   } else if (imageFrame.photometricInterpretation === 'YBR_FULL') {
