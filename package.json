@@ -103,6 +103,7 @@
   },
   "dependencies": {
     "@cornerstonejs/codec-charls": "^0.1.1",
+    "@cornerstonejs/codec-libjpeg-turbo-12bit": "^0.2.0",
     "@cornerstonejs/codec-libjpeg-turbo-8bit": "^0.0.7",
     "@cornerstonejs/codec-openjpeg": "^0.1.0",
     "dicom-parser": "^1.8.9",
