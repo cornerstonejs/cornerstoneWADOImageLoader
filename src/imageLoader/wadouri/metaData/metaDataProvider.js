@@ -20,9 +20,9 @@ function metaDataProvider(type, imageId) {
   if (type === 'generalSeriesModule') {
     return {
       modality: dataSet.string('x00080060'),
-      seriesInstanceUID: dataSet.string('x0020000e'),
+      seriesInstanceUID: dataSet.string('x0020000E'),
       seriesNumber: dataSet.intString('x00200011'),
-      studyInstanceUID: dataSet.string('x0020000d'),
+      studyInstanceUID: dataSet.string('x0020000D'),
       seriesDate: dicomParser.parseDA(dataSet.string('x00080021')),
       seriesTime: dicomParser.parseTM(dataSet.string('x00080031') || ''),
     };
