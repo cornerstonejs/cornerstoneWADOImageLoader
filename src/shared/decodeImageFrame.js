@@ -8,6 +8,7 @@ import decodeJPEGBaseline12Bit from './decoders/decodeJPEGBaseline12Bit-js.js';
 import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
 import decodeJPEGLS from './decoders/decodeJPEGLS.js';
 import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
+import decodeHTJ2K from './decoders/decodeHTJ2K.js';
 import scaleArray from './scaling/scaleArray.js';
 
 function decodeImageFrame(
@@ -110,6 +111,14 @@ function decodeImageFrame(
       // JPEG 2000 Lossy
       // imageFrame, pixelData, decodeConfig, options
       decodePromise = decodeJPEG2000(pixelData, opts);
+      break;
+    case '1.2.840.10008.1.2.4.96':
+      // HTJ2K
+      opts = {
+        ...imageFrame,
+      };
+
+      decodePromise = decodeHTJ2K(pixelData, opts);
       break;
     default:
       throw new Error(`no decoder for transfer syntax ${transferSyntax}`);
