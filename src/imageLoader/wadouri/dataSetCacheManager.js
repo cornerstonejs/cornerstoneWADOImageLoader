@@ -53,14 +53,80 @@ function load(uri, loadRequest = xhrRequest, imageId) {
   // handle success and failure of the XHR request load
   const promise = new Promise((resolve, reject) => {
     loadDICOMPromise
-      .then(function (dicomPart10AsArrayBuffer /* , xhr*/) {
+      .then(function (dicomPart10AsArrayBuffer) {
+        const flags = { isPartialContent: false };
+
+        // Allow passing extra data with the loader promise so as not to change
+        // the API
+        if (!(dicomPart10AsArrayBuffer instanceof ArrayBuffer)) {
+          if (!dicomPart10AsArrayBuffer.arrayBuffer) {
+            return reject(
+              new Error(
+                'If not returning ArrayBuffer, must return object with `arrayBuffer` parameter'
+              )
+            );
+          }
+          flags.isPartialContent =
+            dicomPart10AsArrayBuffer.flags.isPartialContent;
+          dicomPart10AsArrayBuffer = dicomPart10AsArrayBuffer.arrayBuffer;
+        }
+
         const byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
 
         // Reject the promise if parsing the dicom file fails
         let dataSet;
 
         try {
-          dataSet = dicomParser.parseDicom(byteArray);
+          if (flags.isPartialContent) {
+            dataSet = dicomParser.parseDicom(byteArray, {
+              untilTag: 'x7fe00010',
+            });
+            if (!dataSet.elements.x7fe00010) {
+              console.warn('Pixel data not found!');
+              // Re-fetch more of the file
+            }
+
+            let pixelDataSet;
+
+            try {
+              // This is expected to fail, but get the dataset anyways in the
+              // error.
+              pixelDataSet = dicomParser.parseDicom(byteArray);
+            } catch (err) {
+              console.error(err);
+              console.log('pixel data dataset:', err.dataSet);
+              pixelDataSet = err.dataSet;
+            }
+
+            dataSet.elements.x7fe00010 = pixelDataSet.elements.x7fe00010;
+
+            // Fix up broken fragments
+            const fragments = dataSet.elements.x7fe00010.fragments;
+            const totalLength = dataSet.byteArray.length;
+
+            for (const fragment of fragments) {
+              const { position, length } = fragment;
+
+              if (length > totalLength - position) {
+                console.log(
+                  `Truncated fragment, changing fragment length from ${
+                    fragment.length
+                  } to ${totalLength - position}`
+                );
+                fragment.length = totalLength - position;
+              }
+            }
+
+            /**
+             * Trying to first parse just the metadata up to the pixel data
+         then, see if we can just parse the partial byte stream of the pixel
+         data from that offset. but having trouble finding how to hook in to
+         dicomparser to kick of parsing of just the pixel data element. might
+         have to do it twice.
+             */
+          } else {
+            dataSet = dicomParser.parseDicom(byteArray);
+          }
         } catch (error) {
           return reject(error);
         }
