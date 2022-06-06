@@ -1,5 +1,6 @@
 import external from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
+import dataSetFromPartialContent from './dataset-from-partial-content.js';
 
 /**
  * This object supports loading of DICOM P10 dataset from a uri and caching it so it can be accessed
@@ -24,6 +25,30 @@ function get(uri) {
   }
 
   return loadedDataSets[uri].dataSet;
+}
+
+function update(uri, dataSet) {
+  const loadedDataSet = loadedDataSets[uri];
+
+  if (!loadedDataSet) {
+    console.error(`No loaded dataSet for uri ${uri}`);
+
+    return;
+  }
+  // Update dataset
+  cacheSizeInBytes -= loadedDataSet.dataSet.byteArray.length;
+  loadedDataSet.dataSet = dataSet;
+  cacheSizeInBytes += dataSet.byteArray.length;
+
+  external.cornerstone.triggerEvent(
+    external.cornerstone.events,
+    'datasetscachechanged',
+    {
+      uri,
+      action: 'updated',
+      cacheInfo: getInfo(),
+    }
+  );
 }
 
 // loads the dicom dataset from the wadouri sp
@@ -53,8 +78,11 @@ function load(uri, loadRequest = xhrRequest, imageId) {
   // handle success and failure of the XHR request load
   const promise = new Promise((resolve, reject) => {
     loadDICOMPromise
-      .then(function (dicomPart10AsArrayBuffer) {
-        const flags = { isPartialContent: false };
+      .then(async function (dicomPart10AsArrayBuffer) {
+        const partialContent = {
+          isPartialContent: false,
+          fileTotalLength: null,
+        };
 
         // Allow passing extra data with the loader promise so as not to change
         // the API
@@ -66,8 +94,10 @@ function load(uri, loadRequest = xhrRequest, imageId) {
               )
             );
           }
-          flags.isPartialContent =
+          partialContent.isPartialContent =
             dicomPart10AsArrayBuffer.flags.isPartialContent;
+          partialContent.fileTotalLength =
+            dicomPart10AsArrayBuffer.flags.fileTotalLength;
           dicomPart10AsArrayBuffer = dicomPart10AsArrayBuffer.arrayBuffer;
         }
 
@@ -77,53 +107,13 @@ function load(uri, loadRequest = xhrRequest, imageId) {
         let dataSet;
 
         try {
-          if (flags.isPartialContent) {
-            dataSet = dicomParser.parseDicom(byteArray, {
-              untilTag: 'x7fe00010',
+          if (partialContent.isPartialContent) {
+            // This dataSet object will include a fetchMore function,
+            dataSet = await dataSetFromPartialContent(byteArray, loadRequest, {
+              uri,
+              imageId,
+              fileTotalLength: partialContent.fileTotalLength,
             });
-            if (!dataSet.elements.x7fe00010) {
-              console.warn('Pixel data not found!');
-              // Re-fetch more of the file
-            }
-
-            let pixelDataSet;
-
-            try {
-              // This is expected to fail, but get the dataset anyways in the
-              // error.
-              pixelDataSet = dicomParser.parseDicom(byteArray);
-            } catch (err) {
-              console.error(err);
-              console.log('pixel data dataset:', err.dataSet);
-              pixelDataSet = err.dataSet;
-            }
-
-            dataSet.elements.x7fe00010 = pixelDataSet.elements.x7fe00010;
-
-            // Fix up broken fragments
-            const fragments = dataSet.elements.x7fe00010.fragments;
-            const totalLength = dataSet.byteArray.length;
-
-            for (const fragment of fragments) {
-              const { position, length } = fragment;
-
-              if (length > totalLength - position) {
-                console.log(
-                  `Truncated fragment, changing fragment length from ${
-                    fragment.length
-                  } to ${totalLength - position}`
-                );
-                fragment.length = totalLength - position;
-              }
-            }
-
-            /**
-             * Trying to first parse just the metadata up to the pixel data
-         then, see if we can just parse the partial byte stream of the pixel
-         data from that offset. but having trouble finding how to hook in to
-         dicomparser to kick of parsing of just the pixel data element. might
-         have to do it twice.
-             */
           } else {
             dataSet = dicomParser.parseDicom(byteArray);
           }
@@ -205,4 +195,5 @@ export default {
   getInfo,
   purge,
   get,
+  update,
 };
