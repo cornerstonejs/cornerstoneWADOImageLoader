@@ -68,6 +68,11 @@ function setPixelDataType(imageFrame) {
 }
 
 function createImage(imageId, pixelData, transferSyntax, options = {}) {
+  // whether to use RGBA for color images, default true as cs-legacy uses RGBA
+  // but we don't need RGBA in cs3d, and it's faster, and memory-efficient
+  // in cs3d
+  const useRGBA = options.useRGBA ?? true;
+
   if (!pixelData || !pixelData.length) {
     return Promise.reject(new Error('The file does not contain image data.'));
   }
@@ -173,12 +178,24 @@ function createImage(imageId, pixelData, transferSyntax, options = {}) {
           canvas.width = imageFrame.columns;
 
           const context = canvas.getContext('2d');
-          const imageData = context.createImageData(
-            imageFrame.columns,
-            imageFrame.rows
-          );
 
-          convertColorSpace(imageFrame, imageData);
+          let imageData;
+
+          if (useRGBA) {
+            imageData = context.createImageData(
+              imageFrame.columns,
+              imageFrame.rows
+            );
+          } else {
+            const buffer = new ArrayBuffer(
+              3 * imageFrame.columns * imageFrame.rows
+            );
+
+            imageData = new Uint8ClampedArray(buffer);
+          }
+
+          convertColorSpace(imageFrame, imageData, useRGBA);
+
           imageFrame.imageData = imageData;
           imageFrame.pixelData = imageData.data;
 
