@@ -71,7 +71,11 @@ function createImage(imageId, pixelData, transferSyntax, options = {}) {
   // whether to use RGBA for color images, default true as cs-legacy uses RGBA
   // but we don't need RGBA in cs3d, and it's faster, and memory-efficient
   // in cs3d
-  const useRGBA = options.useRGBA ?? true;
+  let useRGBA = true;
+
+  if (options.useRGBA !== undefined) {
+    useRGBA = options.useRGBA;
+  }
 
   if (!pixelData || !pixelData.length) {
     return Promise.reject(new Error('The file does not contain image data.'));
