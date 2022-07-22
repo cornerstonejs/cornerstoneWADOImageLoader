@@ -23,9 +23,7 @@ function convertYBRFull(imageFrame, colorBuffer, useRGBA) {
   }
 }
 
-export default function convertColorSpace(imageFrame, imageData, useRGBA) {
-  const colorBuffer = useRGBA ? imageData.data : imageData;
-
+export default function convertColorSpace(imageFrame, colorBuffer, useRGBA) {
   // convert based on the photometric interpretation
   if (imageFrame.photometricInterpretation === 'RGB') {
     convertRGB(imageFrame, colorBuffer, useRGBA);

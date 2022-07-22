@@ -24,9 +24,5 @@ export default function (imageFrame, colorBuffer, useRGBA) {
   }
 
   // if RGB buffer
-  for (let i = 0; i < numPixels; i++) {
-    colorBuffer[bufferIndex++] = imageFrame[rgbIndex++]; // red
-    colorBuffer[bufferIndex++] = imageFrame[rgbIndex++]; // green
-    colorBuffer[bufferIndex++] = imageFrame[rgbIndex++]; // blue
-  }
+  colorBuffer.set(imageFrame);
 }
