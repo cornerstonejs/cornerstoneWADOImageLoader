@@ -219,8 +219,8 @@ function postProcessDecodedPixels(imageFrame, options, start) {
     pixelDataArray = typedArray;
   }
 
-  if (options.preScale && options.preScale.scalingParameters) {
-    const { scalingParameters } = options.preScale;
+  if (!options.preScale.preventScale) {
+    const scalingParameters = options.preScale.scalingParameters;
     const { rescaleSlope, rescaleIntercept } = scalingParameters;
 
     if (
