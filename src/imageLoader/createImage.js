@@ -105,9 +105,9 @@ function createImage(imageId, pixelData, transferSyntax, options = {}) {
 
   // always preScale the pixel array unless it is asked not to
   options.preScale = {
-    preventScale:
-      options.preScale && options.preScale.preventScale !== undefined
-        ? options.preScale.preventScale
+    enabled:
+      options.preScale && options.preScale.enabled !== undefined
+        ? options.preScale.enabled
         : false,
   };
 
@@ -119,7 +119,8 @@ function createImage(imageId, pixelData, transferSyntax, options = {}) {
   const canvas = document.createElement('canvas');
   const imageFrame = getImageFrame(imageId);
 
-  if (!options.preScale.preventScale) {
+  // Get the scaling parameters from the metadata
+  if (options.preScale.enabled) {
     const scalingParameters = getScalingParameters(
       cornerstone.metaData,
       imageId
