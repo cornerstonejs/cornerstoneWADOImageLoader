@@ -21,12 +21,18 @@ function xhrRequest(url, imageId, defaultHeaders = {}, params = {}) {
     const xhr = new XMLHttpRequest();
 
     xhr.open('get', url, true);
-    const beforeSendHeaders = options.beforeSend(
-      xhr,
-      imageId,
-      defaultHeaders,
-      params
-    );
+    
+    let beforeSendHeaders = {};
+    try{
+      beforeSendHeaders = options.beforeSend(
+        xhr,
+        imageId,
+        defaultHeaders,
+        params
+      );
+    } catch(err) {
+      console.error(err);
+    }
 
     xhr.responseType = 'arraybuffer';
 
