@@ -133,14 +133,17 @@ See
 for how we do it in OHIF Viewer.
 
 ```js
- plugins: [
-  new CopyWebpackPlugin([
-    {
-      from:
-        '../../../node_modules/cornerstone-wado-image-loader/dist/dynamic-import',
-      to: DIST_DIR,
-    },
-  ]),
+plugins: [
+    new CopyWebpackPlugin(
+        {
+          patterns: [
+            {
+                from: '../../../node_modules/cornerstone-wado-image-loader/dist/dynamic-import',
+                to: DIST_DIR,
+            }
+          ]
+        },
+      ),
 ```
 
 Note 1: You need to give the correct path in the `CopyWebpackPlugin`, the above
