@@ -72,21 +72,77 @@ function loadImage(imageId, options = {}) {
   const promise = new Promise((resolve, reject) => {
     // TODO: load bulk data items that we might need
 
-    // Uncomment this on to test jpegls codec in OHIF
-    // const mediaType = 'multipart/related; type="image/x-jls"';
-    // const mediaType = 'multipart/related; type="application/octet-stream"; transfer-syntax="image/x-jls"';
-    const mediaType =
-      'multipart/related; type=application/octet-stream; transfer-syntax=*';
-    // const mediaType =
-    //   'multipart/related; type="image/jpeg"; transfer-syntax=1.2.840.10008.1.2.4.50';
+    const xdicomrleMediaType = 'image/x-dicom-rle';
+    const xdicomrleTransferSyntaxUID = '1.2.840.10008.1.2.5';
+    const jpegMediaType = 'image/jpeg';
+    const jpegTransferSyntaxUID1 = '1.2.840.10008.1.2.4.50';
+    const jpegTransferSyntaxUID2 = '1.2.840.10008.1.2.4.51';
+    const jpegTransferSyntaxUIDlossless = '1.2.840.10008.1.2.4.57';
+    const jllMediaType = 'image/jll';
+    const jlllTransferSyntaxUIDlossless = '1.2.840.10008.1.2.4.70';
+    const jlsMediaType = 'image/jls';
+    const jlsTransferSyntaxUIDlossless = '1.2.840.10008.1.2.4.80';
+    const jlsTransferSyntaxUID = '1.2.840.10008.1.2.4.81';
+    const jp2MediaType = 'image/jp2';
+    const jp2TransferSyntaxUIDlossless = '1.2.840.10008.1.2.4.90';
+    const jp2TransferSyntaxUID = '1.2.840.10008.1.2.4.91';
+    const octetStreamMediaType = 'application/octet-stream';
+    const octetStreamTransferSyntaxUID = '*';
+    const mediaTypes = [];
 
-    function sendXHR(imageURI, imageId, mediaType) {
+    mediaTypes.push(
+      ...[
+        {
+          mediaType: xdicomrleMediaType,
+          transferSyntaxUID: xdicomrleTransferSyntaxUID,
+        },
+        {
+          mediaType: jpegMediaType,
+          transferSyntaxUID: jpegTransferSyntaxUID1,
+        },
+        {
+          mediaType: jpegMediaType,
+          transferSyntaxUID: jpegTransferSyntaxUID2,
+        },
+        {
+          mediaType: jpegMediaType,
+          transferSyntaxUID: jpegTransferSyntaxUIDlossless,
+        },
+        {
+          mediaType: jllMediaType,
+          transferSyntaxUID: jlllTransferSyntaxUIDlossless,
+        },
+        {
+          mediaType: jlsMediaType,
+          transferSyntaxUID: jlsTransferSyntaxUIDlossless,
+        },
+        {
+          mediaType: jlsMediaType,
+          transferSyntaxUID: jlsTransferSyntaxUID,
+        },
+        {
+          mediaType: jp2MediaType,
+          transferSyntaxUID: jp2TransferSyntaxUIDlossless,
+        },
+        {
+          mediaType: jp2MediaType,
+          transferSyntaxUID: jp2TransferSyntaxUID,
+        },
+        {
+          mediaType: octetStreamMediaType,
+          transferSyntaxUID: octetStreamTransferSyntaxUID,
+        },
+      ]
+    );
+
+    function sendXHR(imageURI, imageId, mediaTypes) {
       // get the pixel data from the server
-      return getPixelData(imageURI, imageId, mediaType)
+      return getPixelData(imageURI, imageId, mediaTypes)
         .then((result) => {
           const transferSyntax = getTransferSyntaxForContentType(
             result.contentType
           );
+
           const pixelData = result.imageFrame.pixelData;
           const imagePromise = createImage(
             imageId,
@@ -115,7 +171,7 @@ function loadImage(imageId, options = {}) {
     const uri = imageId.substring(7);
 
     imageRetrievalPool.addRequest(
-      sendXHR.bind(this, uri, imageId, mediaType),
+      sendXHR.bind(this, uri, imageId, mediaTypes),
       requestType,
       additionalDetails,
       priority,

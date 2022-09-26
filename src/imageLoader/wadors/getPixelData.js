@@ -29,9 +29,144 @@ function uint8ArrayToString(data, offset, length) {
   return str;
 }
 
-function getPixelData(uri, imageId, mediaType = 'application/octet-stream') {
+/**
+ * Asserts that a given media type is valid.
+ *
+ * @params {String} mediaType media type
+ */
+
+function assertMediaTypeIsValid(mediaType) {
+  if (!mediaType) {
+    throw new Error(`Not a valid media type: ${mediaType}`);
+  }
+  const sepIndex = mediaType.indexOf('/');
+
+  if (sepIndex === -1) {
+    throw new Error(`Not a valid media type: ${mediaType}`);
+  }
+  const mediaTypeType = mediaType.slice(0, sepIndex);
+
+  const types = ['application', 'image', 'text', 'video'];
+
+  if (!types.includes(mediaTypeType)) {
+    throw new Error(`Not a valid media type: ${mediaType}`);
+  }
+  if (mediaType.slice(sepIndex + 1).includes('/')) {
+    throw new Error(`Not a valid media type: ${mediaType}`);
+  }
+}
+
+/**
+ * Parses media type and extracts its type and subtype.
+ *
+ * @param mediaType e.g. image/jpeg
+ * @private
+ */
+function parseMediaType(mediaType) {
+  assertMediaTypeIsValid(mediaType);
+
+  return mediaType.split('/');
+}
+
+/**
+ * Builds an accept header field value for HTTP GET multipart request
+ messages.
+ *
+ * @param {Array} mediaTypes Acceptable media types
+ * @param {Object} supportedMediaTypes Supported media types
+ */
+
+function buildMultipartAcceptHeaderFieldValue(mediaTypes, supportedMediaTypes) {
+  if (!Array.isArray(mediaTypes)) {
+    throw new Error('Acceptable media types must be provided as an Array');
+  }
+
+  if (typeof supportedMediaTypes !== 'object') {
+    throw new Error(
+      'Supported media types must be provided as an Array or an Object'
+    );
+  }
+
+  const fieldValueParts = [];
+
+  mediaTypes.forEach((item) => {
+    const { transferSyntaxUID, mediaType } = item;
+
+    assertMediaTypeIsValid(mediaType);
+
+    let fieldValue = `multipart/related; type="${mediaType}"`;
+
+    // SupportedMediaTypes is a lookup table that maps Transfer Syntax UID
+    // to one or more Media Types
+    if (!Object.values(supportedMediaTypes).flat(1).includes(mediaType)) {
+      if (
+        (!mediaType.endsWith('/*') || !mediaType.endsWith('/')) &&
+        mediaType !== 'application/octet-stream'
+      ) {
+        throw new Error(
+          `Media type ${mediaType} is not supported for requested resource`
+        );
+      }
+    }
+    if (transferSyntaxUID) {
+      if (transferSyntaxUID !== '*') {
+        if (!Object.keys(supportedMediaTypes).includes(transferSyntaxUID)) {
+          throw new Error(
+            `Transfer syntax ${transferSyntaxUID} is not supported for requested resource`
+          );
+        }
+        const expectedMediaTypes = supportedMediaTypes[transferSyntaxUID];
+
+        if (!expectedMediaTypes.includes(mediaType)) {
+          const actualType = parseMediaType(mediaType)[0];
+
+          expectedMediaTypes.map((expectedMediaType) => {
+            const expectedType = parseMediaType(expectedMediaType)[0];
+
+            const haveSameType = actualType === expectedType;
+
+            if (
+              haveSameType &&
+              (mediaType.endsWith('/*') || mediaType.endsWith('/'))
+            ) {
+              return null;
+            }
+
+            throw new Error(
+              `Transfer syntax ${transferSyntaxUID} is not supported for requested resource`
+            );
+          });
+        }
+      }
+      fieldValue += `; transfer-syntax=${transferSyntaxUID}`;
+    }
+
+    fieldValueParts.push(fieldValue);
+  });
+
+  return fieldValueParts.join(', ');
+}
+
+function getPixelData(uri, imageId, mediaTypes) {
+  const supportedMediaTypes = {
+    '1.2.840.10008.1.2.5': ['image/x-dicom-rle'],
+    '1.2.840.10008.1.2.4.50': ['image/jpeg'],
+    '1.2.840.10008.1.2.4.51': ['image/jpeg'],
+    '1.2.840.10008.1.2.4.57': ['image/jpeg'],
+    '1.2.840.10008.1.2.4.70': ['image/jpeg', 'image/jll'],
+    '1.2.840.10008.1.2.4.80': ['image/x-jls', 'image/jls'],
+    '1.2.840.10008.1.2.4.81': ['image/x-jls', 'image/jls'],
+    '1.2.840.10008.1.2.4.90': ['image/jp2'],
+    '1.2.840.10008.1.2.4.91': ['image/jp2'],
+    '1.2.840.10008.1.2.4.92': ['image/jpx'],
+    '1.2.840.10008.1.2.4.93': ['image/jpx'],
+  };
+
   const headers = {
-    Accept: mediaType,
+    Accept: buildMultipartAcceptHeaderFieldValue(
+      mediaTypes,
+      supportedMediaTypes
+    ),
   };
 
   return new Promise((resolve, reject) => {
