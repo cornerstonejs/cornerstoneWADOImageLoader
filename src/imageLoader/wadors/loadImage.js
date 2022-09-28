@@ -1,7 +1,7 @@
 import external from '../../externalModules.js';
 import getPixelData from './getPixelData.js';
 import createImage from '../createImage.js';
-
+import { mediaTypes } from '../../shared/mediaTypesUtils/mediaTypes.js';
 /**
  * Helper method to extract the transfer-syntax from the response of the server.
  * @param {string} contentType The value of the content-type header as returned by the WADO-RS server.
@@ -71,69 +71,6 @@ function loadImage(imageId, options = {}) {
 
   const promise = new Promise((resolve, reject) => {
     // TODO: load bulk data items that we might need
-
-    const xdicomrleMediaType = 'image/x-dicom-rle';
-    const xdicomrleTransferSyntaxUID = '1.2.840.10008.1.2.5';
-    const jpegMediaType = 'image/jpeg';
-    const jpegTransferSyntaxUID1 = '1.2.840.10008.1.2.4.50';
-    const jpegTransferSyntaxUID2 = '1.2.840.10008.1.2.4.51';
-    const jpegTransferSyntaxUIDlossless = '1.2.840.10008.1.2.4.57';
-    const jllMediaType = 'image/jll';
-    const jlllTransferSyntaxUIDlossless = '1.2.840.10008.1.2.4.70';
-    const jlsMediaType = 'image/jls';
-    const jlsTransferSyntaxUIDlossless = '1.2.840.10008.1.2.4.80';
-    const jlsTransferSyntaxUID = '1.2.840.10008.1.2.4.81';
-    const jp2MediaType = 'image/jp2';
-    const jp2TransferSyntaxUIDlossless = '1.2.840.10008.1.2.4.90';
-    const jp2TransferSyntaxUID = '1.2.840.10008.1.2.4.91';
-    const octetStreamMediaType = 'application/octet-stream';
-    const octetStreamTransferSyntaxUID = '*';
-    const mediaTypes = [];
-
-    mediaTypes.push(
-      ...[
-        {
-          mediaType: xdicomrleMediaType,
-          transferSyntaxUID: xdicomrleTransferSyntaxUID,
-        },
-        {
-          mediaType: jpegMediaType,
-          transferSyntaxUID: jpegTransferSyntaxUID1,
-        },
-        {
-          mediaType: jpegMediaType,
-          transferSyntaxUID: jpegTransferSyntaxUID2,
-        },
-        {
-          mediaType: jpegMediaType,
-          transferSyntaxUID: jpegTransferSyntaxUIDlossless,
-        },
-        {
-          mediaType: jllMediaType,
-          transferSyntaxUID: jlllTransferSyntaxUIDlossless,
-        },
-        {
-          mediaType: jlsMediaType,
-          transferSyntaxUID: jlsTransferSyntaxUIDlossless,
-        },
-        {
-          mediaType: jlsMediaType,
-          transferSyntaxUID: jlsTransferSyntaxUID,
-        },
-        {
-          mediaType: jp2MediaType,
-          transferSyntaxUID: jp2TransferSyntaxUIDlossless,
-        },
-        {
-          mediaType: jp2MediaType,
-          transferSyntaxUID: jp2TransferSyntaxUID,
-        },
-        {
-          mediaType: octetStreamMediaType,
-          transferSyntaxUID: octetStreamTransferSyntaxUID,
-        },
-      ]
-    );
 
     function sendXHR(imageURI, imageId, mediaTypes) {
       // get the pixel data from the server
