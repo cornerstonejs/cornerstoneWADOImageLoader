@@ -1,7 +1,6 @@
 import external from '../../externalModules.js';
 import getPixelData from './getPixelData.js';
 import createImage from '../createImage.js';
-import { mediaTypes } from '../../shared/mediaTypesUtils/mediaTypes.js';
 /**
  * Helper method to extract the transfer-syntax from the response of the server.
  * @param {string} contentType The value of the content-type header as returned by the WADO-RS server.
@@ -72,9 +71,9 @@ function loadImage(imageId, options = {}) {
   const promise = new Promise((resolve, reject) => {
     // TODO: load bulk data items that we might need
 
-    function sendXHR(imageURI, imageId, mediaTypes) {
+    function sendXHR(imageURI, imageId) {
       // get the pixel data from the server
-      return getPixelData(imageURI, imageId, mediaTypes)
+      return getPixelData(imageURI, imageId)
         .then((result) => {
           const transferSyntax = getTransferSyntaxForContentType(
             result.contentType
@@ -108,7 +107,7 @@ function loadImage(imageId, options = {}) {
     const uri = imageId.substring(7);
 
     imageRetrievalPool.addRequest(
-      sendXHR.bind(this, uri, imageId, mediaTypes),
+      sendXHR.bind(this, uri, imageId),
       requestType,
       additionalDetails,
       priority,

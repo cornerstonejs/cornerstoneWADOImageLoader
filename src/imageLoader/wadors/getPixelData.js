@@ -1,7 +1,6 @@
 import { xhrRequest } from '../internal/index.js';
 import findIndexOfString from './findIndexOfString.js';
-import buildMultipartAcceptHeaderFieldValue from '../../shared/mediaTypesUtils/buildMultipartAcceptHeaderFieldValue.js';
-
+import { multipartAcceptHeaderFieldValue } from '../../shared/mediaTypesUtils/multipartAcceptHeaderFieldValue.js';
 function findBoundary(header) {
   for (let i = 0; i < header.length; i++) {
     if (header[i].substr(0, 2) === '--') {
@@ -30,26 +29,9 @@ function uint8ArrayToString(data, offset, length) {
   return str;
 }
 
-function getPixelData(uri, imageId, mediaTypes) {
-  const supportedMediaTypes = {
-    '1.2.840.10008.1.2.5': ['image/x-dicom-rle'],
-    '1.2.840.10008.1.2.4.50': ['image/jpeg'],
-    '1.2.840.10008.1.2.4.51': ['image/jpeg'],
-    '1.2.840.10008.1.2.4.57': ['image/jpeg'],
-    '1.2.840.10008.1.2.4.70': ['image/jpeg', 'image/jll'],
-    '1.2.840.10008.1.2.4.80': ['image/x-jls', 'image/jls'],
-    '1.2.840.10008.1.2.4.81': ['image/x-jls', 'image/jls'],
-    '1.2.840.10008.1.2.4.90': ['image/jp2'],
-    '1.2.840.10008.1.2.4.91': ['image/jp2'],
-    '1.2.840.10008.1.2.4.92': ['image/jpx'],
-    '1.2.840.10008.1.2.4.93': ['image/jpx'],
-  };
-
+function getPixelData(uri, imageId) {
   const headers = {
-    Accept: buildMultipartAcceptHeaderFieldValue(
-      mediaTypes,
-      supportedMediaTypes
-    ),
+    Accept: multipartAcceptHeaderFieldValue,
   };
 
   return new Promise((resolve, reject) => {
