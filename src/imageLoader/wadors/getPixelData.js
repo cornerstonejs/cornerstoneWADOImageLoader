@@ -1,6 +1,6 @@
 import { xhrRequest } from '../internal/index.js';
 import findIndexOfString from './findIndexOfString.js';
-
+import { multipartAcceptHeaderFieldValue } from '../../shared/mediaTypesUtils/multipartAcceptHeaderFieldValue.js';
 function findBoundary(header) {
   for (let i = 0; i < header.length; i++) {
     if (header[i].substr(0, 2) === '--') {
@@ -29,9 +29,9 @@ function uint8ArrayToString(data, offset, length) {
   return str;
 }
 
-function getPixelData(uri, imageId, mediaType = 'application/octet-stream') {
+function getPixelData(uri, imageId) {
   const headers = {
-    Accept: mediaType,
+    Accept: multipartAcceptHeaderFieldValue,
   };
 
   return new Promise((resolve, reject) => {

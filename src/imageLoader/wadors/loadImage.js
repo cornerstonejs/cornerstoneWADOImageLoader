@@ -1,7 +1,6 @@
 import external from '../../externalModules.js';
 import getPixelData from './getPixelData.js';
 import createImage from '../createImage.js';
-
 /**
  * Helper method to extract the transfer-syntax from the response of the server.
  * @param {string} contentType The value of the content-type header as returned by the WADO-RS server.
@@ -72,21 +71,14 @@ function loadImage(imageId, options = {}) {
   const promise = new Promise((resolve, reject) => {
     // TODO: load bulk data items that we might need
 
-    // Uncomment this on to test jpegls codec in OHIF
-    // const mediaType = 'multipart/related; type="image/x-jls"';
-    // const mediaType = 'multipart/related; type="application/octet-stream"; transfer-syntax="image/x-jls"';
-    const mediaType =
-      'multipart/related; type=application/octet-stream; transfer-syntax=*';
-    // const mediaType =
-    //   'multipart/related; type="image/jpeg"; transfer-syntax=1.2.840.10008.1.2.4.50';
-
-    function sendXHR(imageURI, imageId, mediaType) {
+    function sendXHR(imageURI, imageId) {
       // get the pixel data from the server
-      return getPixelData(imageURI, imageId, mediaType)
+      return getPixelData(imageURI, imageId)
         .then((result) => {
           const transferSyntax = getTransferSyntaxForContentType(
             result.contentType
           );
+
           const pixelData = result.imageFrame.pixelData;
           const imagePromise = createImage(
             imageId,
@@ -115,7 +107,7 @@ function loadImage(imageId, options = {}) {
     const uri = imageId.substring(7);
 
     imageRetrievalPool.addRequest(
-      sendXHR.bind(this, uri, imageId, mediaType),
+      sendXHR.bind(this, uri, imageId),
       requestType,
       additionalDetails,
       priority,

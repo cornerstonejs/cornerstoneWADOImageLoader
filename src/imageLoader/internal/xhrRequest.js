@@ -21,6 +21,7 @@ function xhrRequest(url, imageId, defaultHeaders = {}, params = {}) {
     const xhr = new XMLHttpRequest();
 
     xhr.open('get', url, true);
+
     const beforeSendHeaders = options.beforeSend(
       xhr,
       imageId,
@@ -39,6 +40,7 @@ function xhrRequest(url, imageId, defaultHeaders = {}, params = {}) {
       if (key === 'Accept' && url.indexOf('accept=') !== -1) {
         return;
       }
+
       xhr.setRequestHeader(key, headers[key]);
     });
 
