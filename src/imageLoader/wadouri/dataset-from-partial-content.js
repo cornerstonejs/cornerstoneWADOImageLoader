@@ -2,8 +2,6 @@
 
 import external from '../../externalModules.js';
 
-const { dicomParser } = external;
-
 function fixFragments(dataSet) {
   // The partially parsed pixelData element has incorrect fragment
   // lengths because the byte array is truncated, so we manually set
@@ -28,6 +26,7 @@ function fixFragments(dataSet) {
 }
 
 function parsePartialByteArray(byteArray) {
+  const { dicomParser } = external;
   /**
    * First parse just up to pixelData. This will make sure the
    * metadata header is correctly parsed (assuming no other error is
@@ -35,6 +34,7 @@ function parsePartialByteArray(byteArray) {
    * arraybuffer. This will error, but still kick out the parsed
    * partial pixel data in the error object.
    */
+
   let dataSet = dicomParser.parseDicom(byteArray, {
     untilTag: 'x7fe00010',
   });
