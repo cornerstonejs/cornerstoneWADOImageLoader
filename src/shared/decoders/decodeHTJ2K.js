@@ -1,12 +1,13 @@
 // https://emscripten.org/docs/api_reference/module.html
-import openJphFactory from '../../../codecs/openjphjs.js';
+//import openJphFactory from '@cornerstonejs/codec-openjph';
 
 // Webpack asset/resource copies this to our output folder
+//import openjphWasm from '@cornerstonejs/codec-openjph/wasm';
+// import openJphFactory from '../../../codecs/openjphjs.js';
+// import openjphWasm from '../../../codecs/openjphjs.wasm';
 
-// TODO: At some point maybe we can use this instead.
-// This is closer to what Webpack 5 wants but it doesn't seem to work now
-// const wasm = new URL('./blah.wasm', import.meta.url)
-import openjphWasm from '../../../codecs/openjphjs.wasm';
+import openJphFactory from '@cornerstonejs/codec-openjph/dist/openjphjs.js';
+import openjphWasm from '@cornerstonejs/codec-openjph/dist/openjphjs.wasm';
 
 const local = {
   codec: undefined,
@@ -21,6 +22,7 @@ export function initialize(decodeConfig) {
     return Promise.resolve();
   }
 
+  console.log('Calling openJphFactory', openJphFactory);
   const openJphModule = openJphFactory({
     locateFile: (f) => {
       if (f.endsWith('.wasm')) {
@@ -110,6 +112,7 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
   let pixelData = getPixelData(frameInfo, decodedBufferInWASM);
   const { buffer: b, byteOffset, byteLength } = pixelData;
   const pixelDataArrayBuffer = b.slice(byteOffset, byteOffset + byteLength);
+
   pixelData = new pixelData.constructor(pixelDataArrayBuffer);
 
   const encodeOptions = {
