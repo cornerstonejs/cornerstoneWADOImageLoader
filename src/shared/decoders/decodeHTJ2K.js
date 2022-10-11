@@ -22,7 +22,6 @@ export function initialize(decodeConfig) {
     return Promise.resolve();
   }
 
-  console.log('Calling openJphFactory', openJphFactory);
   const openJphModule = openJphFactory({
     locateFile: (f) => {
       if (f.endsWith('.wasm')) {
