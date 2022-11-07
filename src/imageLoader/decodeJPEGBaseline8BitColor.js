@@ -43,14 +43,27 @@ function decodeJPEGBaseline8BitColor(imageFrame, pixelData, canvas) {
     fileReader.onload = function() {
       const img = new Image();
 
-      img.onload = function() {
+      img.onload = function () {
+
+        const maxSize = Math.max(
+          img.height,
+          img.width
+        )
+        const maxSizeThresh = 1000
+
+        if (maxSize > maxSizeThresh) {
+          const ratio = maxSizeThresh / maxSize
+          img.width   *= ratio
+          img.height  *= ratio
+        }
+
         canvas.height = img.height;
         canvas.width = img.width;
         imageFrame.rows = img.height;
         imageFrame.columns = img.width;
         const context = canvas.getContext('2d');
 
-        context.drawImage(this, 0, 0);
+        context.drawImage(this, 0, 0,img.width,img.height);
         const imageData = context.getImageData(0, 0, img.width, img.height);
         const end = new Date().getTime();
 

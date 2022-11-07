@@ -58,6 +58,40 @@ function handler(data, doneCallback) {
     );
   }
 
+  // snippet for resizing the image pixel data for Mobile
+  if (imageFrame.samplesPerPixel === 1) {
+    const maxSize = Math.max(imageFrame.columns, imageFrame.rows);
+    const maxSizeThresh = 1000;
+    if (maxSize > maxSizeThresh) {
+      const factor = maxSize / maxSizeThresh;
+      const width = imageFrame.columns; // width is columns
+      const height = imageFrame.rows;
+      const newWidth = Math.floor(width / factor);
+      const newHeight = Math.floor(height / factor);
+
+      // create new array same type as original
+      const resizedPixelData = new imageFrame.pixelData.constructor(
+        newWidth * newHeight
+      );
+      // resize using nearest neighbour interpolation
+      for (let i = 0; i < resizedPixelData.length; i++) {
+        const x = i % newWidth;
+        const y = Math.floor(i / newWidth);
+
+        const projX = Math.floor(x * factor);
+        const projY = Math.floor(y * factor);
+        const projI = projX + projY * width;
+
+        resizedPixelData[i] = imageFrame.pixelData[projI];
+      }
+
+      imageFrame.columns = newWidth;
+      imageFrame.rows = newHeight;
+      imageFrame.pixelData = resizedPixelData;
+      imageFrame.pixelDataLength = resizedPixelData.length;
+    }
+  }
+
   calculateMinMax(imageFrame, strict);
 
   // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
