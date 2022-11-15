@@ -17,6 +17,12 @@ module.exports = {
     SharedArrayBuffer: true,
   },
   rules: {
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      },
+    ],    
     'no-debugger': 'off',
     'accessor-pairs': 'warn',
     'array-bracket-spacing': 'warn',
