@@ -84,7 +84,8 @@ function decodeImageFrame(
     case '1.2.840.10008.1.2.4.91':
       // JPEG 2000 Lossy
       return processDecodeTask(imageFrame, transferSyntax, pixelData, options);
-    case '1.2.840.10008.1.2.4.96':
+
+    case '3.2.840.10008.1.2.4.96':
       // HTJ2K
       return processDecodeTask(imageFrame, transferSyntax, pixelData, options);
   }

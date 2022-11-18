@@ -27,11 +27,8 @@ function decodeImageFrame(
 
   switch (transferSyntax) {
     case '1.2.840.10008.1.2':
-      // Implicit VR Little Endian
-      decodePromise = decodeLittleEndian(imageFrame, pixelData);
-      break;
     case '1.2.840.10008.1.2.1':
-      // Explicit VR Little Endian
+      // Implicit or Explicit VR Little Endian
       decodePromise = decodeLittleEndian(imageFrame, pixelData);
       break;
     case '1.2.840.10008.1.2.2':
@@ -112,7 +109,7 @@ function decodeImageFrame(
       // imageFrame, pixelData, decodeConfig, options
       decodePromise = decodeJPEG2000(pixelData, opts);
       break;
-    case '1.2.840.10008.1.2.4.96':
+    case '3.2.840.10008.1.2.4.96':
       // HTJ2K
       opts = {
         ...imageFrame,

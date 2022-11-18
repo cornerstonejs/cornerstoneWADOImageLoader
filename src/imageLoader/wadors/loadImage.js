@@ -43,7 +43,7 @@ export function getTransferSyntaxForContentType(contentType) {
     'image/jp2': '1.2.840.10008.1.2.4.90',
     'image/jpx': '1.2.840.10008.1.2.4.92',
     // Temporary types, until ratified by DICOM committed - TODO
-    'image/jphc': '1.2.840.10008.1.2.4.96',
+    'image/jphc': '3.2.840.10008.1.2.4.96',
     'image/jxl': '1.2.840.10008.1.2.4.140',
   };
 
