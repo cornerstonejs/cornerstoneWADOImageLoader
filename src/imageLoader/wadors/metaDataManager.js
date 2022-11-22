@@ -53,7 +53,6 @@ function combineFrameInstance(frame, instance) {
       .filter((it) => it !== undefined && typeof it === 'object');
 
     return Object.assign(
-      { frameNumber },
       rest,
       ...Object.values(shared),
       ...Object.values(perFrame)
