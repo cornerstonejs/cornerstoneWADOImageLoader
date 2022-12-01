@@ -87,6 +87,7 @@ function purge() {
 export default {
   add,
   get,
+  getValue,
   remove,
   purge,
   retrieveFirstFrameMetadata,
