@@ -13,16 +13,6 @@ function metaDataProvider(type, imageId) {
     return;
   }
 
-  // adjust metadata in case of multifrme NM data
-  if (
-    metaData['00540022'] &&
-    metaData['00540022'].Value &&
-    metaData['00540022'].Value.length > 0
-  ) {
-    metaData['00200032'] = metaData['00540022'].Value[0]['00200032'];
-    metaData['00200037'] = metaData['00540022'].Value[0]['00200037'];
-  }
-
   if (type === 'MultiframeModule') {
     return {
       SharedFunctionalGroupsSequence: getValue(metaData['52009229']),
@@ -55,6 +45,17 @@ function metaDataProvider(type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
+    // adjust metadata in case of multiframe NM data, as the diucom tags
+    // 00200032 and 00200037 could be found only in the dicom tag 00540022
+    if (
+      metaData['00540022'] &&
+      metaData['00540022'].Value &&
+      metaData['00540022'].Value.length > 0
+    ) {
+      metaData['00200032'] = metaData['00540022'].Value[0]['00200032'];
+      metaData['00200037'] = metaData['00540022'].Value[0]['00200037'];
+    }
+
     const imageOrientationPatient = getNumberValues(metaData['00200037'], 6);
     const imagePositionPatient = getNumberValues(metaData['00200032'], 3);
     const pixelSpacing = getNumberValues(metaData['00280030'], 2);
