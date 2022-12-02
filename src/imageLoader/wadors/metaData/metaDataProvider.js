@@ -53,16 +53,6 @@ function metaDataProvider(type, imageId) {
     return;
   }
 
-  // adjust metadata in case of multifrme NM data
-  if (
-    metaData['00540022'] &&
-    metaData['00540022'].Value &&
-    metaData['00540022'].Value.length > 0
-  ) {
-    metaData['00200032'] = metaData['00540022'].Value[0]['00200032'];
-    metaData['00200037'] = metaData['00540022'].Value[0]['00200037'];
-  }
-
   if (type === 'MultiframeModule') {
     return {
       SharedFunctionalGroupsSequence: getValue(metaData['52009229']),
