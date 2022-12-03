@@ -1,3 +1,4 @@
+import { convertToFalseColorImage } from 'cornerstone-core';
 import imageIdToURI from '../imageIdToURI.js';
 import { combineFrameInstance } from './combineFrameInstance.js';
 import getValue from './metaData/getValue.js';
@@ -87,7 +88,6 @@ function purge() {
 export default {
   add,
   get,
-  getValue,
   remove,
   purge,
   retrieveFirstFrameMetadata,

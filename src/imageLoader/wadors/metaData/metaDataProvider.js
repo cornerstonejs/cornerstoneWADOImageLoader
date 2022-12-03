@@ -55,7 +55,6 @@ function metaDataProvider(type, imageId) {
 
   if (type === 'MultiframeModule') {
     return {
-      SharedFunctionalGroupsSequence: getValue(metaData['52009229']),
       NumberOfFrames: getValue(metaData['00280008']),
     };
   }
