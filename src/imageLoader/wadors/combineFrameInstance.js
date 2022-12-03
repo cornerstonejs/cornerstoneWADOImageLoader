@@ -1,6 +1,44 @@
-import getValue from "./getValue";
+function getTagValue(tag, justElement = true) {
+  if (tag && tag.Value) {
+    if (tag.Value[0] && justElement) {
+      return tag.Value[0];
+    }
 
-export default function combineFrameInstance(frame, instance) {
+    return tag.Value;
+  }
+
+  return tag;
+}
+
+function getMultiframeInformation(
+  PerFrameFunctionalGroupsSequence,
+  SharedFunctionalGroupsSequence,
+  frameNumber
+) {
+  const shared = (
+    SharedFunctionalGroupsSequence
+      ? Object.values(SharedFunctionalGroupsSequence[0])
+      : []
+  )
+    .map((it) => it[0])
+    .filter((it) => it !== undefined && typeof it === 'object');
+  const perFrame = (
+    PerFrameFunctionalGroupsSequence
+      ? Object.values(PerFrameFunctionalGroupsSequence[frameNumber - 1])
+      : []
+  )
+    .map((it) => it.Value[0])
+    .filter((it) => it !== undefined && typeof it === 'object');
+
+  return {
+    shared,
+    perFrame,
+  };
+}
+
+// function that retrieves specific frame metadata information from multiframe
+// metadata
+export default function combineFrameInstance(frameNumber, instance) {
   let {
     52009230: PerFrameFunctionalGroupsSequence,
     52009229: SharedFunctionalGroupsSequence,
@@ -9,35 +47,25 @@ export default function combineFrameInstance(frame, instance) {
     ...rest
   } = instance;
 
-  PerFrameFunctionalGroupsSequence = getValue(
+  PerFrameFunctionalGroupsSequence = getTagValue(
     PerFrameFunctionalGroupsSequence,
     false
   );
-  SharedFunctionalGroupsSequence = getValue(
+  SharedFunctionalGroupsSequence = getTagValue(
     SharedFunctionalGroupsSequence,
     false
   );
-  NumberOfFrames = getValue(NumberOfFrames);
-
+  NumberOfFrames = getTagValue(NumberOfFrames);
   if (PerFrameFunctionalGroupsSequence || NumberOfFrames > 1) {
-    const frameNumber = Number.parseInt(frame || 1, 10);
-    const shared = (
-      SharedFunctionalGroupsSequence
-        ? Object.values(SharedFunctionalGroupsSequence[0])
-        : []
-    )
-      .map((it) => it[0])
-      .filter((it) => it !== undefined && typeof it === 'object');
-    const perFrame = (
-      PerFrameFunctionalGroupsSequence
-        ? Object.values(PerFrameFunctionalGroupsSequence[frameNumber - 1])
-        : []
-    )
-      .map((it) => it.Value[0])
-      .filter((it) => it !== undefined && typeof it === 'object');
+    const { shared, perFrame } = getMultiframeInformation(
+      PerFrameFunctionalGroupsSequence,
+      SharedFunctionalGroupsSequence,
+      frameNumber
+    );
 
     return Object.assign(
       rest,
+      { '00280008': NumberOfFrames },
       ...Object.values(shared),
       ...Object.values(perFrame)
     );
