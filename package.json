@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.15.4",
+    "@babel/eslint-parser": "^7.19.1",
     "@babel/plugin-proposal-object-rest-spread": "^7.14.7",
     "@babel/plugin-transform-runtime": "^7.15.0",
     "@babel/preset-env": "^7.15.4",
@@ -100,7 +101,6 @@
     "worker-loader": "^3.0.8"
   },
   "dependencies": {
-    "@babel/eslint-parser": "^7.19.1",
     "@cornerstonejs/codec-charls": "^0.1.1",
     "@cornerstonejs/codec-libjpeg-turbo-8bit": "^0.0.7",
     "@cornerstonejs/codec-openjpeg": "^0.1.0",
