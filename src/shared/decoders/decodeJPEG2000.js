@@ -44,6 +44,8 @@ export function initialize(decodeConfig) {
 async function decodeAsync(compressedImageFrame, imageInfo) {
   await initialize();
   const decoder = local.decoder;
+  const decodeLevel = 0;
+  const decodeLayer = 0;
 
   // get pointer to the source/encoded bit stream buffer in WASM memory
   // that can hold the encoded bitstream
@@ -55,8 +57,8 @@ async function decodeAsync(compressedImageFrame, imageInfo) {
   encodedBufferInWASM.set(compressedImageFrame);
 
   // decode it
-  decoder.decode();
-  // decoder.decodeSubResolution(decodeLevel, decodeLayer);
+  // decoder.decode();
+  decoder.decodeSubResolution(decodeLevel, decodeLayer);
   // const resolutionAtLevel = decoder.calculateSizeAtDecompositionLevel(decodeLevel);
 
   // get information about the decoded image
