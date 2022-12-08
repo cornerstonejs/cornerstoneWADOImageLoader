@@ -11,13 +11,16 @@ import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
 import decodeHTJ2K from './decoders/decodeHTJ2K.js';
 import scaleArray from './scaling/scaleArray.js';
 
-function decodeImageFrame(
+/**
+ * Decodes the provided image frame.
+ * This is an async function return the result.
+ */
+async function decodeImageFrame(
   imageFrame,
   transferSyntax,
   pixelData,
   decodeConfig,
-  options,
-  callbackFn
+  options
 ) {
   const start = new Date().getTime();
 
@@ -138,15 +141,9 @@ function decodeImageFrame(
     throw new Error('decodePromise not defined');
   }
 
-  decodePromise
-    .then((imageFrame) => {
-      callbackFn(
-        postProcessDecodedPixels(imageFrame, options, start, decodeConfig)
-      );
-    })
-    .catch((err) => {
-      throw err;
-    });
+  const decodedFrame = await decodePromise;
+
+  return postProcessDecodedPixels(decodedFrame, options, start, decodeConfig);
 }
 
 function postProcessDecodedPixels(imageFrame, options, start, decodeConfig) {
@@ -212,7 +209,7 @@ function postProcessDecodedPixels(imageFrame, options, start, decodeConfig) {
 
     if (length !== imageFramePixelData.length) {
       throw new Error(
-        'target array for image does not have the same length as the decoded image length.'
+        `target array for image does not have the same length (${length}) as the decoded image length (${imageFramePixelData.length}).`
       );
     }
 
