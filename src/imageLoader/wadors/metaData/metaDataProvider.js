@@ -1,22 +1,25 @@
 import external from '../../../externalModules.js';
 import getNumberValues from './getNumberValues.js';
-import getValue from './getValue.js';
 import getNumberValue from './getNumberValue.js';
 import getOverlayPlaneModule from './getOverlayPlaneModule.js';
 import metaDataManager from '../metaDataManager.js';
+import getValue from './getValue.js';
 
 function metaDataProvider(type, imageId) {
+  if (type === 'MultiframeModule') {
+    // the get function removes the PerFrameFunctionalGroupsSequence
+    const { metadata } = metaDataManager.retrieveFirstFrameMetadata(imageId);
+
+    return {
+      NumberOfFrames: getNumberValue(metadata['00280008']),
+      PerFrameFunctionalGroupsSequence: metadata['52009230'],
+    };
+  }
   const { dicomParser } = external;
   const metaData = metaDataManager.get(imageId);
 
   if (!metaData) {
     return;
-  }
-
-  if (type === 'MultiframeModule') {
-    return {
-      NumberOfFrames: getValue(metaData['00280008']),
-    };
   }
 
   if (type === 'generalSeriesModule') {

@@ -1,5 +1,6 @@
 import external from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
+import combineFrameInstance from './combineFrameInstance.js';
 import dataSetFromPartialContent from './dataset-from-partial-content.js';
 
 /**
@@ -14,17 +15,90 @@ let loadedDataSets = {};
 
 let promises = {};
 
+function isMultiFrame(uri) {
+  const dataSet = _get(uri);
+
+  return _isMultiFrame(dataSet);
+}
+
+function _isMultiFrame(dataSet) {
+  // Checks if dicomTag NumberOf Frames exists and it is greater than one
+  if (!dataSet) {
+    return false;
+  }
+
+  const numberOfFrames = dataSet.intString('x00280008');
+
+  return numberOfFrames && numberOfFrames > 1;
+}
+
+function retrieveFrameIndex(uri) {
+  return uri.indexOf('&frame=');
+}
+
+function _get(uri) {
+  if (!loadedDataSets[uri]) {
+    return;
+  }
+
+  return loadedDataSets[uri];
+}
+
+function retrieveFirstFrameMetadata(uri) {
+  const frameParameterIndex = retrieveFrameIndex(uri);
+  const multiframeURI = uri.slice(0, frameParameterIndex);
+  const frame = parseInt(uri.slice(frameParameterIndex + 7), 10);
+
+  let dataSet;
+
+  if (loadedDataSets[uri]) {
+    dataSet = loadedDataSets[multiframeURI].dataSet;
+  } else {
+    dataSet = undefined;
+  }
+
+  return { dataSet, frame };
+}
+
 // returns true if the wadouri for the specified index has been loaded
 function isLoaded(uri) {
   return loadedDataSets[uri] !== undefined;
+}
+
+function generateMultiframeWADOURIs(uri) {
+  const listWADOURIs = [];
+
+  const dataSet = _get(uri);
+
+  if (_isMultiFrame(dataSet)) {
+    const numberOfFrames = dataSet.intString('x00280008');
+
+    for (let i = 1; i <= numberOfFrames; i++) {
+      listWADOURIs.push(`${uri}&frame=${i}`);
+    }
+  } else {
+    listWADOURIs.push(uri);
+  }
+
+  return listWADOURIs;
 }
 
 function get(uri) {
   if (!loadedDataSets[uri]) {
     return;
   }
+  let dataSet;
 
-  return loadedDataSets[uri].dataSet;
+  if (uri.includes('&frame=')) {
+    const { frame, dataSet: multiframeDataSet } =
+      retrieveFirstFrameMetadata(uri);
+
+    dataSet = combineFrameInstance(frame, multiframeDataSet);
+  } else {
+    dataSet = loadedDataSets[uri].dataSet;
+  }
+
+  return dataSet;
 }
 
 function update(uri, dataSet) {
@@ -196,4 +270,6 @@ export default {
   purge,
   get,
   update,
+  generateMultiframeWADOURIs,
+  isMultiFrame,
 };

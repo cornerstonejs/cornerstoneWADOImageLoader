@@ -1,34 +1,43 @@
-import { convertToFalseColorImage } from 'cornerstone-core';
 import imageIdToURI from '../imageIdToURI.js';
 import combineFrameInstance from './combineFrameInstance.js';
+import getValue from './metaData/getValue.js';
 
 let metadataByImageURI = [];
 
 // get metadata information for the first frame
-function retrieveFirstFrameMetadata(imageURI) {
+function _retrieveFirstFrameMetadata(imageURI) {
   const lastSlashIdx = imageURI.indexOf('/frames/') + 8;
   // imageid string without frame number
   const imageIdFrameless = imageURI.slice(0, lastSlashIdx);
   // calculating frame number
   const frame = parseInt(imageURI.slice(lastSlashIdx), 10);
   // retrieving the frame 1 that contains multiframe information
-  const metadataInformation = metadataByImageURI[`${imageIdFrameless}1`];
+
+  const metadata = metadataByImageURI[`${imageIdFrameless}1`];
 
   return {
-    metadataInformation,
+    metadata,
     frame,
   };
 }
 
+function retrieveFirstFrameMetadata(imageId) {
+  const imageURI = imageIdToURI(imageId);
+
+  return _retrieveFirstFrameMetadata(imageURI);
+}
+
+function isMultiFrame(metadata) {
+  // Checks if dicomTag NumberOf Frames exists and it is greater than one
+  const numberOfFrames = getValue(metadata['00280008']);
+
+  return numberOfFrames && numberOfFrames > 1;
+}
+
 function add(imageId, metadata) {
   const imageURI = imageIdToURI(imageId);
-  const multiframe = metadata['00280008'] && metadata['00280008'] > 1;
-  // add multiframe check
 
-  metadataByImageURI[imageURI] = {
-    metadata,
-    multiframe,
-  };
+  metadataByImageURI[imageURI] = metadata;
 }
 
 // multiframes images will have only one imageid returned by the dicomweb
@@ -39,29 +48,27 @@ function get(imageId) {
   const imageURI = imageIdToURI(imageId);
 
   // dealing first with the non multiframe information
-  let metadataInformation = metadataByImageURI[imageURI];
+  let metadata = metadataByImageURI[imageURI];
 
-  if (metadataInformation) {
-    if (!metadataInformation.multiframe) {
-      return metadataInformation.metadata;
+  if (metadata) {
+    if (!isMultiFrame(metadata)) {
+      return metadata;
     }
   }
 
   let frame = 1;
 
-  let metadata;
-
-  if (!metadataInformation) {
+  if (!metadata) {
     // in this case it could indicate a multiframe imageid
     // Try to get the first frame metadata, where is stored the multiframe info
-    const firstFrameInfo = retrieveFirstFrameMetadata(imageURI);
+    const firstFrameInfo = _retrieveFirstFrameMetadata(imageURI);
 
-    metadataInformation = firstFrameInfo.metadataInformation;
+    metadata = firstFrameInfo.metadata;
     frame = firstFrameInfo.frame;
   }
 
-  if (metadataInformation) {
-    metadata = combineFrameInstance(frame, metadataInformation.metadata);
+  if (metadata) {
+    metadata = combineFrameInstance(frame, metadata);
   }
 
   return metadata;
@@ -82,4 +89,5 @@ export default {
   get,
   remove,
   purge,
+  retrieveFirstFrameMetadata,
 };
