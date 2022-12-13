@@ -1,4 +1,3 @@
-import { convertToFalseColorImage } from 'cornerstone-core';
 import imageIdToURI from '../imageIdToURI.js';
 import { combineFrameInstance } from './combineFrameInstance.js';
 import getValue from './metaData/getValue.js';

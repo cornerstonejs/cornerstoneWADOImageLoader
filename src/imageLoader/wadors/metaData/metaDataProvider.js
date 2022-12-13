@@ -53,12 +53,6 @@ function metaDataProvider(type, imageId) {
     return;
   }
 
-  if (type === 'MultiframeModule') {
-    return {
-      NumberOfFrames: getValue(metaData['00280008']),
-    };
-  }
-
   if (type === 'generalSeriesModule') {
     return {
       modality: getValue(metaData['00080060']),
