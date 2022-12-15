@@ -1,6 +1,6 @@
 import external from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
-import combineFrameInstance from './combineFrameInstance.js';
+import { combineFrameInstance } from './combineFrameInstance.js';
 import dataSetFromPartialContent from './dataset-from-partial-content.js';
 
 /**
@@ -32,7 +32,7 @@ function _isMultiFrame(dataSet) {
   return numberOfFrames && numberOfFrames > 1;
 }
 
-function retrieveFrameIndex(uri) {
+function retrieveFrameParameterIndex(uri) {
   return uri.indexOf('&frame=');
 }
 
@@ -45,7 +45,7 @@ function _get(uri) {
 }
 
 function retrieveFirstFrameMetadata(uri) {
-  const frameParameterIndex = retrieveFrameIndex(uri);
+  const frameParameterIndex = retrieveFrameParameterIndex(uri);
   const multiframeURI = uri.slice(0, frameParameterIndex);
   const frame = parseInt(uri.slice(frameParameterIndex + 7), 10);
 
@@ -57,7 +57,10 @@ function retrieveFirstFrameMetadata(uri) {
     dataSet = undefined;
   }
 
-  return { dataSet, frame };
+  return {
+    dataSet,
+    frame,
+  };
 }
 
 // returns true if the wadouri for the specified index has been loaded
@@ -84,9 +87,6 @@ function generateMultiframeWADOURIs(uri) {
 }
 
 function get(uri) {
-  if (!loadedDataSets[uri]) {
-    return;
-  }
   let dataSet;
 
   if (uri.includes('&frame=')) {
@@ -271,5 +271,6 @@ export default {
   get,
   update,
   generateMultiframeWADOURIs,
+  retrieveFirstFrameMetadata,
   isMultiFrame,
 };

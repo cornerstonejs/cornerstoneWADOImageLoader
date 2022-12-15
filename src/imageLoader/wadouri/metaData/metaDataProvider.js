@@ -6,10 +6,20 @@ import getImagePixelModule from './getImagePixelModule.js';
 import getOverlayPlaneModule from './getOverlayPlaneModule.js';
 import getLUTs from './getLUTs.js';
 import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixelRepresentation.js';
+import { getDirectFrameInformation } from '../combineFrameInstance.js';
 
 function metaDataProvider(type, imageId) {
-  const { dicomParser } = external;
   const parsedImageId = parseImageId(imageId);
+
+  if (type === 'MultiframeModule') {
+    const { dataset, frame } = dataSetCacheManager.retrieveFirstFrameMetadata(
+      parsedImageId.url
+    );
+
+    return getDirectFrameInformation(dataset, frame);
+  }
+
+  const { dicomParser } = external;
 
   const dataSet = dataSetCacheManager.get(parsedImageId.url);
 
@@ -27,13 +37,6 @@ function metaDataProvider(type, imageId) {
       seriesTime: dicomParser.parseTM(dataSet.string('x00080031') || ''),
       acquisitionDate: dicomParser.parseDA(dataSet.string('x00080022') || ''),
       acquisitionTime: dicomParser.parseTM(dataSet.string('x00080032') || ''),
-    };
-  }
-
-  if (type === 'MultiframeModule') {
-    return {
-      NumberOfFrames: dataSet.intString('x00280008'),
-      PerFrameFunctionalGroupsSequence: dataSet.elements.x52009230,
     };
   }
 

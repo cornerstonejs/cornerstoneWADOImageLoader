@@ -4,18 +4,49 @@ import getNumberValue from './getNumberValue.js';
 import getOverlayPlaneModule from './getOverlayPlaneModule.js';
 import metaDataManager from '../metaDataManager.js';
 import getValue from './getValue.js';
+//import fixNMMetadata from './fixNMMetadata.js';
+import {
+  getMultiframeInformation,
+  getFrameInformation,
+} from '../combineFrameInstance.js';
 
 function metaDataProvider(type, imageId) {
   if (type === 'MultiframeModule') {
     // the get function removes the PerFrameFunctionalGroupsSequence
-    const { metadata } = metaDataManager.retrieveFirstFrameMetadata(imageId);
+    const { metadata, frame } =
+      metaDataManager.retrieveFirstFrameMetadata(imageId);
+
+    if (!metadata) {
+      return;
+    }
+    const {
+      PerFrameFunctionalGroupsSequence,
+      SharedFunctionalGroupsSequence,
+      NumberOfFrames,
+    } = getMultiframeInformation(metadata);
+
+    if (PerFrameFunctionalGroupsSequence || NumberOfFrames > 1) {
+      const { shared, perFrame } = getFrameInformation(
+        PerFrameFunctionalGroupsSequence,
+        SharedFunctionalGroupsSequence,
+        frame
+      );
+
+      return {
+        NumberOfFrames,
+        //PerFrameFunctionalGroupsSequence,
+        PerFrameFunctionalInformation: perFrame,
+        SharedFunctionalInformation: shared,
+      };
+    }
 
     return {
-      NumberOfFrames: getNumberValue(metadata['00280008']),
-      PerFrameFunctionalGroupsSequence: metadata['52009230'],
+      NumberOfFrames,
+      //PerFrameFunctionalGroupsSequence,
     };
   }
   const { dicomParser } = external;
+
   const metaData = metaDataManager.get(imageId);
 
   if (!metaData) {
@@ -47,16 +78,7 @@ function metaDataProvider(type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
-    // adjust metadata in case of multiframe NM data, as the diucom tags
-    // 00200032 and 00200037 could be found only in the dicom tag 00540022
-    if (
-      metaData['00540022'] &&
-      metaData['00540022'].Value &&
-      metaData['00540022'].Value.length > 0
-    ) {
-      metaData['00200032'] = metaData['00540022'].Value[0]['00200032'];
-      metaData['00200037'] = metaData['00540022'].Value[0]['00200037'];
-    }
+    //metaData = fixNMMetadata(metaData);
 
     const imageOrientationPatient = getNumberValues(metaData['00200037'], 6);
     const imagePositionPatient = getNumberValues(metaData['00200032'], 3);

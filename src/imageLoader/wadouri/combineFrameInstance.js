@@ -1,4 +1,34 @@
-function getMultiframeInformation(
+function getDirectFrameInformation(dataSet, frame) {
+  if (!dataSet) {
+    return;
+  }
+
+  const {
+    NumberOfFrames,
+    PerFrameFunctionalGroupsSequence,
+    SharedFunctionalGroupsSequence,
+  } = getMultiframeInformation(dataSet);
+
+  if (PerFrameFunctionalGroupsSequence || NumberOfFrames > 1) {
+    const { shared, perFrame } = getFrameInformation(
+      PerFrameFunctionalGroupsSequence,
+      SharedFunctionalGroupsSequence,
+      frame
+    );
+
+    return {
+      NumberOfFrames,
+      PerFrameFunctionalInformation: perFrame,
+      SharedFunctionalInformation: shared,
+    };
+  }
+
+  return {
+    NumberOfFrames,
+  };
+}
+
+function getFrameInformation(
   PerFrameFunctionalGroupsSequence,
   SharedFunctionalGroupsSequence,
   frameNumber
@@ -25,9 +55,7 @@ function getMultiframeInformation(
   };
 }
 
-// function that retrieves specific frame metadata information from multiframe
-// metadata
-export default function combineFrameInstance(frameNumber, dataSet) {
+function getMultiframeInformation(dataSet) {
   if (!dataSet) {
     return;
   }
@@ -40,8 +68,32 @@ export default function combineFrameInstance(frameNumber, dataSet) {
 
   const NumberOfFrames = dataSet.intString('x00280008');
 
+  return {
+    NumberOfFrames,
+    PerFrameFunctionalGroupsSequence,
+    SharedFunctionalGroupsSequence,
+    otherElements,
+    otherAttributtes,
+  };
+}
+
+// function that retrieves specific frame metadata information from multiframe
+// metadata
+function combineFrameInstance(frameNumber, dataSet) {
+  if (!dataSet) {
+    return;
+  }
+
+  const {
+    NumberOfFrames,
+    PerFrameFunctionalGroupsSequence,
+    SharedFunctionalGroupsSequence,
+    otherElements,
+    otherAttributtes,
+  } = getMultiframeInformation(dataSet);
+
   if (PerFrameFunctionalGroupsSequence || NumberOfFrames > 1) {
-    const { shared, perFrame } = getMultiframeInformation(
+    const { shared, perFrame } = getFrameInformation(
       PerFrameFunctionalGroupsSequence,
       SharedFunctionalGroupsSequence,
       frameNumber
@@ -62,3 +114,10 @@ export default function combineFrameInstance(frameNumber, dataSet) {
 
   return dataSet;
 }
+
+export {
+  combineFrameInstance,
+  getMultiframeInformation,
+  getFrameInformation,
+  getDirectFrameInformation,
+};

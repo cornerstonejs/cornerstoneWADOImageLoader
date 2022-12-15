@@ -10,7 +10,7 @@ function getTagValue(tag, justElement = true) {
   return tag;
 }
 
-function getMultiframeInformation(
+function getFrameInformation(
   PerFrameFunctionalGroupsSequence,
   SharedFunctionalGroupsSequence,
   frameNumber
@@ -36,16 +36,14 @@ function getMultiframeInformation(
   };
 }
 
-// function that retrieves specific frame metadata information from multiframe
-// metadata
-export default function combineFrameInstance(frameNumber, instance) {
+function getMultiframeInformation(metaData) {
   let {
     52009230: PerFrameFunctionalGroupsSequence,
     52009229: SharedFunctionalGroupsSequence,
     '00280008': NumberOfFrames,
     // eslint-disable-next-line prefer-const
     ...rest
-  } = instance;
+  } = metaData;
 
   PerFrameFunctionalGroupsSequence = getTagValue(
     PerFrameFunctionalGroupsSequence,
@@ -56,8 +54,26 @@ export default function combineFrameInstance(frameNumber, instance) {
     false
   );
   NumberOfFrames = getTagValue(NumberOfFrames);
+
+  return {
+    PerFrameFunctionalGroupsSequence,
+    SharedFunctionalGroupsSequence,
+    NumberOfFrames,
+    rest,
+  };
+}
+// function that retrieves specific frame metadata information from multiframe
+// metadata
+function combineFrameInstance(frameNumber, instance) {
+  const {
+    PerFrameFunctionalGroupsSequence,
+    SharedFunctionalGroupsSequence,
+    NumberOfFrames,
+    rest,
+  } = getMultiframeInformation(instance);
+
   if (PerFrameFunctionalGroupsSequence || NumberOfFrames > 1) {
-    const { shared, perFrame } = getMultiframeInformation(
+    const { shared, perFrame } = getFrameInformation(
       PerFrameFunctionalGroupsSequence,
       SharedFunctionalGroupsSequence,
       frameNumber
@@ -73,3 +89,5 @@ export default function combineFrameInstance(frameNumber, instance) {
 
   return instance;
 }
+
+export { combineFrameInstance, getMultiframeInformation, getFrameInformation };
