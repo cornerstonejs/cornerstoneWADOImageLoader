@@ -40,13 +40,6 @@ function metaDataProvider(type, imageId) {
     };
   }
 
-  if (type === 'MultiframeModule') {
-    return {
-      NumberOfFrames: dataSet.intString('x00280008'),
-      PerFrameFunctionalGroupsSequence: dataSet.elements.x52009230,
-    };
-  }
-
   if (type === 'patientStudyModule') {
     return {
       patientAge: dataSet.intString('x00101010'),
