@@ -194,6 +194,9 @@ function postProcessDecodedPixels(imageFrame, options, start) {
       case 'Uint16Array':
         TypedArrayConstructor = Uint16Array;
         break;
+      case 'Int16Array':
+        TypedArrayConstructor = Int16Array;
+        break;
       case 'Float32Array':
         TypedArrayConstructor = Float32Array;
         break;

@@ -176,6 +176,9 @@ function createImage(imageId, pixelData, transferSyntax, options = {}) {
           case 'Uint16Array':
             TypedArrayConstructor = Uint16Array;
             break;
+          case 'Int16Array':
+            TypedArrayConstructor = Int16Array;
+            break;
           case 'Float32Array':
             TypedArrayConstructor = Float32Array;
             break;
