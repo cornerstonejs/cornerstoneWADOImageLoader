@@ -140,7 +140,9 @@ function decodeImageFrame(
 
   decodePromise
     .then((imageFrame) => {
-      callbackFn(postProcessDecodedPixels(imageFrame, options, start, decodeConfig));
+      callbackFn(
+        postProcessDecodedPixels(imageFrame, options, start, decodeConfig)
+      );
     })
     .catch((err) => {
       throw err;
@@ -196,7 +198,7 @@ function postProcessDecodedPixels(imageFrame, options, start, decodeConfig) {
       case use16BitDataType && 'Uint16Array':
         TypedArrayConstructor = Uint16Array;
         break;
-      case use16BitDataType&& 'Int16Array':
+      case use16BitDataType && 'Int16Array':
         TypedArrayConstructor = Int16Array;
         break;
       case 'Float32Array':
