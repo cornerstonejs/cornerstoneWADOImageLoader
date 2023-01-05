@@ -48,20 +48,20 @@ async function handler(data, doneCallback) {
     // decodeTask are webworker specific, but decodeConfig are the configs
     // that are passed in from the user. We need to merge them together
     Object.assign(decodeConfig.decodeTask, data.data.decodeConfig),
-    data.data.options,
+    data.data.options
   );
 
-    if (!imageFrame.pixelData) {
-      throw new Error(
-        'decodeTask: imageFrame.pixelData is undefined after decoding'
-      );
-    }
+  if (!imageFrame.pixelData) {
+    throw new Error(
+      'decodeTask: imageFrame.pixelData is undefined after decoding'
+    );
+  }
 
-    calculateMinMax(imageFrame, strict);
+  calculateMinMax(imageFrame, strict);
 
-    // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
-    // typed arrays
-    imageFrame.pixelData = imageFrame.pixelData.buffer;
+  // convert from TypedArray to ArrayBuffer since web workers support passing ArrayBuffers but not
+  // typed arrays
+  imageFrame.pixelData = imageFrame.pixelData.buffer;
 
   doneCallback?.(imageFrame, [imageFrame.pixelData]);
 
@@ -69,7 +69,7 @@ async function handler(data, doneCallback) {
     result: imageFrame,
     transferList: [imageFrame.pixelData],
   };
-  }
+}
 
 export default {
   taskType: 'decodeTask',
