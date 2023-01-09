@@ -13,14 +13,16 @@ import scaleArray from './scaling/scaleArray.js';
 
 /**
  * Decodes the provided image frame.
- * This is an async function return the result.
+ * This is an async function return the result, or you can provide an optional
+ * callbackFn that is called with the results.
  */
 async function decodeImageFrame(
   imageFrame,
   transferSyntax,
   pixelData,
   decodeConfig,
-  options
+  options,
+  callbackFn
 ) {
   const start = new Date().getTime();
 
@@ -143,7 +145,17 @@ async function decodeImageFrame(
 
   const decodedFrame = await decodePromise;
 
-  return postProcessDecodedPixels(decodedFrame, options, start, decodeConfig);
+  const postProcessed = postProcessDecodedPixels(
+    decodedFrame,
+    options,
+    start,
+    decodeConfig
+  );
+
+  // Call the callbackFn to agree with older arguments
+  callbackFn?.(postProcessed);
+
+  return postProcessed;
 }
 
 function postProcessDecodedPixels(imageFrame, options, start, decodeConfig) {
