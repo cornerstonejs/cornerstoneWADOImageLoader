@@ -14,6 +14,7 @@ import { retrieveFirstFrameMetadata } from '../retrieveFirstFrameMetadata.js';
 function metaDataProvider(type, imageId) {
   if (type === 'MultiframeModule') {
     // the get function removes the PerFrameFunctionalGroupsSequence
+    console.log('No cswil: ', imageId);
     const { metadata, frame } = retrieveFirstFrameMetadata(imageId);
 
     if (!metadata) {
@@ -79,7 +80,6 @@ function metaDataProvider(type, imageId) {
 
   if (type === 'imagePlaneModule') {
     //metaData = fixNMMetadata(metaData);
-
     const imageOrientationPatient = getNumberValues(metaData['00200037'], 6);
     const imagePositionPatient = getNumberValues(metaData['00200032'], 3);
     const pixelSpacing = getNumberValues(metaData['00280030'], 2);

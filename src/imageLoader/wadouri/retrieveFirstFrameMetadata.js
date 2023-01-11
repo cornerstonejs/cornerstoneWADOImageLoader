@@ -1,4 +1,4 @@
-import { loadedDataSets } from '../dataSetCacheManager.js';
+import { loadedDataSets } from './dataSetCacheManager.js';
 
 function _get(uri) {
   if (!loadedDataSets[uri]) {

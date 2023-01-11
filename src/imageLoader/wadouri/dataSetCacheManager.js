@@ -1,6 +1,7 @@
 import external from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
 import { combineFrameInstance } from './combineFrameInstance.js';
+import { retrieveFirstFrameMetadata } from './retrieveFirstFrameMetadata.js';
 import dataSetFromPartialContent from './dataset-from-partial-content.js';
 
 /**
@@ -182,7 +183,7 @@ function unload(uri) {
   }
 }
 
-export function getInfo() {
+function getInfo() {
   return {
     cacheSizeInBytes,
     numberOfDataSetsCached: Object.keys(loadedDataSets).length,

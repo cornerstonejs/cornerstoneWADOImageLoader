@@ -3,7 +3,7 @@ import { combineFrameInstance } from './combineFrameInstance.js';
 import {
   isMultiFrame,
   _retrieveFirstFrameMetadata,
-} from './retrieveFirstFrameMetadata';
+} from './retrieveFirstFrameMetadata.js';
 
 let metadataByImageURI = [];
 
