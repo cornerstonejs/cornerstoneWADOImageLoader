@@ -1,9 +1,6 @@
 import imageIdToURI from '../imageIdToURI.js';
 import { combineFrameInstance } from './combineFrameInstance.js';
-import {
-  isMultiFrame,
-  _retrieveFirstFrameMetadata,
-} from './retrieveFirstFrameMetadata.js';
+import multiFrameMetadata from './retrieveMultiFrameMetadata.js';
 
 let metadataByImageURI = [];
 
@@ -24,7 +21,7 @@ function get(imageId) {
   let metadata = metadataByImageURI[imageURI];
 
   if (metadata) {
-    if (!isMultiFrame(metadata)) {
+    if (!multiFrameMetadata.isMultiFrame(metadata)) {
       return metadata;
     }
   }
@@ -34,7 +31,8 @@ function get(imageId) {
   if (!metadata) {
     // in this case it could indicate a multiframe imageid
     // Try to get the first frame metadata, where is stored the multiframe info
-    const firstFrameInfo = _retrieveFirstFrameMetadata(imageURI);
+    const firstFrameInfo =
+      multiFrameMetadata._retrieveMultiFrameMetadata(imageURI);
 
     metadata = firstFrameInfo.metadata;
     frame = firstFrameInfo.frame;

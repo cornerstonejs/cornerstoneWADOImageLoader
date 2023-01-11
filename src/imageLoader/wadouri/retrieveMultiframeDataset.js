@@ -8,13 +8,13 @@ function _get(uri) {
   return loadedDataSets[uri];
 }
 
-function isMultiFrame(uri) {
+function isMultiFrameDataset(uri) {
   const dataSet = _get(uri);
 
-  return _isMultiFrame(dataSet);
+  return _isMultiFrameDataset(dataSet);
 }
 
-function _isMultiFrame(dataSet) {
+function _isMultiFrameDataset(dataSet) {
   // Checks if dicomTag NumberOf Frames exists and it is greater than one
   if (!dataSet) {
     return false;
@@ -29,14 +29,14 @@ function retrieveFrameParameterIndex(uri) {
   return uri.indexOf('&frame=');
 }
 
-function retrieveFirstFrameMetadata(uri) {
+function retrieveMultiframeDataset(uri) {
   const frameParameterIndex = retrieveFrameParameterIndex(uri);
-  const multiframeURI = uri.slice(0, frameParameterIndex);
+  const multiframeURI = `${uri.slice(0, frameParameterIndex)}1`;
   const frame = parseInt(uri.slice(frameParameterIndex + 7), 10);
 
   let dataSet;
 
-  if (loadedDataSets[uri]) {
+  if (loadedDataSets[multiframeURI]) {
     dataSet = loadedDataSets[multiframeURI].dataSet;
   } else {
     dataSet = undefined;
@@ -53,7 +53,7 @@ function generateMultiframeWADOURIs(uri) {
 
   const dataSet = _get(uri);
 
-  if (_isMultiFrame(dataSet)) {
+  if (_isMultiFrameDataset(dataSet)) {
     const numberOfFrames = dataSet.intString('x00280008');
 
     for (let i = 1; i <= numberOfFrames; i++) {
@@ -66,9 +66,9 @@ function generateMultiframeWADOURIs(uri) {
   return listWADOURIs;
 }
 
-export {
+export default {
   _get,
   generateMultiframeWADOURIs,
-  retrieveFirstFrameMetadata,
-  isMultiFrame,
+  retrieveMultiframeDataset,
+  isMultiFrameDataset,
 };

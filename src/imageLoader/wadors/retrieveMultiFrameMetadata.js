@@ -3,7 +3,7 @@ import imageIdToURI from '../imageIdToURI.js';
 import { metadataByImageURI } from './metaDataManager.js';
 
 // get metadata information for the first frame
-function _retrieveFirstFrameMetadata(imageURI) {
+function _retrieveMultiFrameMetadata(imageURI) {
   const lastSlashIdx = imageURI.indexOf('/frames/') + 8;
   // imageid string without frame number
   const imageIdFrameless = imageURI.slice(0, lastSlashIdx);
@@ -19,10 +19,10 @@ function _retrieveFirstFrameMetadata(imageURI) {
   };
 }
 
-function retrieveFirstFrameMetadata(imageId) {
+function retrieveMultiFrameMetadata(imageId) {
   const imageURI = imageIdToURI(imageId);
 
-  return _retrieveFirstFrameMetadata(imageURI);
+  return _retrieveMultiFrameMetadata(imageURI);
 }
 
 function isMultiFrame(metadata) {
@@ -32,8 +32,8 @@ function isMultiFrame(metadata) {
   return numberOfFrames && numberOfFrames > 1;
 }
 
-export {
-  _retrieveFirstFrameMetadata,
-  retrieveFirstFrameMetadata,
+export default {
+  _retrieveMultiFrameMetadata,
+  retrieveMultiFrameMetadata,
   isMultiFrame,
 };

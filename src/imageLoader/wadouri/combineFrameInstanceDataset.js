@@ -79,7 +79,7 @@ function getMultiframeInformation(dataSet) {
 
 // function that retrieves specific frame metadata information from multiframe
 // metadata
-function combineFrameInstance(frameNumber, dataSet) {
+function combineFrameInstanceDataset(frameNumber, dataSet) {
   if (!dataSet) {
     return;
   }
@@ -116,7 +116,7 @@ function combineFrameInstance(frameNumber, dataSet) {
 }
 
 export {
-  combineFrameInstance,
+  combineFrameInstanceDataset,
   getMultiframeInformation,
   getFrameInformation,
   getDirectFrameInformation,
