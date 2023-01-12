@@ -31,7 +31,7 @@ function retrieveFrameParameterIndex(uri) {
 
 function retrieveMultiframeDataset(uri) {
   const frameParameterIndex = retrieveFrameParameterIndex(uri);
-  const multiframeURI = `${uri.slice(0, frameParameterIndex)}1`;
+  const multiframeURI = uri.slice(0, frameParameterIndex);
   const frame = parseInt(uri.slice(frameParameterIndex + 7), 10);
 
   let dataSet;
