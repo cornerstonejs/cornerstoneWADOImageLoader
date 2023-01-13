@@ -9,13 +9,13 @@ import {
   getMultiframeInformation,
   getFrameInformation,
 } from '../combineFrameInstance.js';
-import multiFrameMetadata from '../retrieveMultiFrameMetadata.js';
+import multiframeMetadata from '../retrieveMultiframeMetadata.js';
 
 function metaDataProvider(type, imageId) {
   if (type === 'MultiframeModule') {
     // the get function removes the PerFrameFunctionalGroupsSequence
     const { metadata, frame } =
-      multiFrameMetadata.retrieveMultiFrameMetadata(imageId);
+      multiframeMetadata.retrieveMultiframeMetadata(imageId);
 
     if (!metadata) {
       return;

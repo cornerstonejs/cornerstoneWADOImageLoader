@@ -8,13 +8,13 @@ function _get(uri) {
   return loadedDataSets[uri];
 }
 
-function isMultiFrameDataset(uri) {
+function isMultiframeDataset(uri) {
   const dataSet = _get(uri);
 
-  return _isMultiFrameDataset(dataSet);
+  return _isMultiframeDataset(dataSet);
 }
 
-function _isMultiFrameDataset(dataSet) {
+function _isMultiframeDataset(dataSet) {
   // Checks if dicomTag NumberOf Frames exists and it is greater than one
   if (!dataSet) {
     return false;
@@ -53,7 +53,7 @@ function generateMultiframeWADOURIs(uri) {
 
   const dataSet = _get(uri);
 
-  if (_isMultiFrameDataset(dataSet)) {
+  if (_isMultiframeDataset(dataSet)) {
     const numberOfFrames = dataSet.intString('x00280008');
 
     for (let i = 1; i <= numberOfFrames; i++) {
@@ -70,5 +70,5 @@ export default {
   _get,
   generateMultiframeWADOURIs,
   retrieveMultiframeDataset,
-  isMultiFrameDataset,
+  isMultiframeDataset,
 };

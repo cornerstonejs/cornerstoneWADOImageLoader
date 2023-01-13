@@ -1,7 +1,7 @@
 import external from '../../externalModules.js';
 import { xhrRequest } from '../internal/index.js';
 import { combineFrameInstanceDataset } from './combineFrameInstanceDataset.js';
-import MultiframeDataset from './retrieveMultiframeDataset.js';
+import multiframeDataset from './retrieveMultiframeDataset.js';
 import dataSetFromPartialContent from './dataset-from-partial-content.js';
 
 /**
@@ -26,7 +26,7 @@ function get(uri) {
 
   if (uri.includes('&frame=')) {
     const { frame, dataSet: multiframeDataSet } =
-      MultiframeDataset.retrieveMultiframeDataset(uri);
+      multiframeDataset.retrieveMultiframeDataset(uri);
 
     dataSet = combineFrameInstanceDataset(frame, multiframeDataSet);
   } else if (loadedDataSets[uri]) {

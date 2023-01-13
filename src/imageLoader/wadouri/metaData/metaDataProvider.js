@@ -7,13 +7,13 @@ import getOverlayPlaneModule from './getOverlayPlaneModule.js';
 import getLUTs from './getLUTs.js';
 import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixelRepresentation.js';
 import { getDirectFrameInformation } from '../combineFrameInstanceDataset.js';
-import multiFrameDataset from '../retrieveMultiframeDataset.js';
+import multiframeDataset from '../retrieveMultiframeDataset.js';
 
 function metaDataProvider(type, imageId) {
   const parsedImageId = parseImageId(imageId);
 
   if (type === 'MultiframeModule') {
-    const { dataSet, frame } = multiFrameDataset.retrieveMultiframeDataset(
+    const { dataSet, frame } = multiframeDataset.retrieveMultiframeDataset(
       parsedImageId.url
     );
 
