@@ -13,11 +13,20 @@ function metaDataProvider(type, imageId) {
   const parsedImageId = parseImageId(imageId);
 
   if (type === 'MultiframeModule') {
-    const { dataSet, frame } = multiframeDataset.retrieveMultiframeDataset(
+    const multiframeData = multiframeDataset.retrieveMultiframeDataset(
       parsedImageId.url
     );
 
-    return getDirectFrameInformation(dataSet, frame);
+    if (!multiframeData.dataSet) {
+      return;
+    }
+
+    const multiframeInfo = getDirectFrameInformation(
+      multiframeData.dataSet,
+      multiframeData.frame
+    );
+
+    return multiframeInfo;
   }
 
   const { dicomParser } = external;
