@@ -12,7 +12,7 @@ import {
 import multiframeMetadata from '../retrieveMultiframeMetadata.js';
 
 function metaDataProvider(type, imageId) {
-  if (type === 'MultiframeModule') {
+  if (type === 'multiframeModule') {
     // the get function removes the PerFrameFunctionalGroupsSequence
     const { metadata, frame } =
       multiframeMetadata.retrieveMultiframeMetadata(imageId);

@@ -7,6 +7,8 @@ let metadataByImageURI = [];
 function add(imageId, metadata) {
   const imageURI = imageIdToURI(imageId);
 
+  metadata.isMultiframe = multiframeMetadata.isMultiframe(metadata);
+
   metadataByImageURI[imageURI] = metadata;
 }
 
@@ -21,7 +23,7 @@ function get(imageId) {
   let metadata = metadataByImageURI[imageURI];
 
   if (metadata) {
-    if (!multiframeMetadata.isMultiframe(metadata)) {
+    if (!metadata.isMultiframe) {
       return metadata;
     }
   }

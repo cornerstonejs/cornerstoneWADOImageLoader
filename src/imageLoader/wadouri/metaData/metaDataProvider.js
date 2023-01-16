@@ -12,7 +12,7 @@ import multiframeDataset from '../retrieveMultiframeDataset.js';
 function metaDataProvider(type, imageId) {
   const parsedImageId = parseImageId(imageId);
 
-  if (type === 'MultiframeModule') {
+  if (type === 'multiframeModule') {
     const multiframeData = multiframeDataset.retrieveMultiframeDataset(
       parsedImageId.url
     );
