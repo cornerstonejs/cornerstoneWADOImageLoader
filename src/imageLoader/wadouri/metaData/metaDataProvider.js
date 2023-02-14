@@ -31,7 +31,12 @@ function metaDataProvider(type, imageId) {
 
   const { dicomParser } = external;
 
-  const dataSet = dataSetCacheManager.get(parsedImageId.url);
+  let url = parsedImageId.url;
+
+  if (parsedImageId.frame) {
+    url = `${url}&frame=${parsedImageId.frame}`;
+  }
+  const dataSet = dataSetCacheManager.get(url);
 
   if (!dataSet) {
     return;
@@ -59,9 +64,56 @@ function metaDataProvider(type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
-    const imageOrientationPatient = getNumberValues(dataSet, 'x00200037', 6);
-    const imagePositionPatient = getNumberValues(dataSet, 'x00200032', 3);
-    const pixelSpacing = getNumberValues(dataSet, 'x00280030', 2);
+    let imageOrientationPatient = getNumberValues(dataSet, 'x00200037', 6);
+
+    if (!imageOrientationPatient && dataSet.elements.x00209116) {
+      imageOrientationPatient = getNumberValues(
+        dataSet.elements.x00209116.items[0].dataSet,
+        'x00200037',
+        6
+      );
+    }
+
+    let imagePositionPatient = getNumberValues(dataSet, 'x00200032', 3);
+
+    if (!imagePositionPatient && dataSet.elements.x00209113) {
+      imagePositionPatient = getNumberValues(
+        dataSet.elements.x00209113.items[0].dataSet,
+        'x00200032',
+        3
+      );
+    }
+
+    let pixelSpacing = getNumberValues(dataSet, 'x00280030', 2);
+
+    if (!pixelSpacing && dataSet.elements.x00289110) {
+      pixelSpacing = getNumberValues(
+        dataSet.elements.x00289110.items[0].dataSet,
+        'x00280030',
+        2
+      );
+    }
+
+    let frameOfReferenceUID;
+
+    if (dataSet.elements.x00200052) {
+      frameOfReferenceUID = dataSet.string('x00200052');
+    }
+
+    let sliceThickness;
+
+    if (dataSet.elements.x00180050) {
+      sliceThickness = dataSet.floatString('x00180050');
+    } else if (dataSet.elements.x00289110.items[0].dataSet.elements.x00180050) {
+      sliceThickness =
+        dataSet.elements.x00289110.items[0].dataSet.floatString('x00180050');
+    }
+
+    let sliceLocation;
+
+    if (dataSet.elements.x00201041) {
+      sliceLocation = dataSet.floatString('x00201041');
+    }
 
     let columnPixelSpacing = null;
 
@@ -90,15 +142,15 @@ function metaDataProvider(type, imageId) {
     }
 
     return {
-      frameOfReferenceUID: dataSet.string('x00200052'),
+      frameOfReferenceUID,
       rows: dataSet.uint16('x00280010'),
       columns: dataSet.uint16('x00280011'),
       imageOrientationPatient,
       rowCosines,
       columnCosines,
       imagePositionPatient,
-      sliceThickness: dataSet.floatString('x00180050'),
-      sliceLocation: dataSet.floatString('x00201041'),
+      sliceThickness,
+      sliceLocation,
       pixelSpacing,
       rowPixelSpacing,
       columnPixelSpacing,
