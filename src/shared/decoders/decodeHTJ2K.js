@@ -6,8 +6,8 @@
 // import openJphFactory from '../../../codecs/openjphjs.js';
 // import openjphWasm from '../../../codecs/openjphjs.wasm';
 
-import openJphFactory from '@cornerstonejs/codec-openjph/dist/openjphjs.js';
-import openjphWasm from '@cornerstonejs/codec-openjph/dist/openjphjs.wasm';
+import openJphFactory from '@cornerstonejs/codec-openjph/wasmjs';
+import openjphWasm from '@cornerstonejs/codec-openjph/wasm';
 
 const local = {
   codec: undefined,
