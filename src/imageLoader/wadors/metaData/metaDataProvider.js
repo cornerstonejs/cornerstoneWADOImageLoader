@@ -4,7 +4,7 @@ import getNumberValue from './getNumberValue.js';
 import getOverlayPlaneModule from './getOverlayPlaneModule.js';
 import metaDataManager from '../metaDataManager.js';
 import getValue from './getValue.js';
-//import fixNMMetadata from './fixNMMetadata.js';
+import fixNMMetadata from './fixNMMetadata.js';
 import {
   getMultiframeInformation,
   getFrameInformation,
@@ -48,7 +48,7 @@ function metaDataProvider(type, imageId) {
   }
   const { dicomParser } = external;
 
-  const metaData = metaDataManager.get(imageId);
+  let metaData = metaDataManager.get(imageId);
 
   if (!metaData) {
     return;
@@ -79,7 +79,7 @@ function metaDataProvider(type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
-    //metaData = fixNMMetadata(metaData);
+    metaData = fixNMMetadata(metaData);
     const imageOrientationPatient = getNumberValues(metaData['00200037'], 6);
     const imagePositionPatient = getNumberValues(metaData['00200032'], 3);
     const pixelSpacing = getNumberValues(metaData['00280030'], 2);
