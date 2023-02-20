@@ -64,6 +64,8 @@ function metaDataProvider(type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
+    const modality = dataSet.string('x00080060');
+
     let imageOrientationPatient = getNumberValues(dataSet, 'x00200037', 6);
 
     // Trying to get the orientation from the Plane Orientation Sequence
@@ -77,7 +79,11 @@ function metaDataProvider(type, imageId) {
 
     // If orientation not valid to this point, trying to get the orientation
     // from the Detector Information Sequence (for NM images)
-    if (!imageOrientationPatient && dataSet.elements.x00540022) {
+    if (
+      !imageOrientationPatient &&
+      dataSet.elements.x00540022 &&
+      modality.includes('NM')
+    ) {
       imageOrientationPatient = getNumberValues(
         dataSet.elements.x00540022.items[0].dataSet,
         'x00200037',
@@ -98,7 +104,11 @@ function metaDataProvider(type, imageId) {
 
     // If position not valid to this point, trying to get the position
     // from the Detector Information Sequence (for NM images)
-    if (!imagePositionPatient && dataSet.elements.x00540022) {
+    if (
+      !imagePositionPatient &&
+      dataSet.elements.x00540022 &&
+      modality.includes('NM')
+    ) {
       imagePositionPatient = getNumberValues(
         dataSet.elements.x00540022.items[0].dataSet,
         'x00200032',
