@@ -8,6 +8,14 @@ import getLUTs from './getLUTs.js';
 import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixelRepresentation.js';
 import { getDirectFrameInformation } from '../combineFrameInstanceDataset.js';
 import multiframeDataset from '../retrieveMultiframeDataset.js';
+import {
+  getImageTypeSubItemFromDataset,
+  extractOrientationFromDataset,
+  extractPositionFromDataset,
+  extractSpacingFromDataset,
+  extractSliceThicknessFromDataset,
+} from './extractPositioningFromDataset.js';
+import isNMReconstructable from '../../isNMReconstructable.js';
 
 function metaDataProvider(type, imageId) {
   const parsedImageId = parseImageId(imageId);
@@ -64,69 +72,11 @@ function metaDataProvider(type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
-    const modality = dataSet.string('x00080060');
+    const imageOrientationPatient = extractOrientationFromDataset(dataSet);
 
-    let imageOrientationPatient = getNumberValues(dataSet, 'x00200037', 6);
+    const imagePositionPatient = extractPositionFromDataset(dataSet);
 
-    // Trying to get the orientation from the Plane Orientation Sequence
-    if (!imageOrientationPatient && dataSet.elements.x00209116) {
-      imageOrientationPatient = getNumberValues(
-        dataSet.elements.x00209116.items[0].dataSet,
-        'x00200037',
-        6
-      );
-    }
-
-    // If orientation not valid to this point, trying to get the orientation
-    // from the Detector Information Sequence (for NM images)
-    if (
-      !imageOrientationPatient &&
-      dataSet.elements.x00540022 &&
-      modality.includes('NM')
-    ) {
-      imageOrientationPatient = getNumberValues(
-        dataSet.elements.x00540022.items[0].dataSet,
-        'x00200037',
-        6
-      );
-    }
-
-    let imagePositionPatient = getNumberValues(dataSet, 'x00200032', 3);
-
-    // Trying to get the position from the Plane Position Sequence
-    if (!imagePositionPatient && dataSet.elements.x00209113) {
-      imagePositionPatient = getNumberValues(
-        dataSet.elements.x00209113.items[0].dataSet,
-        'x00200032',
-        3
-      );
-    }
-
-    // If position not valid to this point, trying to get the position
-    // from the Detector Information Sequence (for NM images)
-    if (
-      !imagePositionPatient &&
-      dataSet.elements.x00540022 &&
-      modality.includes('NM')
-    ) {
-      imagePositionPatient = getNumberValues(
-        dataSet.elements.x00540022.items[0].dataSet,
-        'x00200032',
-        3
-      );
-    }
-
-    let pixelSpacing = getNumberValues(dataSet, 'x00280030', 2);
-
-    // If pixelSpacing not valid to this point, trying to get the spacing
-    // from the Pixel Measures Sequence
-    if (!pixelSpacing && dataSet.elements.x00289110) {
-      pixelSpacing = getNumberValues(
-        dataSet.elements.x00289110.items[0].dataSet,
-        'x00280030',
-        2
-      );
-    }
+    const pixelSpacing = extractSpacingFromDataset(dataSet);
 
     let frameOfReferenceUID;
 
@@ -134,18 +84,7 @@ function metaDataProvider(type, imageId) {
       frameOfReferenceUID = dataSet.string('x00200052');
     }
 
-    let sliceThickness;
-
-    if (dataSet.elements.x00180050) {
-      sliceThickness = dataSet.floatString('x00180050');
-    } else if (
-      dataSet.elements.x00289110 &&
-      dataSet.elements.x00289110.items.length &&
-      dataSet.elements.x00289110.items[0].dataSet.elements.x00180050
-    ) {
-      sliceThickness =
-        dataSet.elements.x00289110.items[0].dataSet.floatString('x00180050');
-    }
+    const sliceThickness = extractSliceThicknessFromDataset(dataSet);
 
     let sliceLocation;
 
@@ -192,6 +131,24 @@ function metaDataProvider(type, imageId) {
       pixelSpacing,
       rowPixelSpacing,
       columnPixelSpacing,
+    };
+  }
+
+  if (type === 'nmMultiframeGeometryModule') {
+    const modality = dataSet.string('x00080060');
+    const imageSubType = getImageTypeSubItemFromDataset(dataSet, 2);
+
+    return {
+      modality,
+      imageType: dataSet.string('x00080008'),
+      imageSubType,
+      imageOrientationPatient: extractOrientationFromDataset(dataSet),
+      imagePositionPatient: extractPositionFromDataset(dataSet),
+      sliceThickness: extractSliceThicknessFromDataset(dataSet),
+      pixelSpacing: extractSpacingFromDataset(dataSet),
+      numberOfFrames: dataSet.uint16('x00280008'),
+      isNMReconstructable:
+        isNMReconstructable(imageSubType) && modality.includes('NM'),
     };
   }
 
