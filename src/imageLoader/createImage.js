@@ -57,14 +57,21 @@ function convertToIntPixelData(floatPixelData) {
 function setPixelDataType(imageFrame, preScale) {
   const isScaled = preScale?.scaled;
   const scalingParmeters = preScale?.scalingParameters;
-  const rescaleSlope = scalingParmeters?.rescaleSlope;
-  const rescaleIntercept = scalingParmeters?.rescaleIntercept;
-  const isNegative = rescaleSlope < 0 || rescaleIntercept < 0;
+  let isNegative = false;
+  if (isScaled && scalingParmeters) {
+    const rescaleSlope = scalingParmeters?.rescaleSlope || 1;
+    const rescaleIntercept = scalingParmeters?.rescaleIntercep || 0;
+    const suvbw = scalingParmeters?.suvbw || 1;
+    isNegative =
+      suvbw *
+        (imageFrame.smallestPixelValue * rescaleSlope + rescaleIntercept) <
+      0;
+  }
 
   if (imageFrame.bitsAllocated === 32) {
     imageFrame.pixelData = new Float32Array(imageFrame.pixelData);
   } else if (imageFrame.bitsAllocated === 16) {
-    if (imageFrame.pixelRepresentation === 0 && !(isScaled && isNegative)) {
+    if (imageFrame.pixelRepresentation === 0 && !isNegative) {
       imageFrame.pixelData = new Uint16Array(imageFrame.pixelData);
     } else {
       imageFrame.pixelData = new Int16Array(imageFrame.pixelData);
