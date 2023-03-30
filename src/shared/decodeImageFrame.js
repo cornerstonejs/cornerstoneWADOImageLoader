@@ -181,7 +181,7 @@ function postProcessDecodedPixels(imageFrame, options, start, decodeConfig) {
 
   imageFrame.pixelDataLength = imageFrame.pixelData.length;
 
-  if (options.targetBuffer) {
+  if (options.targetBuffer && options.targetBuffer.type) {
     let offset, length;
     // If we have a target buffer, write to that instead. This helps reduce memory duplication.
 
@@ -256,18 +256,19 @@ function postProcessDecodedPixels(imageFrame, options, start, decodeConfig) {
       typeof rescaleSlope === 'number' &&
       typeof rescaleIntercept === 'number'
     ) {
-      if (scaleArray(pixelDataArray, scalingParameters)) {
-        imageFrame.preScale = {
-          ...options.preScale,
-          scaled: true,
-        };
-      }
+      scaleArray(
+        imageFrame,
+        options.preScale,
+        pixelDataArray,
+        scalingParameters
+      );
     }
   }
 
   // Handle cases where the targetBuffer is not backed by a SharedArrayBuffer
   if (
     options.targetBuffer &&
+    options.targetBuffer.type &&
     (!options.targetBuffer.arrayBuffer ||
       options.targetBuffer.arrayBuffer instanceof ArrayBuffer)
   ) {

@@ -55,18 +55,7 @@ function convertToIntPixelData(floatPixelData) {
  * @param imageFrame
  */
 function setPixelDataType(imageFrame, preScale) {
-  const isScaled = preScale?.scaled;
-  const scalingParmeters = preScale?.scalingParameters;
-  let isNegative = false;
-  if (isScaled && scalingParmeters) {
-    const rescaleSlope = scalingParmeters?.rescaleSlope || 1;
-    const rescaleIntercept = scalingParmeters?.rescaleIntercep || 0;
-    const suvbw = scalingParmeters?.suvbw || 1;
-    isNegative =
-      suvbw *
-        (imageFrame.smallestPixelValue * rescaleSlope + rescaleIntercept) <
-      0;
-  }
+  const isNegative = preScale?.isNegative;
 
   if (imageFrame.bitsAllocated === 32) {
     imageFrame.pixelData = new Float32Array(imageFrame.pixelData);
@@ -174,7 +163,7 @@ function createImage(imageId, pixelData, transferSyntax, options = {}) {
       // We can't have done it within the thread incase it was a SharedArrayBuffer.
       let alreadyTyped = false;
 
-      if (options.targetBuffer) {
+      if (options.targetBuffer && options.targetBuffer.type) {
         let offset, length;
         // If we have a target buffer, write to that instead. This helps reduce memory duplication.
 
