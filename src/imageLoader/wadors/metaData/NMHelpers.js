@@ -32,7 +32,6 @@ function getImageTypeSubItemFromMetadata(metaData, index) {
  * Extracts the orientation from NM multiframe metadata, if image type
  * equal to RECON TOMO or RECON GATED TOMO
  * @param {*} metaData
- * @returns
  */
 function extractOrientationFromNMMultiframeMetadata(metaData) {
   let imageOrientationPatient;
@@ -42,7 +41,6 @@ function extractOrientationFromNMMultiframeMetadata(metaData) {
     const detectorInformationSequence = getTagValue(metaData['00540022']);
 
     if (detectorInformationSequence) {
-      debugger;
       imageOrientationPatient = getNumberValues(
         detectorInformationSequence['00200037'],
         6
@@ -57,7 +55,6 @@ function extractOrientationFromNMMultiframeMetadata(metaData) {
  * Extracts the position from NM multiframe dataset, if image type
  * equal to RECON TOMO or RECON GATED TOMO
  * @param {*} metaData
- * @returns
  */
 function extractPositionFromNMMultiframeMetadata(metaData) {
   let imagePositionPatient;
