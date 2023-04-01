@@ -25,7 +25,7 @@ module.exports = {
     path: outputPath,
     publicPath: 'auto',
   },
-  devtool: 'eval-source-map',
+  devtool: 'source-map',
   externals: {
     'dicom-parser': {
       commonjs: 'dicom-parser',
