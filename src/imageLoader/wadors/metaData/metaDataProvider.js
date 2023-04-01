@@ -5,12 +5,10 @@ import getOverlayPlaneModule from './getOverlayPlaneModule.js';
 import metaDataManager from '../metaDataManager.js';
 import getValue from './getValue.js';
 import {
-  getImageTypeSubItemFromMetadata,
   extractOrientationFromMetadata,
   extractPositionFromMetadata,
-  extractSpacingFromMetadata,
-  extractSliceThicknessFromMetadata,
 } from './extractPositioningFromMetadata.js';
+import { getImageTypeSubItemFromMetadata } from './NMHelpers.js';
 
 import {
   getMultiframeInformation,
@@ -96,8 +94,8 @@ function metaDataProvider(type, imageId) {
       imageSubType,
       imageOrientationPatient: extractOrientationFromMetadata(metaData),
       imagePositionPatient: extractPositionFromMetadata(metaData),
-      sliceThickness: extractSliceThicknessFromMetadata(metaData),
-      pixelSpacing: extractSpacingFromMetadata(metaData),
+      sliceThickness: getNumberValue(metaData['00180050']),
+      pixelSpacing: getNumberValues(metaData['00280030'], 2),
       numberOfFrames: getNumberValue(metaData['00280008']),
       isNMReconstructable:
         isNMReconstructable(imageSubType) && modality.includes('NM'),
@@ -107,7 +105,7 @@ function metaDataProvider(type, imageId) {
   if (type === 'imagePlaneModule') {
     const imageOrientationPatient = extractOrientationFromMetadata(metaData);
     const imagePositionPatient = extractPositionFromMetadata(metaData);
-    const pixelSpacing = extractSpacingFromMetadata(metaData);
+    const pixelSpacing = getNumberValues(metaData['00280030'], 2);
 
     let columnPixelSpacing = null;
 
@@ -143,7 +141,7 @@ function metaDataProvider(type, imageId) {
       rowCosines,
       columnCosines,
       imagePositionPatient,
-      sliceThickness: extractSliceThicknessFromMetadata(metaData),
+      sliceThickness: getNumberValue(metaData['00180050']),
       sliceLocation: getNumberValue(metaData['00201041']),
       pixelSpacing,
       rowPixelSpacing,

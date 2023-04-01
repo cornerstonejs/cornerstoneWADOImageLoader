@@ -25,7 +25,7 @@ module.exports = {
     path: outputPath,
     publicPath: 'auto',
   },
-  devtool: 'source-map',
+  devtool: 'eval-source-map',
   externals: {
     'dicom-parser': {
       commonjs: 'dicom-parser',
@@ -72,6 +72,9 @@ module.exports = {
         exclude: [/(node_modules)/, /(codecs)/],
         use: {
           loader: 'babel-loader',
+          options: {
+            cacheDirectory: true,
+          },
         },
       },
       {

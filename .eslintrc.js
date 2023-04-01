@@ -35,7 +35,6 @@ module.exports = {
       },
     ],
     'comma-style': 'warn',
-    complexity: 'warn',
     'computed-property-spacing': 'warn',
     'consistent-this': 'warn',
     curly: 'warn',
