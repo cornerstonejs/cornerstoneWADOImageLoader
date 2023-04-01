@@ -10,7 +10,6 @@ import {
  * from the Detector Information Sequence (for NM images) if image type equal
  * to RECON TOMO or RECON GATED TOMO
  * @param {*} metaData
- * @returns
  */
 function extractOrientationFromMetadata(metaData) {
   let imageOrientationPatient = getNumberValues(metaData['00200037'], 6);
@@ -32,7 +31,6 @@ function extractOrientationFromMetadata(metaData) {
  * from the Detector Information Sequence (for NM images) if image type equal
  * to RECON TOMO or RECON GATED TOMO
  * @param {*} metaData
- * @returns
  */
 function extractPositionFromMetadata(metaData) {
   let imagePositionPatient = getNumberValues(metaData['00200032'], 3);
