@@ -23,7 +23,6 @@ function getImageTypeSubItemFromDataset(dataSet, index) {
  * Extracts the orientation from NM multiframe dataset, if image type
  * equal to RECON TOMO or RECON GATED TOMO
  * @param {*} dataSet
- * @returns
  */
 function extractOrientationFromNMMultiframeDataset(dataSet) {
   let imageOrientationPatient;
@@ -50,7 +49,6 @@ function extractOrientationFromNMMultiframeDataset(dataSet) {
  * Extracts the position from NM multiframe dataset, if image type
  * equal to RECON TOMO or RECON GATED TOMO
  * @param {*} dataSet
- * @returns
  */
 function extractPositionFromNMMultiframeDataset(dataSet) {
   let imagePositionPatient;
@@ -78,7 +76,6 @@ function extractPositionFromNMMultiframeDataset(dataSet) {
  * from the Detector Information Sequence (for NM images) if image type equal
  * to RECON TOMO or RECON GATED TOMO
  * @param {*} dataSet
- * @returns
  */
 function extractOrientationFromDataset(dataSet) {
   let imageOrientationPatient = getNumberValues(dataSet, 'x00200037', 6);
@@ -109,7 +106,6 @@ function extractOrientationFromDataset(dataSet) {
  * from the Detector Information Sequence (for NM images) if image type equal
  * to RECON TOMO or RECON GATED TOMO
  * @param {*} dataSet
- * @returns
  */
 function extractPositionFromDataset(dataSet) {
   let imagePositionPatient = getNumberValues(dataSet, 'x00200032', 3);
@@ -136,7 +132,6 @@ function extractPositionFromDataset(dataSet) {
  * Extract the pixelSpacing information. If exists, extracts this information
  * from Pixel Measures Sequence
  * @param {*} dataSet
- * @returns
  */
 function extractSpacingFromDataset(dataSet) {
   let pixelSpacing = getNumberValues(dataSet, 'x00280030', 2);
@@ -158,7 +153,6 @@ function extractSpacingFromDataset(dataSet) {
  * Extract the sliceThickness information. If exists, extracts this information
  * from Pixel Measures Sequence
  * @param {*} dataSet
- * @returns
  */
 function extractSliceThicknessFromDataset(dataSet) {
   let sliceThickness;
