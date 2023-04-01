@@ -4,12 +4,18 @@ import getNumberValue from './getNumberValue.js';
 import getOverlayPlaneModule from './getOverlayPlaneModule.js';
 import metaDataManager from '../metaDataManager.js';
 import getValue from './getValue.js';
-//import fixNMMetadata from './fixNMMetadata.js';
+import {
+  extractOrientationFromMetadata,
+  extractPositionFromMetadata,
+} from './extractPositioningFromMetadata.js';
+import { getImageTypeSubItemFromMetadata } from './NMHelpers.js';
+
 import {
   getMultiframeInformation,
   getFrameInformation,
 } from '../combineFrameInstance.js';
 import multiframeMetadata from '../retrieveMultiframeMetadata.js';
+import isNMReconstructable from '../../isNMReconstructable.js';
 
 function metaDataProvider(type, imageId) {
   if (type === 'multiframeModule') {
@@ -78,10 +84,27 @@ function metaDataProvider(type, imageId) {
     };
   }
 
+  if (type === 'nmMultiframeGeometryModule') {
+    const modality = getValue(metaData['00080060']);
+    const imageSubType = getImageTypeSubItemFromMetadata(metaData, 2);
+
+    return {
+      modality,
+      imageType: getValue(metaData['00080008']),
+      imageSubType,
+      imageOrientationPatient: extractOrientationFromMetadata(metaData),
+      imagePositionPatient: extractPositionFromMetadata(metaData),
+      sliceThickness: getNumberValue(metaData['00180050']),
+      pixelSpacing: getNumberValues(metaData['00280030'], 2),
+      numberOfFrames: getNumberValue(metaData['00280008']),
+      isNMReconstructable:
+        isNMReconstructable(imageSubType) && modality.includes('NM'),
+    };
+  }
+
   if (type === 'imagePlaneModule') {
-    //metaData = fixNMMetadata(metaData);
-    const imageOrientationPatient = getNumberValues(metaData['00200037'], 6);
-    const imagePositionPatient = getNumberValues(metaData['00200032'], 3);
+    const imageOrientationPatient = extractOrientationFromMetadata(metaData);
+    const imagePositionPatient = extractPositionFromMetadata(metaData);
     const pixelSpacing = getNumberValues(metaData['00280030'], 2);
 
     let columnPixelSpacing = null;

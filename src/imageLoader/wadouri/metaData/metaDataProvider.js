@@ -8,6 +8,14 @@ import getLUTs from './getLUTs.js';
 import getModalityLUTOutputPixelRepresentation from './getModalityLUTOutputPixelRepresentation.js';
 import { getDirectFrameInformation } from '../combineFrameInstanceDataset.js';
 import multiframeDataset from '../retrieveMultiframeDataset.js';
+import {
+  getImageTypeSubItemFromDataset,
+  extractOrientationFromDataset,
+  extractPositionFromDataset,
+  extractSpacingFromDataset,
+  extractSliceThicknessFromDataset,
+} from './extractPositioningFromDataset.js';
+import isNMReconstructable from '../../isNMReconstructable.js';
 
 function metaDataProvider(type, imageId) {
   const parsedImageId = parseImageId(imageId);
@@ -31,7 +39,12 @@ function metaDataProvider(type, imageId) {
 
   const { dicomParser } = external;
 
-  const dataSet = dataSetCacheManager.get(parsedImageId.url);
+  let url = parsedImageId.url;
+
+  if (parsedImageId.frame) {
+    url = `${url}&frame=${parsedImageId.frame}`;
+  }
+  const dataSet = dataSetCacheManager.get(url);
 
   if (!dataSet) {
     return;
@@ -59,9 +72,25 @@ function metaDataProvider(type, imageId) {
   }
 
   if (type === 'imagePlaneModule') {
-    const imageOrientationPatient = getNumberValues(dataSet, 'x00200037', 6);
-    const imagePositionPatient = getNumberValues(dataSet, 'x00200032', 3);
-    const pixelSpacing = getNumberValues(dataSet, 'x00280030', 2);
+    const imageOrientationPatient = extractOrientationFromDataset(dataSet);
+
+    const imagePositionPatient = extractPositionFromDataset(dataSet);
+
+    const pixelSpacing = extractSpacingFromDataset(dataSet);
+
+    let frameOfReferenceUID;
+
+    if (dataSet.elements.x00200052) {
+      frameOfReferenceUID = dataSet.string('x00200052');
+    }
+
+    const sliceThickness = extractSliceThicknessFromDataset(dataSet);
+
+    let sliceLocation;
+
+    if (dataSet.elements.x00201041) {
+      sliceLocation = dataSet.floatString('x00201041');
+    }
 
     let columnPixelSpacing = null;
 
@@ -90,18 +119,36 @@ function metaDataProvider(type, imageId) {
     }
 
     return {
-      frameOfReferenceUID: dataSet.string('x00200052'),
+      frameOfReferenceUID,
       rows: dataSet.uint16('x00280010'),
       columns: dataSet.uint16('x00280011'),
       imageOrientationPatient,
       rowCosines,
       columnCosines,
       imagePositionPatient,
-      sliceThickness: dataSet.floatString('x00180050'),
-      sliceLocation: dataSet.floatString('x00201041'),
+      sliceThickness,
+      sliceLocation,
       pixelSpacing,
       rowPixelSpacing,
       columnPixelSpacing,
+    };
+  }
+
+  if (type === 'nmMultiframeGeometryModule') {
+    const modality = dataSet.string('x00080060');
+    const imageSubType = getImageTypeSubItemFromDataset(dataSet, 2);
+
+    return {
+      modality,
+      imageType: dataSet.string('x00080008'),
+      imageSubType,
+      imageOrientationPatient: extractOrientationFromDataset(dataSet),
+      imagePositionPatient: extractPositionFromDataset(dataSet),
+      sliceThickness: extractSliceThicknessFromDataset(dataSet),
+      pixelSpacing: extractSpacingFromDataset(dataSet),
+      numberOfFrames: dataSet.uint16('x00280008'),
+      isNMReconstructable:
+        isNMReconstructable(imageSubType) && modality.includes('NM'),
     };
   }
 
