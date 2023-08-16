@@ -153,7 +153,7 @@ function loadImage(imageId, options = {}) {
     return loadImageFromDataSet(
       dataSet,
       imageId,
-      parsedImageId.frame,
+      Math.max(0, parsedImageId.frame - 1),
       parsedImageId.url,
       options
     );
@@ -169,7 +169,7 @@ function loadImage(imageId, options = {}) {
   return loadImageFromPromise(
     dataSetPromise,
     imageId,
-    parsedImageId.frame,
+    Math.max(0, parsedImageId.frame - 1),
     parsedImageId.url,
     options
   );
