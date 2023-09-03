@@ -90,7 +90,7 @@
     "open-cli": "^7.0.1",
     "prettier": "^2.3.2",
     "puppeteer": "^10.2.0",
-    "semantic-release": "^17.4.7",
+    "semantic-release": "^19.0.3",
     "shx": "^0.3.3",
     "terser-webpack-plugin": "^5.2.2",
     "webpack": "^5.51.2",
