@@ -15,6 +15,31 @@ function addDecache(imageLoadObject, imageId) {
   };
 }
 
+window.store = {};
+
+function updateTime(imageId, time) {
+  const SeriesInstanceUID = getSeriesInstanceUIDFromImageId(imageId);
+
+  if (!window.store[SeriesInstanceUID]) {
+    window.store[SeriesInstanceUID] = {};
+  }
+
+  if (!window.store[SeriesInstanceUID][imageId]) {
+    window.store[SeriesInstanceUID][imageId] = [time];
+  } else {
+    window.store[SeriesInstanceUID][imageId].push(time);
+  }
+}
+
+function getSeriesInstanceUIDFromImageId(imageId) {
+  const [, imageIdWithNoDicomWeb] = imageId.split('dicomweb:');
+  const url = new URL(imageIdWithNoDicomWeb);
+  const { pathname } = url;
+  const [emptyString, userId, SeriesInstanceUID] = pathname.split('/');
+
+  return SeriesInstanceUID;
+}
+
 function loadImageFromPromise(
   dataSetPromise,
   imageId,
@@ -27,6 +52,10 @@ function loadImageFromPromise(
   const imageLoadObject = {
     cancelFn: undefined,
   };
+
+  const startTime = performance.now();
+
+  updateTime(imageId, startTime);
 
   imageLoadObject.promise = new Promise((resolve, reject) => {
     dataSetPromise.then(
@@ -58,6 +87,10 @@ function loadImageFromPromise(
               callbacks.imageDoneCallback(image);
             }
             resolve(image);
+
+            const endTime = performance.now();
+
+            updateTime(imageId, endTime);
           },
           function (error) {
             // Reject the error, and the dataSet
