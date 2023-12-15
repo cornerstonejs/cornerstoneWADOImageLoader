@@ -106,9 +106,15 @@ self.onmessage = async function (msg) {
   // dispatch the message if there is a handler registered for it
   if (taskHandlers[msg.data.taskType]) {
     try {
+      console.log(
+        'POST MESSAGE DATA:',
+        taskHandlers[msg.data.taskType].handler(msg.data)
+      );
       const { result, transferList } = await taskHandlers[
         msg.data.taskType
       ].handler(msg.data);
+
+      console.log('WEB WORKER RESULTS:', result);
 
       self.postMessage(
         {
